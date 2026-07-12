@@ -1,13 +1,71 @@
-// ===== ТОВАРЫ =====
+// ===== ТОВАРЫ (новый ассортимент) =====
 const products = [
-    { id: 1, name: 'Клубничный лёд', brand: 'PodKing', price: 590, category: 'fruit', emoji: '🍓' },
-    { id: 2, name: 'Манго-маракуйя', brand: 'VapeLab', price: 650, category: 'fruit', emoji: '🥭' },
-    { id: 3, name: 'Карамельный чизкейк', brand: 'SweetCloud', price: 720, category: 'dessert', emoji: '🍰' },
-    { id: 4, name: 'Мятный холодок', brand: 'Frosty', price: 540, category: 'menthol', emoji: '❄️' },
-    { id: 5, name: 'Виноград-яблоко', brand: 'PodKing', price: 610, category: 'fruit', emoji: '🍇' },
-    { id: 6, name: 'Ванильный крем', brand: 'SweetCloud', price: 690, category: 'dessert', emoji: '🍦' },
-    { id: 7, name: 'Эвкалипт-мята', brand: 'Frosty', price: 560, category: 'menthol', emoji: '🌿' },
-    { id: 8, name: 'Персик-нектарин', brand: 'VapeLab', price: 630, category: 'fruit', emoji: '🍑' },
+    // Rick and Morty Bad acid (15)
+    { id: 1, name: 'Ананасовый леденец', brand: 'Rick and Morty Bad acid', price: 15, emoji: '🍍' },
+    { id: 2, name: 'Киви лайм', brand: 'Rick and Morty Bad acid', price: 15, emoji: '🥝' },
+    { id: 3, name: 'Клюква лайм', brand: 'Rick and Morty Bad acid', price: 15, emoji: '🍒' },
+    { id: 4, name: 'Вишня клюква', brand: 'Rick and Morty Bad acid', price: 15, emoji: '🍒' },
+    // Catswill extra (15)
+    { id: 5, name: 'Кислый швепс грейпфрут', brand: 'Catswill extra', price: 15, emoji: '🍊' },
+    // Подонки Подгон (15)
+    { id: 6, name: 'Апельсин мята', brand: 'Подонки Подгон', price: 15, emoji: '🍊' },
+    { id: 7, name: 'Апельсин', brand: 'Подонки Подгон', price: 15, emoji: '🍊' },
+    // Подонки (15)
+    { id: 8, name: 'Кола сода айс (критикал)', brand: 'Подонки', price: 15, emoji: '🥤' },
+    // Подонки Блуд (15)
+    { id: 9, name: 'Черная смородина', brand: 'Подонки Блуд', price: 15, emoji: '🫐' },
+    { id: 10, name: 'Классический бабл гам', brand: 'Подонки Блуд', price: 15, emoji: '🍬' },
+    { id: 11, name: 'Яблоко виноград', brand: 'Подонки Блуд', price: 15, emoji: '🍏' },
+    { id: 12, name: 'Персиковый лимонад', brand: 'Подонки Блуд', price: 15, emoji: '🍑' },
+    { id: 13, name: 'Скитлс', brand: 'Подонки Блуд', price: 15, emoji: '🍬' },
+    { id: 14, name: 'Сочная малина', brand: 'Подонки Блуд', price: 15, emoji: '🍓' },
+    { id: 15, name: 'Виноград черника', brand: 'Подонки Блуд', price: 15, emoji: '🍇' },
+    { id: 16, name: 'Конфеты смородина мята', brand: 'Подонки Блуд', price: 15, emoji: '🍬' },
+    { id: 17, name: 'Брусничный морс', brand: 'Подонки Блуд', price: 15, emoji: '🍒' },
+    { id: 18, name: 'Кислые вишневые червячки', brand: 'Подонки Блуд', price: 15, emoji: '🍒' },
+    { id: 19, name: 'Банан клубника', brand: 'Подонки Блуд', price: 15, emoji: '🍌' },
+    { id: 20, name: 'Клубника ежевика', brand: 'Подонки Блуд', price: 15, emoji: '🍓' },
+    // Подонки инферно (17)
+    { id: 21, name: 'Клубника грейпфрут малина', brand: 'Подонки инферно', price: 17, emoji: '🍓' },
+    { id: 22, name: 'Клубничная шипучка', brand: 'Подонки инферно', price: 17, emoji: '🍓' },
+    { id: 23, name: 'Клубника банан', brand: 'Подонки инферно', price: 17, emoji: '🍌' },
+    // Anime love zombi (17)
+    { id: 24, name: 'Алоэ виноград', brand: 'Anime love zombi', price: 17, emoji: '🍇' },
+    { id: 25, name: 'Киви клубника', brand: 'Anime love zombi', price: 17, emoji: '🥝' },
+    { id: 26, name: 'Персиковый шейк', brand: 'Anime love zombi', price: 17, emoji: '🍑' },
+    { id: 27, name: 'Морозный рэдбул', brand: 'Anime love zombi', price: 17, emoji: '🐂' },
+    { id: 28, name: 'Арбузный бабл гам', brand: 'Anime love zombi', price: 17, emoji: '🍉' },
+    { id: 29, name: 'Клубничный леденец', brand: 'Anime love zombi', price: 17, emoji: '🍓' },
+    { id: 30, name: 'Ананас киви', brand: 'Anime love zombi', price: 17, emoji: '🍍' },
+    { id: 31, name: 'Малина с кислинкой', brand: 'Anime love zombi', price: 17, emoji: '🍓' },
+    { id: 32, name: 'Фанта маракуйя', brand: 'Anime love zombi', price: 17, emoji: '🍊' },
+    { id: 33, name: 'Лесной микс', brand: 'Anime love zombi', price: 17, emoji: '🌲' },
+    { id: 34, name: 'Мандариновая фанта', brand: 'Anime love zombi', price: 17, emoji: '🍊' },
+    { id: 35, name: 'Вишня лед', brand: 'Anime love zombi', price: 17, emoji: '🍒' },
+    { id: 36, name: 'Ежевичный лимонад', brand: 'Anime love zombi', price: 17, emoji: '🍇' },
+    { id: 37, name: 'Яблоко персик', brand: 'Anime love zombi', price: 17, emoji: '🍏' },
+    { id: 38, name: 'Клубнично-вишневый лимонад', brand: 'Anime love zombi', price: 17, emoji: '🍓' },
+    { id: 39, name: 'Клубника банан', brand: 'Anime love zombi', price: 17, emoji: '🍌' },
+    { id: 40, name: 'Яблоко виноград', brand: 'Anime love zombi', price: 17, emoji: '🍏' },
+    { id: 41, name: 'Энергетик виноград', brand: 'Anime love zombi', price: 17, emoji: '⚡' },
+    // Long злой (17)
+    { id: 42, name: 'Морс из лесных ягод', brand: 'Long злой', price: 17, emoji: '🫐' },
+    { id: 43, name: 'Мандарин персик', brand: 'Long злой', price: 17, emoji: '🍊' },
+    { id: 44, name: 'Клюква апельсин', brand: 'Long злой', price: 17, emoji: '🍒' },
+    { id: 45, name: 'Виноград арбуз', brand: 'Long злой', price: 17, emoji: '🍇' },
+    { id: 46, name: 'Клубника банан', brand: 'Long злой', price: 17, emoji: '🍌' },
+    { id: 47, name: 'Фруктовый мармелад', brand: 'Long злой', price: 17, emoji: '🍬' },
+    { id: 48, name: 'Виноградный чупа-чупс', brand: 'Long злой', price: 17, emoji: '🍬' },
+    { id: 49, name: 'Мята спрайт', brand: 'Long злой', price: 17, emoji: '🌿' },
+    { id: 50, name: 'Персик абрикос', brand: 'Long злой', price: 17, emoji: '🍑' },
+    { id: 51, name: 'Малиновая газировка', brand: 'Long злой', price: 17, emoji: '🍓' },
+    // Rick and Morty & catswill (18)
+    { id: 52, name: 'Арбуз морозная черешня', brand: 'Rick and Morty & catswill', price: 18, emoji: '🍉' },
+    { id: 53, name: 'Фрутелла лайм лимон малина', brand: 'Rick and Morty & catswill', price: 18, emoji: '🍋' },
+    { id: 54, name: 'Малина яблоко лед', brand: 'Rick and Morty & catswill', price: 18, emoji: '🍓' },
+    { id: 55, name: 'Кислые ленточки клубника ежевика', brand: 'Rick and Morty & catswill', price: 18, emoji: '🍓' },
+    { id: 56, name: 'Голубика арбуз лед', brand: 'Rick and Morty & catswill', price: 18, emoji: '🫐' },
+    { id: 57, name: 'Банан дыня мята', brand: 'Rick and Morty & catswill', price: 18, emoji: '🍌' },
 ];
 
 // ===== КОРЗИНА =====
@@ -21,21 +79,37 @@ const cartItems = document.getElementById('cartItems');
 const cartTotal = document.getElementById('cartTotal');
 const overlay = document.getElementById('overlay');
 
+// ===== ФИЛЬТРЫ (создаём кнопки по брендам) =====
+function initFilters() {
+    const container = document.getElementById('filterContainer');
+    const brands = ['Все', ...new Set(products.map(p => p.brand))];
+    container.innerHTML = brands.map(b => `
+        <button class="filter-btn ${b === 'Все' ? 'active' : ''}" data-filter="${b}">${b}</button>
+    `).join('');
+
+    container.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            container.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderProducts(btn.dataset.filter);
+        });
+    });
+}
+
 // ===== ОТРИСОВКА ТОВАРОВ =====
-function renderProducts(filter = 'all') {
-    const filtered = filter === 'all' ? products : products.filter(p => p.category === filter);
+function renderProducts(filter = 'Все') {
+    const filtered = filter === 'Все' ? products : products.filter(p => p.brand === filter);
     
     grid.innerHTML = filtered.map(p => `
         <div class="product-card" data-id="${p.id}">
             <div class="product-card__image">${p.emoji}</div>
             <div class="product-card__name">${p.name}</div>
             <div class="product-card__brand">${p.brand}</div>
-            <div class="product-card__price">${p.price} ₽</div>
+            <div class="product-card__price">${p.price} BYN</div>
             <button class="product-card__btn" data-id="${p.id}">В корзину</button>
         </div>
     `).join('');
 
-    // Вешаем обработчики на кнопки "В корзину"
     document.querySelectorAll('.product-card__btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = parseInt(btn.dataset.id);
@@ -55,7 +129,6 @@ function addToCart(productId) {
     } else {
         cart.push({ ...product, quantity: 1 });
     }
-
     updateCartUI();
 }
 
@@ -67,11 +140,9 @@ function removeFromCart(productId) {
 
 // ===== ОБНОВЛЕНИЕ UI КОРЗИНЫ =====
 function updateCartUI() {
-    // Счётчик в шапке
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     cartCount.textContent = totalItems;
 
-    // Содержимое панели
     if (cart.length === 0) {
         cartItems.innerHTML = '<p class="cart-empty">Корзина пуста</p>';
         cartTotal.textContent = '0';
@@ -82,13 +153,12 @@ function updateCartUI() {
         <div class="cart-item">
             <div class="cart-item__info">
                 <span class="cart-item__name">${item.emoji} ${item.name} × ${item.quantity}</span>
-                <span class="cart-item__price">${item.price} ₽</span>
+                <span class="cart-item__price">${item.price} BYN</span>
             </div>
             <button class="cart-item__remove" data-id="${item.id}">✕</button>
         </div>
     `).join('');
 
-    // Обработчики на кнопки удаления
     document.querySelectorAll('.cart-item__remove').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = parseInt(btn.dataset.id);
@@ -96,7 +166,6 @@ function updateCartUI() {
         });
     });
 
-    // Итого
     const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     cartTotal.textContent = total;
 }
@@ -116,15 +185,6 @@ document.getElementById('cartToggle').addEventListener('click', openCart);
 document.getElementById('cartClose').addEventListener('click', closeCart);
 overlay.addEventListener('click', closeCart);
 
-// ===== ФИЛЬТРЫ =====
-document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderProducts(btn.dataset.filter);
-    });
-});
-
 // ===== ОФОРМЛЕНИЕ ЗАКАЗА =====
 document.getElementById('checkoutBtn').addEventListener('click', () => {
     if (cart.length === 0) {
@@ -132,11 +192,12 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
         return;
     }
     const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    alert(`✅ Заказ оформлен!\nСумма: ${total} ₽\nСпасибо за покупку!`);
+    alert(`✅ Заказ оформлен!\nСумма: ${total} BYN\nСпасибо за покупку!`);
     cart = [];
     updateCartUI();
     closeCart();
 });
 
 // ===== СТАРТ =====
-renderProducts('all');
+initFilters();
+renderProducts('Все');
