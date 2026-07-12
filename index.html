@@ -4,24 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Torgovchik — Жидкости для POD</title>
-    <!-- Подключаем шрифты и стили -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
-
-    <!-- Дополнительный стиль для логотипа (чтобы не менять style.css) -->
-    <style>
-        .hero__logo {
-            width: 240px;
-            height: 240px;
-            border-radius: 50%;
-            object-fit: cover;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
-            background: #fff;
-        }
-        /* на случай, если картинка не загрузится — будет белый фон */
-    </style>
 </head>
 <body>
 
@@ -43,11 +29,10 @@
         <div class="container hero__inner">
             <div class="hero__text">
                 <h1>Лучшие жидкости для POD-систем</h1>
-                <p>Огромный выбор оригинальных жидкостей для POD-систем. Быстрая доставка по Гомелю и всей Беларуси.</p>
+                <p>Огромный выбор оригинальных жидкостей для POD-систем. Работаем в Гомеле и по всей Беларуси.</p>
                 <a href="#catalog" class="btn btn-primary">Смотреть каталог</a>
             </div>
             <div class="hero__image">
-                <!-- Логотип вместо эмодзи -->
                 <img src="https://i.ibb.co/Lq9yvs3/photo-2026-07-10-04-24-53.jpg" alt="Torgovchik logo" class="hero__logo">
             </div>
         </div>
@@ -91,7 +76,7 @@
         </div>
     </footer>
 
-    <!-- ===== КОРЗИНА (выпадающая панель) ===== -->
+    <!-- ===== КОРЗИНА ===== -->
     <div class="cart-panel" id="cartPanel">
         <div class="cart-panel__header">
             <h3>Ваша корзина</h3>
@@ -106,7 +91,6 @@
         </div>
     </div>
 
-    <!-- Затемнение фона при открытой корзине -->
     <div class="overlay" id="overlay"></div>
 
     <script src="script.js"></script>
