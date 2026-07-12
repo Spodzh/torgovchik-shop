@@ -44,11 +44,8 @@
     <section class="catalog" id="catalog">
         <div class="container">
             <h2 class="section-title">Наш ассортимент</h2>
-            <div class="catalog__filters">
-                <button class="filter-btn active" data-filter="all">Все</button>
-                <button class="filter-btn" data-filter="fruit">Фруктовые</button>
-                <button class="filter-btn" data-filter="dessert">Десертные</button>
-                <button class="filter-btn" data-filter="menthol">Ментоловые</button>
+            <div class="catalog__filters" id="filterContainer">
+                <!-- Кнопки фильтров будут добавлены скриптом -->
             </div>
             <div class="catalog__grid" id="productGrid">
                 <!-- Товары будут подгружены из JavaScript -->
@@ -90,7 +87,7 @@
             <p class="cart-empty">Корзина пуста</p>
         </div>
         <div class="cart-panel__footer">
-            <p><strong>Итого: <span id="cartTotal">0</span> ₽</strong></p>
+            <p><strong>Итого: <span id="cartTotal">0</span> BYN</strong></p>
             <button class="btn btn-primary" id="checkoutBtn">Оформить заказ</button>
         </div>
     </div>
