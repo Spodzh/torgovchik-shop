@@ -1,7 +1,7 @@
 // =============================================
 // ===== КОНФИГУРАЦИЯ =====
 // =============================================
-const WORKER_URL = 'https://torgovchik-bot.ernest-chanel.workers.dev/';
+const WORKER_URL = 'https://torgovchik-bot.ernest-chanel.workers.dev'; // УБРАЛ СЛЕШ
 
 // =============================================
 // ===== 1. ТОВАРЫ (ассортимент) =====
@@ -312,7 +312,7 @@ orderForm.addEventListener('submit', async (e) => {
     message += `\n💰 Итого: ${orderData.total} BYN`;
 
     try {
-        // ✅ ОТПРАВЛЯЕМ ЗАПРОС НА WORKER (без токена)
+        // ОТПРАВЛЯЕМ ЗАПРОС НА WORKER
         const response = await fetch(WORKER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
