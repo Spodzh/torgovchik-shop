@@ -10,7 +10,7 @@ const products = [
     // Подонки Подгон (15)
     { id: 6, name: 'Апельсин мята', brand: 'Подонки Подгон', price: 15, emoji: '🍊' },
     { id: 7, name: 'Апельсин', brand: 'Подонки Подгон', price: 15, emoji: '🍊' },
-    // Подонки (15)
+    // Подонки (15) — этот бренд исключён из фильтров, но товар остаётся
     { id: 8, name: 'Кола сода айс (критикал)', brand: 'Подонки', price: 15, emoji: '🥤' },
     // Подонки Блуд (15)
     { id: 9, name: 'Черная смородина', brand: 'Подонки Блуд', price: 15, emoji: '🫐' },
@@ -78,30 +78,24 @@ const cartPanel = document.getElementById('cartPanel');
 const cartItems = document.getElementById('cartItems');
 const cartTotal = document.getElementById('cartTotal');
 const overlay = document.getElementById('overlay');
+const toastContainer = document.getElementById('toastContainer');
 
 // ===== ФИЛЬТРЫ (без "Все") =====
 function initFilters() {
     const container = document.getElementById('filterContainer');
-    // Исключаем бренды, которые не нужны в фильтрах
     const excludeBrands = ['Подонки', 'Catswill extra'];
-    
-    // Получаем уникальные бренды, исключая ненужные
     const brands = [...new Set(products.map(p => p.brand))]
         .filter(brand => !excludeBrands.includes(brand));
     
-    // Создаём кнопки для каждого бренда (без "Все")
     container.innerHTML = brands.map(b => `
         <button class="filter-btn" data-filter="${b}">${b}</button>
     `).join('');
 
-    // По умолчанию активна первая кнопка (первый бренд), либо можно ничего не активировать
     const firstBtn = container.querySelector('.filter-btn');
     if (firstBtn) {
         firstBtn.classList.add('active');
-        // Показываем товары первого бренда при загрузке
         renderProducts(firstBtn.dataset.filter);
     } else {
-        // Если брендов нет (маловероятно), показываем все
         renderProducts('Все');
     }
 
@@ -116,7 +110,6 @@ function initFilters() {
 
 // ===== ОТРИСОВКА ТОВАРОВ =====
 function renderProducts(filter) {
-    // Если filter === 'Все' или filter не задан, показываем все товары
     const filtered = (filter === 'Все' || !filter) ? products : products.filter(p => p.brand === filter);
     
     grid.innerHTML = filtered.map(p => `
@@ -149,6 +142,7 @@ function addToCart(productId) {
         cart.push({ ...product, quantity: 1 });
     }
     updateCartUI();
+    showToast(`✅ ${product.name} добавлен в корзину`, 'success');
 }
 
 // ===== УДАЛЕНИЕ ИЗ КОРЗИНЫ =====
@@ -204,45 +198,171 @@ document.getElementById('cartToggle').addEventListener('click', openCart);
 document.getElementById('cartClose').addEventListener('click', closeCart);
 overlay.addEventListener('click', closeCart);
 
-// ===== ОФОРМЛЕНИЕ ЗАКАЗА =====
+// ===== ТОСТЫ =====
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    const icon = type === 'success' ? '✅' : '❌';
+    toast.innerHTML = `
+        <span class="toast-icon">${icon}</span>
+        <span class="toast-message">${message}</span>
+    `;
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('hide');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА =====
+const orderModal = document.getElementById('orderModal');
+const orderModalClose = document.getElementById('orderModalClose');
+const orderForm = document.getElementById('orderForm');
+const orderMessage = document.getElementById('orderMessage');
+
 document.getElementById('checkoutBtn').addEventListener('click', () => {
     if (cart.length === 0) {
-        alert('Корзина пуста!');
+        showToast('Корзина пуста. Добавьте товары.', 'error');
         return;
     }
-    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    alert(`✅ Заказ оформлен!\nСумма: ${total} BYN\nСпасибо за покупку!`);
-    cart = [];
-    updateCartUI();
-    closeCart();
+    // Открываем модалку
+    orderModal.classList.add('open');
+    orderMessage.style.display = 'none';
+    orderMessage.textContent = '';
 });
 
-// ===== СТАРТ =====
-initFilters();
+orderModalClose.addEventListener('click', () => {
+    orderModal.classList.remove('open');
+});
 
-// =============================================
+overlay.addEventListener('click', () => {
+    orderModal.classList.remove('open');
+});
+
+orderForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const name = document.getElementById('orderName').value.trim();
+    const phone = document.getElementById('orderPhone').value.trim();
+    const address = document.getElementById('orderAddress').value.trim();
+    const comment = document.getElementById('orderComment').value.trim();
+
+    if (!name || !phone) {
+        orderMessage.style.display = 'block';
+        orderMessage.textContent = '⚠️ Пожалуйста, заполните имя и телефон.';
+        orderMessage.style.color = '#ff7777';
+        return;
+    }
+
+    // Формируем данные заказа
+    const orderData = {
+        name,
+        phone,
+        address,
+        comment,
+        items: cart,
+        total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    };
+
+    // Здесь можно отправить данные на сервер или в Telegram
+    console.log('✅ Заказ оформлен:', orderData);
+
+    // Имитация отправки
+    orderMessage.style.display = 'block';
+    orderMessage.textContent = '✅ Заказ успешно отправлен! Мы свяжемся с вами в ближайшее время.';
+    orderMessage.style.color = '#8aff8a';
+
+    // Очищаем корзину через 2 секунды и закрываем модалку
+    setTimeout(() => {
+        cart = [];
+        updateCartUI();
+        closeCart();
+        orderModal.classList.remove('open');
+        // Сбрасываем форму
+        orderForm.reset();
+        orderMessage.style.display = 'none';
+        showToast('✅ Заказ оформлен! Спасибо!', 'success');
+    }, 2000);
+});
+
+// ===== КАТЕГОРИИ (табы) =====
+const categoryBtns = document.querySelectorAll('.category-btn');
+const categoryBtnsMobile = document.querySelectorAll('.category-btn-mobile');
+const categoryContent = document.getElementById('categoryContent');
+
+function switchCategory(category) {
+    // Обновляем активные кнопки (десктоп)
+    categoryBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.category === category);
+    });
+    // Мобильные
+    categoryBtnsMobile.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.category === category);
+    });
+
+    // Рендерим контент
+    if (category === 'liquids') {
+        categoryContent.innerHTML = `
+            <div class="category-content active">
+                <div class="catalog__filters" id="filterContainer"></div>
+                <div class="catalog__grid" id="productGrid"></div>
+            </div>
+        `;
+        // Переинициализируем фильтры и товары
+        initFilters();
+    } else {
+        const titles = {
+            coils: 'Испарители / Картриджи',
+            snus: 'Снюс',
+            disposables: 'Одноразки / Pod-системы'
+        };
+        categoryContent.innerHTML = `
+            <div class="category-content active">
+                <div class="placeholder">
+                    <h3>${titles[category]}</h3>
+                    <p>🛠 Скоро появится!</p>
+                    <p style="font-size: 14px; margin-top: 8px; color: #8888aa;">Следите за обновлениями</p>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// Обработчики для десктопных кнопок
+categoryBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        switchCategory(btn.dataset.category);
+    });
+});
+
+// Обработчики для мобильных кнопок
+categoryBtnsMobile.forEach(btn => {
+    btn.addEventListener('click', () => {
+        switchCategory(btn.dataset.category);
+        // Закрываем мобильное меню
+        burger.classList.remove('active');
+        mobileMenu.classList.remove('open');
+    });
+});
+
 // ===== БУРГЕР-МЕНЮ =====
-// =============================================
 const burger = document.getElementById('burgerBtn');
 const mobileMenu = document.getElementById('mobileMenu');
 
-if (burger && mobileMenu) {
-    burger.addEventListener('click', () => {
-        burger.classList.toggle('active');
-        mobileMenu.classList.toggle('open');
-    });
+burger.addEventListener('click', () => {
+    burger.classList.toggle('active');
+    mobileMenu.classList.toggle('open');
+});
 
-    document.querySelectorAll('.mobile-nav a').forEach(link => {
-        link.addEventListener('click', () => {
-            burger.classList.remove('active');
-            mobileMenu.classList.remove('open');
-        });
-    });
+// Закрываем меню при клике вне его
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.header__inner')) {
+        burger.classList.remove('active');
+        mobileMenu.classList.remove('open');
+    }
+});
 
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.header__inner')) {
-            burger.classList.remove('active');
-            mobileMenu.classList.remove('open');
-        }
-    });
-}
+// ===== СТАРТ =====
+// По умолчанию показываем жидкость
+switchCategory('liquids');
