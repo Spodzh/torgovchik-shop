@@ -16,7 +16,7 @@
         <div class="container header__inner">
             <a href="#" class="logo">Torgovchik</a>
 
-            <!-- Категории (новые табы) -->
+            <!-- Навигация (десктоп) -->
             <nav class="nav nav--desktop" id="categoryNav">
                 <button class="category-btn active" data-category="liquids">Жидкости</button>
                 <button class="category-btn" data-category="coils">Испарители/Картриджи</button>
@@ -66,7 +66,6 @@
     <!-- ===== КАТАЛОГ (АССОРТИМЕНТ) ===== -->
     <section class="catalog" id="catalog">
         <div class="container">
-            <!-- Здесь будет динамический контент: либо жидкости с фильтрами, либо заглушка -->
             <div id="categoryContent">
                 <!-- Заполняется скриптом -->
             </div>
@@ -126,7 +125,7 @@
     <!-- ===== ТОСТЫ ===== -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА ===== -->
+    <!-- ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА (обновлено) ===== -->
     <div class="order-modal" id="orderModal">
         <div class="order-modal__content">
             <button class="order-modal__close" id="orderModalClose">✕</button>
@@ -137,8 +136,8 @@
                     <input type="text" id="orderName" required placeholder="Иван Иванов">
                 </div>
                 <div class="form-group">
-                    <label for="orderPhone">Телефон *</label>
-                    <input type="tel" id="orderPhone" required placeholder="+375 (29) 123-45-67">
+                    <label for="orderTelegram">Ваш Telegram (username) *</label>
+                    <input type="text" id="orderTelegram" required placeholder="@username">
                 </div>
                 <div class="form-group">
                     <label for="orderAddress">Адрес (для доставки)</label>
