@@ -117,19 +117,6 @@ body {
     flex: 1 1 300px;
 }
 
-.hero__tag {
-    display: inline-block;
-    background: rgba(247, 201, 72, 0.12);
-    color: #f7c948;
-    border: 1px solid rgba(247, 201, 72, 0.2);
-    padding: 4px 16px;
-    border-radius: 40px;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    margin-bottom: 16px;
-}
-
 .hero__content h1 {
     font-size: 48px;
     font-weight: 800;
