@@ -325,7 +325,7 @@ body {
     backdrop-filter: blur(8px);
     border: 2px solid rgba(40, 20, 60, 0.6);
     border-radius: 20px;
-    padding: 20px 16px 18px;
+    padding: 20px 16px 12px;
     text-align: center;
     transition: all 0.3s ease;
     display: flex;
@@ -365,7 +365,7 @@ body {
     font-weight: 700;
     font-size: 20px;
     color: #e0c0ff;
-    margin-bottom: 14px;
+    margin-bottom: 8px;
 }
 
 .product-card__btn {
@@ -431,7 +431,7 @@ body {
 }
 
 .contacts__text a {
-    color: #ffffff; /* Ссылка теперь белая */
+    color: #ffffff;
     text-decoration: none;
     font-weight: 600;
 }
@@ -440,17 +440,16 @@ body {
     text-decoration: underline;
 }
 
-/* Иконка Telegram — белая */
 .contacts__icon {
     width: 28px;
     height: 28px;
-    fill: #ffffff; /* Белая заливка */
+    fill: #ffffff;
     transition: fill 0.2s;
     flex-shrink: 0;
 }
 
 .contacts__icon:hover {
-    fill: #e0c0ff; /* При наведении становится фиолетовой (по желанию) */
+    fill: #e0c0ff;
 }
 
 /* ===== ФУТЕР ===== */
