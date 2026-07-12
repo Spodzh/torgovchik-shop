@@ -5,12 +5,12 @@ const products = [
     { id: 2, name: 'Киви лайм', brand: 'Rick and Morty Bad acid', price: 15, emoji: '🥝' },
     { id: 3, name: 'Клюква лайм', brand: 'Rick and Morty Bad acid', price: 15, emoji: '🍒' },
     { id: 4, name: 'Вишня клюква', brand: 'Rick and Morty Bad acid', price: 15, emoji: '🍒' },
-    // Catswill extra (15)
+    // Catswill extra (15) — этот бренд исключён из фильтров, но товар остаётся
     { id: 5, name: 'Кислый швепс грейпфрут', brand: 'Catswill extra', price: 15, emoji: '🍊' },
     // Подонки Подгон (15)
     { id: 6, name: 'Апельсин мята', brand: 'Подонки Подгон', price: 15, emoji: '🍊' },
     { id: 7, name: 'Апельсин', brand: 'Подонки Подгон', price: 15, emoji: '🍊' },
-    // Подонки (15)
+    // Подонки (15) — исключаем из фильтров
     { id: 8, name: 'Кола сода айс (критикал)', brand: 'Подонки', price: 15, emoji: '🥤' },
     // Подонки Блуд (15)
     { id: 9, name: 'Черная смородина', brand: 'Подонки Блуд', price: 15, emoji: '🫐' },
@@ -79,10 +79,20 @@ const cartItems = document.getElementById('cartItems');
 const cartTotal = document.getElementById('cartTotal');
 const overlay = document.getElementById('overlay');
 
-// ===== ФИЛЬТРЫ (создаём кнопки по брендам) =====
+// ===== ФИЛЬТРЫ (создаём кнопки по брендам, исключая "Подонки" и "Catswill extra") =====
 function initFilters() {
     const container = document.getElementById('filterContainer');
-    const brands = ['Все', ...new Set(products.map(p => p.brand))];
+    // Список брендов, которые НЕ должны показываться в фильтрах
+    const excludeBrands = ['Подонки', 'Catswill extra'];
+    
+    // Получаем уникальные бренды
+    const allBrands = [...new Set(products.map(p => p.brand))];
+    // Фильтруем, оставляя только те, которых нет в исключениях
+    const filteredBrands = allBrands.filter(brand => !excludeBrands.includes(brand));
+    
+    // Добавляем "Все" в начало
+    const brands = ['Все', ...filteredBrands];
+    
     container.innerHTML = brands.map(b => `
         <button class="filter-btn ${b === 'Все' ? 'active' : ''}" data-filter="${b}">${b}</button>
     `).join('');
@@ -98,6 +108,7 @@ function initFilters() {
 
 // ===== ОТРИСОВКА ТОВАРОВ =====
 function renderProducts(filter = 'Все') {
+    // Если фильтр "Все", показываем все товары, иначе — только выбранный бренд
     const filtered = filter === 'Все' ? products : products.filter(p => p.brand === filter);
     
     grid.innerHTML = filtered.map(p => `
@@ -203,7 +214,7 @@ initFilters();
 renderProducts('Все');
 
 // =============================================
-// ===== БУРГЕР-МЕНЮ (добавлено для мобильной версии) =====
+// ===== БУРГЕР-МЕНЮ =====
 // =============================================
 const burger = document.getElementById('burgerBtn');
 const mobileMenu = document.getElementById('mobileMenu');
@@ -214,7 +225,7 @@ if (burger && mobileMenu) {
         mobileMenu.classList.toggle('open');
     });
 
-    // Закрываем меню при клике на любую ссылку
+    // Закрываем меню при клике на ссылку
     document.querySelectorAll('.mobile-nav a').forEach(link => {
         link.addEventListener('click', () => {
             burger.classList.remove('active');
@@ -222,7 +233,7 @@ if (burger && mobileMenu) {
         });
     });
 
-    // Закрываем меню при клике вне него (по фону)
+    // Закрываем меню при клике вне его
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.header__inner')) {
             burger.classList.remove('active');
