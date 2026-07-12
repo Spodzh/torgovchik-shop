@@ -1,4 +1,9 @@
 // =============================================
+// ===== КОНФИГУРАЦИЯ =====
+// =============================================
+const WORKER_URL = 'https://torgovchik-bot.ernest-chanel.workers.dev/';
+
+// =============================================
 // ===== 1. ТОВАРЫ (ассортимент) =====
 // =============================================
 const products = [
@@ -238,7 +243,7 @@ function renderProducts(filter) {
 }
 
 // =============================================
-// ===== 6. ФОРМА ЗАКАЗА =====
+// ===== 6. ФОРМА ЗАКАЗА (с отправкой через Worker) =====
 // =============================================
 const orderModal = document.getElementById('orderModal');
 const orderModalClose = document.getElementById('orderModalClose');
@@ -263,7 +268,7 @@ overlay.addEventListener('click', () => {
     orderModal.classList.remove('open');
 });
 
-orderForm.addEventListener('submit', (e) => {
+orderForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const name = document.getElementById('orderName').value.trim();
@@ -294,21 +299,54 @@ orderForm.addEventListener('submit', (e) => {
         total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
     };
 
-    console.log('✅ Заказ оформлен:', orderData);
+    // Формируем текст сообщения
+    let message = `🛒 Новый заказ!\n\n`;
+    message += `👤 Имя: ${orderData.name}\n`;
+    message += `📱 Telegram: ${orderData.telegram}\n`;
+    if (orderData.address) message += `📍 Адрес: ${orderData.address}\n`;
+    if (orderData.comment) message += `💬 Комментарий: ${orderData.comment}\n`;
+    message += `\n📦 Товары:\n`;
+    orderData.items.forEach(item => {
+        message += `  • ${item.emoji} ${item.name} × ${item.quantity} = ${item.price * item.quantity} BYN\n`;
+    });
+    message += `\n💰 Итого: ${orderData.total} BYN`;
 
-    orderMessage.style.display = 'block';
-    orderMessage.textContent = '✅ Заказ успешно отправлен! Мы свяжемся с вами в Telegram.';
-    orderMessage.style.color = '#8aff8a';
+    try {
+        // ✅ ОТПРАВЛЯЕМ ЗАПРОС НА WORKER (без токена)
+        const response = await fetch(WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: message
+            })
+        });
 
-    setTimeout(() => {
-        cart = [];
-        updateCartUI();
-        closeCart();
-        orderModal.classList.remove('open');
-        orderForm.reset();
-        orderMessage.style.display = 'none';
-        showToast('✅ Заказ оформлен! Спасибо!', 'success');
-    }, 2000);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.description || 'Ошибка отправки заказа');
+        }
+
+        // Успешно
+        orderMessage.style.display = 'block';
+        orderMessage.textContent = '✅ Заказ успешно отправлен! Мы свяжемся с вами в Telegram.';
+        orderMessage.style.color = '#8aff8a';
+
+        setTimeout(() => {
+            cart = [];
+            updateCartUI();
+            closeCart();
+            orderModal.classList.remove('open');
+            orderForm.reset();
+            orderMessage.style.display = 'none';
+            showToast('✅ Заказ оформлен! Спасибо!', 'success');
+        }, 2000);
+
+    } catch (error) {
+        console.error('Ошибка отправки:', error);
+        orderMessage.style.display = 'block';
+        orderMessage.textContent = `⚠️ Ошибка: ${error.message}. Попробуйте позже.`;
+        orderMessage.style.color = '#ff7777';
+    }
 });
 
 // =============================================
