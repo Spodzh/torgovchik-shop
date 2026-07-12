@@ -53,29 +53,34 @@ body {
     color: #ffffff;
 }
 
-/* ===== НАВИГАЦИЯ (ДЕСКТОП) ===== */
+/* ===== НАВИГАЦИЯ (ДЕСКТОП) - КАТЕГОРИИ ===== */
 .nav--desktop {
     display: flex;
-    gap: 24px;
+    gap: 8px;
 }
 
-.nav--desktop a {
+.category-btn {
+    background: transparent;
+    border: none;
     color: #c8b0e0;
-    text-decoration: none;
-    font-weight: 400;
-    font-size: 16px;
-    transition: color 0.2s;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 6px 16px;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
 }
 
-.nav--desktop a:link,
-.nav--desktop a:visited,
-.nav--desktop a:hover,
-.nav--desktop a:active {
-    color: #c8b0e0;
-}
-
-.nav--desktop a:hover {
+.category-btn:hover {
     color: #ffffff;
+    background: rgba(255,255,255,0.05);
+}
+
+.category-btn.active {
+    background: #a86eff;
+    color: #1a0a2e;
+    box-shadow: 0 0 20px rgba(255, 80, 180, 0.3);
 }
 
 /* ===== БУРГЕР ===== */
@@ -131,26 +136,23 @@ body {
 .mobile-nav {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
-.mobile-nav a {
+.category-btn-mobile {
+    background: transparent;
+    border: none;
     color: #f0eaff;
-    text-decoration: none;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 500;
     padding: 8px 0;
     border-bottom: 1px solid rgba(255,255,255,0.05);
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
 }
 
-.mobile-nav a:link,
-.mobile-nav a:visited,
-.mobile-nav a:hover,
-.mobile-nav a:active {
-    color: #f0eaff;
-}
-
-.mobile-nav a:hover {
+.category-btn-mobile.active {
     color: #e0c0ff;
 }
 
@@ -274,7 +276,30 @@ body {
     padding: 60px 0 80px;
 }
 
-/* ===== ФИЛЬТРЫ ===== */
+/* Контент категорий */
+.category-content {
+    display: none;
+}
+.category-content.active {
+    display: block;
+}
+
+/* Заглушка для пустых категорий */
+.placeholder {
+    text-align: center;
+    padding: 60px 20px;
+    color: #c8b0e0;
+}
+.placeholder h3 {
+    font-size: 28px;
+    margin-bottom: 12px;
+    color: #e0c0ff;
+}
+.placeholder p {
+    font-size: 18px;
+}
+
+/* ===== ФИЛЬТРЫ (только для жидкостей) ===== */
 .catalog__filters {
     display: flex;
     flex-wrap: wrap;
@@ -582,7 +607,153 @@ body {
     display: block;
 }
 
-/* =========================================== */
+/* ===== ТОСТЫ ===== */
+.toast-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 320px;
+}
+
+.toast {
+    background: rgba(26, 10, 46, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(200, 150, 255, 0.2);
+    border-radius: 16px;
+    padding: 14px 20px;
+    color: #f0eaff;
+    box-shadow: 0 8px 30px rgba(255, 80, 180, 0.15);
+    animation: slideIn 0.3s ease forwards;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toast.hide {
+    animation: slideOut 0.3s ease forwards;
+}
+
+.toast-icon {
+    font-size: 20px;
+}
+.toast-message {
+    font-size: 14px;
+    flex: 1;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+/* ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА ===== */
+.order-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 250;
+    align-items: center;
+    justify-content: center;
+}
+
+.order-modal.open {
+    display: flex;
+}
+
+.order-modal__content {
+    background: #2d1b4e;
+    border-radius: 24px;
+    padding: 32px 28px;
+    max-width: 480px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid rgba(200, 150, 255, 0.2);
+    box-shadow: 0 20px 60px rgba(255, 80, 180, 0.2);
+    position: relative;
+}
+
+.order-modal__close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #c8b0e0;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.order-modal__close:hover {
+    color: #ffffff;
+}
+
+.order-modal__content h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #f0eaff;
+    margin-bottom: 24px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: #c8b0e0;
+    margin-bottom: 6px;
+    font-size: 15px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: #f0eaff;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    transition: border 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #a86eff;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+#orderSubmit {
+    width: 100%;
+    margin-top: 8px;
+}
+
+#orderMessage {
+    margin-top: 16px;
+    font-size: 16px;
+}
+
 /* ===== АДАПТИВ ===== */
 @media (max-width: 768px) {
     .nav--desktop {
@@ -592,8 +763,8 @@ body {
         display: flex;
     }
 
-    .mobile-nav a {
-        font-size: 20px;
+    .mobile-nav .category-btn-mobile {
+        font-size: 18px;
     }
 
     .catalog__filters {
@@ -615,6 +786,10 @@ body {
     .section-title {
         font-size: 26px;
         padding: 10px 18px;
+    }
+
+    .order-modal__content {
+        padding: 24px 20px;
     }
 }
 
