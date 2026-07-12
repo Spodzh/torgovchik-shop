@@ -65,13 +65,21 @@ body {
     transition: color 0.2s;
 }
 
+/* Явно задаём цвет для всех состояний ссылок, чтобы не было фиолетового */
+.nav--desktop a:link,
+.nav--desktop a:visited,
+.nav--desktop a:hover,
+.nav--desktop a:active {
+    color: #b0aaa0;
+}
+
 .nav--desktop a:hover {
     color: #f7c948;
 }
 
-/* ===== БУРГЕР ===== */
+/* ===== БУРГЕР (по умолчанию скрыт, появляется на мобильных) ===== */
 .burger {
-    display: none;
+    display: none; /* скрыт на десктопе */
     flex-direction: column;
     gap: 5px;
     background: transparent;
@@ -87,6 +95,7 @@ body {
     background: #f0ece4;
     transition: 0.3s;
     border-radius: 2px;
+    display: block; /* убеждаемся, что полоски видны */
 }
 
 .burger.active span:nth-child(1) {
@@ -127,10 +136,18 @@ body {
 .mobile-nav a {
     color: #f0ece4;
     text-decoration: none;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 500;
     padding: 8px 0;
     border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Явно задаём цвет для всех состояний ссылок в мобильном меню */
+.mobile-nav a:link,
+.mobile-nav a:visited,
+.mobile-nav a:hover,
+.mobile-nav a:active {
+    color: #f0ece4;
 }
 
 .mobile-nav a:hover {
@@ -557,15 +574,13 @@ body {
         display: none;
     }
     .burger {
-        display: flex;
+        display: flex; /* показываем бургер */
     }
 
-    /* Увеличиваем шрифт в мобильном меню и навигации */
     .mobile-nav a {
         font-size: 20px;
     }
 
-    /* Фильтры: переносим, увеличиваем отступы */
     .catalog__filters {
         gap: 8px;
     }
@@ -657,7 +672,6 @@ body {
         font-size: 14px;
     }
 
-    /* Фильтры: делаем кнопки чуть меньше, чтобы умещались */
     .filter-btn {
         font-size: 12px;
         padding: 5px 12px;
