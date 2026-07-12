@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Torgovchik — Жидкости для POD</title>
+    <!-- Подключаем шрифты и стили -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- ===== ШАПКА ===== -->
+    <header class="header">
+        <div class="container header__inner">
+            <a href="#" class="logo">🍋 Torgovchik</a>
+            <nav class="nav">
+                <a href="#catalog">Каталог</a>
+                <a href="#about">О нас</a>
+                <a href="#contacts">Контакты</a>
+            </nav>
+            <button class="cart-btn" id="cartToggle">🛒 Корзина (<span id="cartCount">0</span>)</button>
+        </div>
+    </header>
+
+    <!-- ===== ГЛАВНЫЙ БАННЕР ===== -->
+    <section class="hero">
+        <div class="container hero__inner">
+            <div class="hero__text">
+                <h1>Лучшие жидкости для POD-систем</h1>
+                <p>Огромный выбор вкусов, только оригинальные бренды. Доставка по всей России.</p>
+                <a href="#catalog" class="btn btn-primary">Смотреть каталог</a>
+            </div>
+            <div class="hero__image">
+                <!-- Можно заменить на свою картинку -->
+                <div class="hero__placeholder">🍓</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== КАТАЛОГ ===== -->
+    <section class="catalog" id="catalog">
+        <div class="container">
+            <h2 class="section-title">Наш ассортимент</h2>
+            <div class="catalog__filters">
+                <button class="filter-btn active" data-filter="all">Все</button>
+                <button class="filter-btn" data-filter="fruit">Фруктовые</button>
+                <button class="filter-btn" data-filter="dessert">Десертные</button>
+                <button class="filter-btn" data-filter="menthol">Ментоловые</button>
+            </div>
+            <div class="catalog__grid" id="productGrid">
+                <!-- Товары будут подгружены из JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== О НАС ===== -->
+    <section class="about" id="about">
+        <div class="container">
+            <h2 class="section-title">О нас</h2>
+            <p>Мы — команда Torgovchik, и мы любим своё дело. Все жидкости проходят проверку качества, а наши цены — одни из самых низких на рынке. Работаем с 2020 года, тысячи довольных клиентов.</p>
+        </div>
+    </section>
+
+    <!-- ===== КОНТАКТЫ ===== -->
+    <section class="contacts" id="contacts">
+        <div class="container">
+            <h2 class="section-title">Контакты</h2>
+            <p>📱 Telegram: <a href="https://t.me/Torgovchik" target="_blank">@Torgovchik</a></p>
+            <p>📧 Email: torgovchik@example.com</p>
+        </div>
+    </section>
+
+    <!-- ===== ФУТЕР ===== -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 Torgovchik. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <!-- ===== КОРЗИНА (выпадающая панель) ===== -->
+    <div class="cart-panel" id="cartPanel">
+        <div class="cart-panel__header">
+            <h3>Ваша корзина</h3>
+            <button class="cart-panel__close" id="cartClose">✕</button>
+        </div>
+        <div class="cart-panel__body" id="cartItems">
+            <p class="cart-empty">Корзина пуста</p>
+        </div>
+        <div class="cart-panel__footer">
+            <p><strong>Итого: <span id="cartTotal">0</span> ₽</strong></p>
+            <button class="btn btn-primary" id="checkoutBtn">Оформить заказ</button>
+        </div>
+    </div>
+
+    <!-- Затемнение фона при открытой корзине -->
+    <div class="overlay" id="overlay"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
