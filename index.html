@@ -7,7 +7,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css" />
+    <!-- Подключаем все CSS -->
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/header.css" />
+    <link rel="stylesheet" href="css/catalog.css" />
+    <link rel="stylesheet" href="css/cart.css" />
+    <link rel="stylesheet" href="css/modal.css" />
+    <link rel="stylesheet" href="css/toast.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
 </head>
 <body>
 
@@ -125,7 +132,7 @@
     <!-- ===== ТОСТЫ ===== -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА (обновлено) ===== -->
+    <!-- ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА ===== -->
     <div class="order-modal" id="orderModal">
         <div class="order-modal__content">
             <button class="order-modal__close" id="orderModalClose">✕</button>
@@ -155,6 +162,14 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Подключаем все JS -->
+    <script src="js/products.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/order-form.js"></script>
+    <script src="js/categories.js"></script>
+    <script src="js/burger.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
