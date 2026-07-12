@@ -1,4 +1,4 @@
-// ===== ТОВАРЫ (новый ассортимент) =====
+// ===== ТОВАРЫ (ассортимент) =====
 const products = [
     // Rick and Morty Bad acid (15)
     { id: 1, name: 'Ананасовый леденец', brand: 'Rick and Morty Bad acid', price: 15, emoji: '🍍' },
@@ -201,3 +201,32 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
 // ===== СТАРТ =====
 initFilters();
 renderProducts('Все');
+
+// =============================================
+// ===== БУРГЕР-МЕНЮ (добавлено для мобильной версии) =====
+// =============================================
+const burger = document.getElementById('burgerBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+
+if (burger && mobileMenu) {
+    burger.addEventListener('click', () => {
+        burger.classList.toggle('active');
+        mobileMenu.classList.toggle('open');
+    });
+
+    // Закрываем меню при клике на любую ссылку
+    document.querySelectorAll('.mobile-nav a').forEach(link => {
+        link.addEventListener('click', () => {
+            burger.classList.remove('active');
+            mobileMenu.classList.remove('open');
+        });
+    });
+
+    // Закрываем меню при клике вне него (по фону)
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.header__inner')) {
+            burger.classList.remove('active');
+            mobileMenu.classList.remove('open');
+        }
+    });
+}
