@@ -23,7 +23,7 @@ body {
 .header {
     background: rgba(13, 13, 13, 0.85);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+    border-bottom: 1px solid rgba(200, 150, 255, 0.2);
     padding: 14px 0;
     position: sticky;
     top: 0;
@@ -42,13 +42,13 @@ body {
 .logo {
     font-size: 24px;
     font-weight: 800;
-    color: #f7c948;
+    color: #d4a0ff; /* фиолетово-розовый */
     text-decoration: none;
     letter-spacing: -0.5px;
 }
 
 .logo:hover {
-    color: #ffd966;
+    color: #ea80fc;
 }
 
 /* ===== НАВИГАЦИЯ (ДЕСКТОП) ===== */
@@ -65,7 +65,6 @@ body {
     transition: color 0.2s;
 }
 
-/* Явно задаём цвет для всех состояний ссылок, чтобы не было фиолетового */
 .nav--desktop a:link,
 .nav--desktop a:visited,
 .nav--desktop a:hover,
@@ -74,12 +73,12 @@ body {
 }
 
 .nav--desktop a:hover {
-    color: #f7c948;
+    color: #d4a0ff;
 }
 
-/* ===== БУРГЕР (по умолчанию скрыт, появляется на мобильных) ===== */
+/* ===== БУРГЕР ===== */
 .burger {
-    display: none; /* скрыт на десктопе */
+    display: none;
     flex-direction: column;
     gap: 5px;
     background: transparent;
@@ -95,7 +94,7 @@ body {
     background: #f0ece4;
     transition: 0.3s;
     border-radius: 2px;
-    display: block; /* убеждаемся, что полоски видны */
+    display: block;
 }
 
 .burger.active span:nth-child(1) {
@@ -108,7 +107,7 @@ body {
     transform: rotate(-45deg) translate(5px, -5px);
 }
 
-/* ===== МОБИЛЬНОЕ МЕНЮ (выпадающее) ===== */
+/* ===== МОБИЛЬНОЕ МЕНЮ ===== */
 .mobile-menu {
     display: none;
     position: absolute;
@@ -118,7 +117,7 @@ body {
     background: rgba(13, 13, 13, 0.98);
     backdrop-filter: blur(12px);
     padding: 20px 24px;
-    border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+    border-bottom: 1px solid rgba(200, 150, 255, 0.2);
     z-index: 90;
     border-radius: 0 0 16px 16px;
 }
@@ -142,7 +141,6 @@ body {
     border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-/* Явно задаём цвет для всех состояний ссылок в мобильном меню */
 .mobile-nav a:link,
 .mobile-nav a:visited,
 .mobile-nav a:hover,
@@ -151,13 +149,13 @@ body {
 }
 
 .mobile-nav a:hover {
-    color: #f7c948;
+    color: #d4a0ff;
 }
 
 /* ===== КОРЗИНА В ШАПКЕ ===== */
 .cart-btn {
     background: transparent;
-    border: 1.5px solid rgba(247, 201, 72, 0.3);
+    border: 1.5px solid rgba(200, 150, 255, 0.3);
     border-radius: 40px;
     padding: 8px 16px;
     cursor: pointer;
@@ -171,12 +169,12 @@ body {
 }
 
 .cart-btn:hover {
-    border-color: #f7c948;
-    background: rgba(247, 201, 72, 0.08);
+    border-color: #d4a0ff;
+    background: rgba(200, 150, 255, 0.08);
 }
 
 .cart-badge {
-    background: #f7c948;
+    background: #d4a0ff;
     color: #0d0d0d;
     border-radius: 30px;
     padding: 0 8px;
@@ -191,7 +189,7 @@ body {
 .hero {
     padding: 60px 0 80px;
     background: radial-gradient(circle at 20% 30%, #1a1a1a, #0d0d0d 80%);
-    border-bottom: 1px solid rgba(255, 215, 0, 0.05);
+    border-bottom: 1px solid rgba(200, 150, 255, 0.05);
 }
 
 .hero__inner {
@@ -202,15 +200,16 @@ body {
 }
 
 .hero__content {
-    flex: 1 1 300px;
+    flex: 1 1 100%;
+    text-align: center;
 }
 
 .hero__content h1 {
     font-size: 48px;
     font-weight: 800;
-    line-height: 1.1;
+    line-height: 1.2;
     margin-bottom: 16px;
-    background: linear-gradient(135deg, #fff 0%, #b0aaa0 100%);
+    background: linear-gradient(135deg, #d4a0ff, #ea80fc);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -220,7 +219,10 @@ body {
     font-size: 18px;
     color: #b0aaa0;
     margin-bottom: 28px;
-    max-width: 480px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.8;
 }
 
 .btn {
@@ -236,65 +238,48 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #f7c948, #e6b73c);
+    background: linear-gradient(135deg, #d4a0ff, #ea80fc);
     color: #0d0d0d;
-    box-shadow: 0 4px 20px rgba(247, 201, 72, 0.25);
+    box-shadow: 0 4px 20px rgba(200, 150, 255, 0.25);
 }
 
 .btn-primary:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(247, 201, 72, 0.35);
-}
-
-.hero__visual {
-    flex: 1 1 200px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-}
-
-.hero__glow {
-    width: 240px;
-    height: 240px;
-    background: radial-gradient(circle, rgba(247, 201, 72, 0.15), transparent 70%);
-    border-radius: 50%;
-    position: absolute;
-}
-
-.hero__icon {
-    font-size: 100px;
-    line-height: 1;
-    filter: drop-shadow(0 0 40px rgba(247, 201, 72, 0.2));
-    animation: float 4s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-16px); }
+    box-shadow: 0 8px 30px rgba(200, 150, 255, 0.35);
 }
 
 /* ===== КАТАЛОГ ===== */
 .section-title {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 700;
     letter-spacing: -0.5px;
     margin-bottom: 28px;
     text-align: center;
     color: #f0ece4;
+    background: rgba(200, 150, 255, 0.08);
+    padding: 12px 20px;
+    border-radius: 60px;
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid rgba(200, 150, 255, 0.15);
 }
 
 .catalog {
     padding: 60px 0 80px;
 }
 
-/* ===== ФИЛЬТРЫ (без скролла) ===== */
+/* ===== ФИЛЬТРЫ ===== */
 .catalog__filters {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
     margin-bottom: 36px;
+    background: rgba(200, 150, 255, 0.04);
+    padding: 16px 20px;
+    border-radius: 60px;
+    border: 1px solid rgba(200, 150, 255, 0.08);
 }
 
 .filter-btn {
@@ -311,14 +296,14 @@ body {
 }
 
 .filter-btn:hover {
-    border-color: rgba(247, 201, 72, 0.3);
+    border-color: rgba(200, 150, 255, 0.3);
     color: #fff;
 }
 
 .filter-btn.active {
-    background: #f7c948;
+    background: #d4a0ff;
     color: #0d0d0d;
-    border-color: #f7c948;
+    border-color: #d4a0ff;
 }
 
 /* ===== КАРТОЧКИ ===== */
@@ -343,7 +328,7 @@ body {
 .product-card:hover {
     transform: translateY(-6px);
     background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(247, 201, 72, 0.2);
+    border-color: rgba(200, 150, 255, 0.2);
     box-shadow: 0 12px 40px rgba(0,0,0,0.5);
 }
 
@@ -368,36 +353,36 @@ body {
 .product-card__price {
     font-weight: 700;
     font-size: 20px;
-    color: #f7c948;
+    color: #d4a0ff;
     margin-bottom: 14px;
 }
 
 .product-card__btn {
-    background: rgba(247, 201, 72, 0.1);
-    border: 1px solid rgba(247, 201, 72, 0.2);
+    background: rgba(200, 150, 255, 0.1);
+    border: 1px solid rgba(200, 150, 255, 0.2);
     border-radius: 40px;
     padding: 10px 0;
     font-weight: 600;
     font-size: 15px;
     cursor: pointer;
     transition: all 0.2s;
-    color: #f7c948;
+    color: #d4a0ff;
     width: 100%;
     margin-top: auto;
 }
 
 .product-card__btn:hover {
-    background: #f7c948;
+    background: #d4a0ff;
     color: #0d0d0d;
-    border-color: #f7c948;
+    border-color: #d4a0ff;
 }
 
 /* ===== О НАС ===== */
 .about {
     padding: 60px 0;
     background: #111111;
-    border-top: 1px solid rgba(255, 255, 255, 0.03);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    border-top: 1px solid rgba(200, 150, 255, 0.03);
+    border-bottom: 1px solid rgba(200, 150, 255, 0.03);
 }
 
 .about__grid {
@@ -410,10 +395,10 @@ body {
 .about__item {
     font-size: 18px;
     color: #b0aaa0;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(200, 150, 255, 0.04);
     padding: 12px 28px;
     border-radius: 60px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(200, 150, 255, 0.08);
 }
 
 /* ===== КОНТАКТЫ ===== */
@@ -429,7 +414,7 @@ body {
 }
 
 .contacts__text a {
-    color: #f7c948;
+    color: #d4a0ff;
     text-decoration: none;
     font-weight: 600;
 }
@@ -444,7 +429,7 @@ body {
     padding: 24px 0;
     text-align: center;
     color: #555;
-    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    border-top: 1px solid rgba(200, 150, 255, 0.03);
 }
 
 /* ===== КОРЗИНА ===== */
@@ -455,7 +440,7 @@ body {
     width: 400px;
     height: 100%;
     background: #141414;
-    border-left: 1px solid rgba(255, 215, 0, 0.1);
+    border-left: 1px solid rgba(200, 150, 255, 0.1);
     padding: 28px 24px;
     transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 200;
@@ -472,7 +457,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(200, 150, 255, 0.1);
     padding-bottom: 16px;
     margin-bottom: 20px;
 }
@@ -506,7 +491,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(200, 150, 255, 0.05);
 }
 
 .cart-item__info {
@@ -541,7 +526,7 @@ body {
 }
 
 .cart-panel__footer {
-    border-top: 1px solid rgba(255,255,255,0.06);
+    border-top: 1px solid rgba(200, 150, 255, 0.1);
     padding-top: 18px;
     margin-top: 18px;
 }
@@ -568,13 +553,13 @@ body {
 }
 
 /* =========================================== */
-/* ===== АДАПТИВ (≤ 768px) ===== */
+/* ===== АДАПТИВ ===== */
 @media (max-width: 768px) {
     .nav--desktop {
         display: none;
     }
     .burger {
-        display: flex; /* показываем бургер */
+        display: flex;
     }
 
     .mobile-nav a {
@@ -583,6 +568,7 @@ body {
 
     .catalog__filters {
         gap: 8px;
+        padding: 12px 16px;
     }
     .filter-btn {
         font-size: 13px;
@@ -595,16 +581,10 @@ body {
     .hero__content p {
         font-size: 16px;
     }
-    .hero__icon {
-        font-size: 70px;
-    }
-    .hero__glow {
-        width: 180px;
-        height: 180px;
-    }
 
     .section-title {
-        font-size: 24px;
+        font-size: 26px;
+        padding: 10px 18px;
     }
 }
 
@@ -628,13 +608,6 @@ body {
     }
     .hero__content p {
         font-size: 15px;
-    }
-    .hero__icon {
-        font-size: 50px;
-    }
-    .hero__glow {
-        width: 140px;
-        height: 140px;
     }
 
     .catalog__grid {
