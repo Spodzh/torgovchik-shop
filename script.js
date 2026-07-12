@@ -10,7 +10,7 @@ const products = [
     // Подонки Подгон (15)
     { id: 6, name: 'Апельсин мята', brand: 'Подонки Подгон', price: 15, emoji: '🍊' },
     { id: 7, name: 'Апельсин', brand: 'Подонки Подгон', price: 15, emoji: '🍊' },
-    // Подонки (15) — этот бренд исключён из фильтров, но товар остаётся
+    // Подонки (15)
     { id: 8, name: 'Кола сода айс (критикал)', brand: 'Подонки', price: 15, emoji: '🥤' },
     // Подонки Блуд (15)
     { id: 9, name: 'Черная смородина', brand: 'Подонки Блуд', price: 15, emoji: '🫐' },
@@ -71,8 +71,7 @@ const products = [
 // ===== КОРЗИНА =====
 let cart = [];
 
-// ===== DOM-ЭЛЕМЕНТЫ =====
-const grid = document.getElementById('productGrid');
+// ===== DOM-ЭЛЕМЕНТЫ (глобальные для корзины и модалок) =====
 const cartCount = document.getElementById('cartCount');
 const cartPanel = document.getElementById('cartPanel');
 const cartItems = document.getElementById('cartItems');
@@ -83,6 +82,7 @@ const toastContainer = document.getElementById('toastContainer');
 // ===== ФИЛЬТРЫ (без "Все") =====
 function initFilters() {
     const container = document.getElementById('filterContainer');
+    if (!container) return;
     const excludeBrands = ['Подонки', 'Catswill extra'];
     const brands = [...new Set(products.map(p => p.brand))]
         .filter(brand => !excludeBrands.includes(brand));
@@ -110,6 +110,8 @@ function initFilters() {
 
 // ===== ОТРИСОВКА ТОВАРОВ =====
 function renderProducts(filter) {
+    const grid = document.getElementById('productGrid');
+    if (!grid) return;
     const filtered = (filter === 'Все' || !filter) ? products : products.filter(p => p.brand === filter);
     
     grid.innerHTML = filtered.map(p => `
@@ -226,7 +228,6 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
         showToast('Корзина пуста. Добавьте товары.', 'error');
         return;
     }
-    // Открываем модалку
     orderModal.classList.add('open');
     orderMessage.style.display = 'none';
     orderMessage.textContent = '';
@@ -255,7 +256,6 @@ orderForm.addEventListener('submit', (e) => {
         return;
     }
 
-    // Формируем данные заказа
     const orderData = {
         name,
         phone,
@@ -265,21 +265,17 @@ orderForm.addEventListener('submit', (e) => {
         total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
     };
 
-    // Здесь можно отправить данные на сервер или в Telegram
     console.log('✅ Заказ оформлен:', orderData);
 
-    // Имитация отправки
     orderMessage.style.display = 'block';
     orderMessage.textContent = '✅ Заказ успешно отправлен! Мы свяжемся с вами в ближайшее время.';
     orderMessage.style.color = '#8aff8a';
 
-    // Очищаем корзину через 2 секунды и закрываем модалку
     setTimeout(() => {
         cart = [];
         updateCartUI();
         closeCart();
         orderModal.classList.remove('open');
-        // Сбрасываем форму
         orderForm.reset();
         orderMessage.style.display = 'none';
         showToast('✅ Заказ оформлен! Спасибо!', 'success');
@@ -292,16 +288,14 @@ const categoryBtnsMobile = document.querySelectorAll('.category-btn-mobile');
 const categoryContent = document.getElementById('categoryContent');
 
 function switchCategory(category) {
-    // Обновляем активные кнопки (десктоп)
+    // Обновляем активные кнопки
     categoryBtns.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.category === category);
     });
-    // Мобильные
     categoryBtnsMobile.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.category === category);
     });
 
-    // Рендерим контент
     if (category === 'liquids') {
         categoryContent.innerHTML = `
             <div class="category-content active">
@@ -309,7 +303,7 @@ function switchCategory(category) {
                 <div class="catalog__grid" id="productGrid"></div>
             </div>
         `;
-        // Переинициализируем фильтры и товары
+        // После создания DOM инициализируем фильтры
         initFilters();
     } else {
         const titles = {
@@ -336,11 +330,9 @@ categoryBtns.forEach(btn => {
     });
 });
 
-// Обработчики для мобильных кнопок
 categoryBtnsMobile.forEach(btn => {
     btn.addEventListener('click', () => {
         switchCategory(btn.dataset.category);
-        // Закрываем мобильное меню
         burger.classList.remove('active');
         mobileMenu.classList.remove('open');
     });
@@ -355,7 +347,6 @@ burger.addEventListener('click', () => {
     mobileMenu.classList.toggle('open');
 });
 
-// Закрываем меню при клике вне его
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.header__inner')) {
         burger.classList.remove('active');
@@ -364,5 +355,4 @@ document.addEventListener('click', (e) => {
 });
 
 // ===== СТАРТ =====
-// По умолчанию показываем жидкость
 switchCategory('liquids');
