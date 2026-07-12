@@ -71,7 +71,7 @@ const products = [
 // ===== КОРЗИНА =====
 let cart = [];
 
-// ===== DOM-ЭЛЕМЕНТЫ (глобальные для корзины и модалок) =====
+// ===== DOM-ЭЛЕМЕНТЫ (глобальные) =====
 const cartCount = document.getElementById('cartCount');
 const cartPanel = document.getElementById('cartPanel');
 const cartItems = document.getElementById('cartItems');
@@ -108,7 +108,7 @@ function initFilters() {
     });
 }
 
-// ===== ОТРИСОВКА ТОВАРОВ =====
+// ===== ОТРИСОВКА ТОВАРОВ (с раскрывающимися карточками) =====
 function renderProducts(filter) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
@@ -120,13 +120,30 @@ function renderProducts(filter) {
             <div class="product-card__name">${p.name}</div>
             <div class="product-card__brand">${p.brand}</div>
             <div class="product-card__price">${p.price} BYN</div>
-            <button class="product-card__btn" data-id="${p.id}">В корзину</button>
+            <button class="product-card__btn" data-id="${p.id}">Добавить в корзину</button>
         </div>
     `).join('');
 
+    // Обработчик клика по карточке (раскрытие/сворачивание)
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Если клик по кнопке "Добавить в корзину" – не переключаем, только добавляем
+            if (e.target.classList.contains('product-card__btn')) return;
+
+            // Закрываем все другие открытые карточки (опционально)
+            document.querySelectorAll('.product-card.expanded').forEach(other => {
+                if (other !== this) other.classList.remove('expanded');
+            });
+            // Переключаем класс на текущей
+            this.classList.toggle('expanded');
+        });
+    });
+
+    // Обработчик кнопки "Добавить в корзину"
     document.querySelectorAll('.product-card__btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const id = parseInt(btn.dataset.id);
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation(); // не даём карточке переключиться при клике на кнопку
+            const id = parseInt(this.dataset.id);
             addToCart(id);
         });
     });
@@ -217,7 +234,7 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА =====
+// ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА (с Telegram) =====
 const orderModal = document.getElementById('orderModal');
 const orderModalClose = document.getElementById('orderModalClose');
 const orderForm = document.getElementById('orderForm');
@@ -245,20 +262,28 @@ orderForm.addEventListener('submit', (e) => {
     e.preventDefault();
     
     const name = document.getElementById('orderName').value.trim();
-    const phone = document.getElementById('orderPhone').value.trim();
+    const telegram = document.getElementById('orderTelegram').value.trim();
     const address = document.getElementById('orderAddress').value.trim();
     const comment = document.getElementById('orderComment').value.trim();
 
-    if (!name || !phone) {
+    if (!name || !telegram) {
         orderMessage.style.display = 'block';
-        orderMessage.textContent = '⚠️ Пожалуйста, заполните имя и телефон.';
+        orderMessage.textContent = '⚠️ Пожалуйста, заполните имя и Telegram.';
+        orderMessage.style.color = '#ff7777';
+        return;
+    }
+
+    // Проверка на наличие @
+    if (!telegram.startsWith('@')) {
+        orderMessage.style.display = 'block';
+        orderMessage.textContent = '⚠️ Укажите Telegram username, начиная с @';
         orderMessage.style.color = '#ff7777';
         return;
     }
 
     const orderData = {
         name,
-        phone,
+        telegram,
         address,
         comment,
         items: cart,
@@ -268,7 +293,7 @@ orderForm.addEventListener('submit', (e) => {
     console.log('✅ Заказ оформлен:', orderData);
 
     orderMessage.style.display = 'block';
-    orderMessage.textContent = '✅ Заказ успешно отправлен! Мы свяжемся с вами в ближайшее время.';
+    orderMessage.textContent = '✅ Заказ успешно отправлен! Мы свяжемся с вами в Telegram.';
     orderMessage.style.color = '#8aff8a';
 
     setTimeout(() => {
@@ -288,7 +313,6 @@ const categoryBtnsMobile = document.querySelectorAll('.category-btn-mobile');
 const categoryContent = document.getElementById('categoryContent');
 
 function switchCategory(category) {
-    // Обновляем активные кнопки
     categoryBtns.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.category === category);
     });
@@ -303,7 +327,6 @@ function switchCategory(category) {
                 <div class="catalog__grid" id="productGrid"></div>
             </div>
         `;
-        // После создания DOM инициализируем фильтры
         initFilters();
     } else {
         const titles = {
@@ -323,7 +346,6 @@ function switchCategory(category) {
     }
 }
 
-// Обработчики для десктопных кнопок
 categoryBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         switchCategory(btn.dataset.category);
