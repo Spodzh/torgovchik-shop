@@ -15,11 +15,30 @@
     <header class="header">
         <div class="container header__inner">
             <a href="#" class="logo">⚡ Torgovchik</a>
-            <nav class="nav">
+
+            <!-- Навигация (десктоп) -->
+            <nav class="nav nav--desktop">
                 <a href="#catalog">Каталог</a>
                 <a href="#about">О нас</a>
                 <a href="#contacts">Контакты</a>
             </nav>
+
+            <!-- Бургер-меню (мобильная версия) -->
+            <button class="burger" id="burgerBtn" aria-label="Меню">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <!-- Мобильное меню (выпадающее) -->
+            <div class="mobile-menu" id="mobileMenu">
+                <nav class="mobile-nav">
+                    <a href="#catalog">Каталог</a>
+                    <a href="#about">О нас</a>
+                    <a href="#contacts">Контакты</a>
+                </nav>
+            </div>
+
             <button class="cart-btn" id="cartToggle">
                 <span class="cart-icon">🛒</span>
                 <span class="cart-badge" id="cartCount">0</span>
@@ -31,7 +50,6 @@
     <section class="hero">
         <div class="container hero__inner">
             <div class="hero__content">
-                <!-- Тег "#1 в Гомеле" удалён -->
                 <h1>Лучшие жидкости<br>для POD-систем</h1>
                 <p>Огромный выбор оригинальных вкусов. Только качественные бренды. Работаем в Гомеле.</p>
                 <a href="#catalog" class="btn btn-primary">Смотреть каталог</a>
