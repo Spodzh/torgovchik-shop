@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Torgovchik — Жидкости для POD</title>
+    <title>Torgovchik — жидкости для POD</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -14,32 +14,39 @@
     <!-- ===== ШАПКА ===== -->
     <header class="header">
         <div class="container header__inner">
-            <a href="#" class="logo">🍋 Torgovchik</a>
+            <a href="#" class="logo">⚡ Torgovchik</a>
             <nav class="nav">
                 <a href="#catalog">Каталог</a>
                 <a href="#about">О нас</a>
                 <a href="#contacts">Контакты</a>
             </nav>
-            <button class="cart-btn" id="cartToggle">🛒 Корзина (<span id="cartCount">0</span>)</button>
+            <button class="cart-btn" id="cartToggle">
+                <span class="cart-icon">🛒</span>
+                <span class="cart-badge" id="cartCount">0</span>
+            </button>
         </div>
     </header>
 
     <!-- ===== ГЛАВНЫЙ БАННЕР ===== -->
     <section class="hero">
         <div class="container hero__inner">
-            <div class="hero__text" style="flex: 1 1 100%; text-align: center;">
-                <h1>Лучшие жидкости для POD-систем</h1>
-                <p>Огромный выбор оригинальных жидкостей для POD-систем. Работаем в Гомеле.</p>
+            <div class="hero__content">
+                <span class="hero__tag">#1 в Гомеле</span>
+                <h1>Лучшие жидкости<br>для POD-систем</h1>
+                <p>Огромный выбор оригинальных вкусов. Только качественные бренды. Работаем в Гомеле.</p>
                 <a href="#catalog" class="btn btn-primary">Смотреть каталог</a>
             </div>
-            <!-- Картинка удалена -->
+            <div class="hero__visual">
+                <div class="hero__glow"></div>
+                <div class="hero__icon">🔥</div>
+            </div>
         </div>
     </section>
 
     <!-- ===== КАТАЛОГ ===== -->
     <section class="catalog" id="catalog">
         <div class="container">
-            <h2 class="section-title">Наш ассортимент</h2>
+            <h2 class="section-title">Ассортимент</h2>
             <div class="catalog__filters" id="filterContainer">
                 <!-- Кнопки фильтров будут добавлены скриптом -->
             </div>
@@ -53,9 +60,11 @@
     <section class="about" id="about">
         <div class="container">
             <h2 class="section-title">О нас</h2>
-            <p>🍓 Оригинальные жидкости.</p>
-            <p>🍓 Вежливый персонал и грамотный подход к каждому.</p>
-            <p>🍓 Выгодные акции и приятные плюшки для клиентов.</p>
+            <div class="about__grid">
+                <div class="about__item">🍓 Оригинальные жидкости</div>
+                <div class="about__item">🤝 Вежливый персонал</div>
+                <div class="about__item">🎁 Выгодные акции</div>
+            </div>
         </div>
     </section>
 
@@ -63,7 +72,7 @@
     <section class="contacts" id="contacts">
         <div class="container">
             <h2 class="section-title">Контакты</h2>
-            <p>📱 Telegram: <a href="https://t.me/+oB1FldrU8v02NjEx" target="_blank">Torgovchik в Telegram</a></p>
+            <p class="contacts__text">📱 Telegram: <a href="https://t.me/+oB1FldrU8v02NjEx" target="_blank">@Torgovchik</a></p>
         </div>
     </section>
 
@@ -77,7 +86,7 @@
     <!-- ===== КОРЗИНА ===== -->
     <div class="cart-panel" id="cartPanel">
         <div class="cart-panel__header">
-            <h3>Ваша корзина</h3>
+            <h3>Корзина</h3>
             <button class="cart-panel__close" id="cartClose">✕</button>
         </div>
         <div class="cart-panel__body" id="cartItems">
