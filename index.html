@@ -9,6 +9,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
+
+    <!-- Дополнительный стиль для логотипа (чтобы не менять style.css) -->
+    <style>
+        .hero__logo {
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            background: #fff;
+        }
+        /* на случай, если картинка не загрузится — будет белый фон */
+    </style>
 </head>
 <body>
 
@@ -30,12 +43,12 @@
         <div class="container hero__inner">
             <div class="hero__text">
                 <h1>Лучшие жидкости для POD-систем</h1>
-                <p>Огромный выбор вкусов, только оригинальные бренды. Доставка по всей России.</p>
+                <p>Огромный выбор оригинальных жидкостей для POD-систем. Быстрая доставка по Гомелю и всей Беларуси.</p>
                 <a href="#catalog" class="btn btn-primary">Смотреть каталог</a>
             </div>
             <div class="hero__image">
-                <!-- Можно заменить на свою картинку -->
-                <div class="hero__placeholder">🍓</div>
+                <!-- Логотип вместо эмодзи -->
+                <img src="https://i.ibb.co/Lq9yvs3/photo-2026-07-10-04-24-53.jpg" alt="Torgovchik logo" class="hero__logo">
             </div>
         </div>
     </section>
@@ -57,7 +70,9 @@
     <section class="about" id="about">
         <div class="container">
             <h2 class="section-title">О нас</h2>
-            <p>Мы — команда Torgovchik, и мы любим своё дело. Все жидкости проходят проверку качества, а наши цены — одни из самых низких на рынке. Работаем с 2020 года, тысячи довольных клиентов.</p>
+            <p>🍓 Оригинальные жидкости.</p>
+            <p>🍓 Вежливый персонал и грамотный подход к каждому.</p>
+            <p>🍓 Выгодные акции и приятные плюшки для клиентов.</p>
         </div>
     </section>
 
@@ -65,8 +80,7 @@
     <section class="contacts" id="contacts">
         <div class="container">
             <h2 class="section-title">Контакты</h2>
-            <p>📱 Telegram: <a href="https://t.me/Torgovchik" target="_blank">@Torgovchik</a></p>
-            <p>📧 Email: torgovchik@example.com</p>
+            <p>📱 Telegram: <a href="https://t.me/+oB1FldrU8v02NjEx" target="_blank">Torgovchik в Telegram</a></p>
         </div>
     </section>
 
