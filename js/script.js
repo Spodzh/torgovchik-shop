@@ -1040,39 +1040,45 @@ document.querySelectorAll('.faq__question').forEach(question => {
 });
 
 // =============================================
-// ===== 11. ВСПЛЫВАЮЩАЯ ПОДСКАЗКА ПРИ КЛИКЕ НА ЛОГОТИП =====
+// ===== ВСПЛЫВАЮЩАЯ ПОДСКАЗКА ПРИ КЛИКЕ НА ЛОГОТИП =====
 // =============================================
-const logo = document.querySelector('.logo');
-const phrases = [
-    'Заказывай жижу :3',
-    'Какой сегодня вкус хочешь?',
-    'Время выбрать свой вкус!',
-    'Хочешь сладкого или мятного?',
-    'Новый день — новый вкус!',
-    'Что-то вкусненькое уже ждёт!',
-    'Лови свой идеальный вкус!',
-    'Сделай выбор — закажи сейчас!',
-    'Клубника, мята, апельсин — всё здесь!',
-    'Найди свой любимый вкус!'
-];
+document.addEventListener('DOMContentLoaded', function() {
+    const logo = document.querySelector('.logo');
+    if (!logo) return;
 
-let tooltipTimeout = null;
+    const phrases = [
+        'Заказывай жижу :3',
+        'Какой сегодня вкус хочешь?',
+        'Время выбрать свой вкус!',
+        'Хочешь сладкого или мятного?',
+        'Новый день — новый вкус!',
+        'Что-то вкусненькое уже ждёт!',
+        'Лови свой идеальный вкус!',
+        'Сделай выбор — закажи сейчас!',
+        'Клубника, мята, апельсин — всё здесь!',
+        'Найди свой любимый вкус!'
+    ];
 
-if (logo) {
+    let tooltipTimeout = null;
+
     logo.addEventListener('click', function(e) {
         e.preventDefault();
 
+        // Удаляем старую подсказку
         const oldTooltip = document.querySelector('.logo-tooltip');
         if (oldTooltip) oldTooltip.remove();
         if (tooltipTimeout) clearTimeout(tooltipTimeout);
 
+        // Случайная фраза
         const randomIndex = Math.floor(Math.random() * phrases.length);
         const phrase = phrases[randomIndex];
 
+        // Создаём элемент
         const tooltip = document.createElement('div');
         tooltip.className = 'logo-tooltip';
         tooltip.textContent = phrase;
 
+        // Позиционируем
         const rect = this.getBoundingClientRect();
         const top = rect.top - 10;
         const left = rect.left + rect.width / 2;
@@ -1085,15 +1091,18 @@ if (logo) {
 
         document.body.appendChild(tooltip);
 
+        // Анимация появления
         requestAnimationFrame(() => {
             tooltip.classList.add('show');
         });
 
+        // Удаление через 2.5 секунды
         tooltipTimeout = setTimeout(() => {
             tooltip.classList.remove('show');
             setTimeout(() => tooltip.remove(), 300);
         }, 2500);
     });
+});
 }
 
 // =============================================
