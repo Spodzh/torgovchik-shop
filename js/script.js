@@ -618,7 +618,6 @@ function showToast(message, type = 'success') {
 function initFilters() {
     const container = document.getElementById('filterContainer');
     if (!container) return;
-    // Фильтруем только жидкости, чтобы создать кнопки по их брендам
     const liquidProducts = products.filter(p => p.category === 'liquids');
     const brands = [...new Set(liquidProducts.map(p => p.brand))];
     
@@ -644,21 +643,17 @@ function initFilters() {
 }
 
 // =============================================
-// ===== 5. ОТРИСОВКА ТОВАРОВ (с учётом категории) =====
+// ===== 5. ОТРИСОВКА ТОВАРОВ =====
 // =============================================
 function renderProducts(category, filter = 'Все') {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
-    // Фильтруем товары по категории
     let filtered = products.filter(p => p.category === category);
-
-    // Если категория 'liquids' и выбран конкретный бренд — дополнительно фильтруем
     if (category === 'liquids' && filter !== 'Все') {
         filtered = filtered.filter(p => p.brand === filter);
     }
 
-    // Если товаров нет — показываем сообщение
     if (filtered.length === 0) {
         grid.innerHTML = `<div class="placeholder"><p>🛠 В этой категории пока нет товаров</p></div>`;
         return;
@@ -674,7 +669,6 @@ function renderProducts(category, filter = 'Все') {
         </div>
     `).join('');
 
-    // Раскрытие карточки
     document.querySelectorAll('.product-card').forEach(card => {
         card.addEventListener('click', function(e) {
             if (e.target.classList.contains('product-card__btn')) return;
@@ -685,7 +679,6 @@ function renderProducts(category, filter = 'Все') {
         });
     });
 
-    // Кнопка "Добавить в корзину"
     document.querySelectorAll('.product-card__btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -696,7 +689,7 @@ function renderProducts(category, filter = 'Все') {
 }
 
 // =============================================
-// ===== 6. ФОРМА ЗАКАЗА =====
+// ===== 6. ФОРМА ЗАКАЗА (с брендом в сообщении) =====
 // =============================================
 const orderModal = document.getElementById('orderModal');
 const orderModalClose = document.getElementById('orderModalClose');
@@ -759,7 +752,8 @@ orderForm.addEventListener('submit', async (e) => {
     if (orderData.comment) message += `💬 Комментарий: ${orderData.comment}\n`;
     message += `\n📦 Товары:\n`;
     orderData.items.forEach(item => {
-        message += `  • ${item.name} × ${item.quantity} = ${item.price * item.quantity} BYN\n`;
+        // ✅ Теперь выводим бренд и название
+        message += `  • ${item.brand} | ${item.name} × ${item.quantity} = ${item.price * item.quantity} BYN\n`;
     });
     message += `\n💰 Итого: ${orderData.total} BYN`;
 
@@ -813,25 +807,21 @@ function switchCategory(category) {
     });
 
     if (category === 'liquids') {
-        // Жидкости — показываем фильтры и сетку
         categoryContent.innerHTML = `
             <div class="category-content active">
                 <div class="catalog__filters" id="filterContainer"></div>
                 <div class="catalog__grid" id="productGrid"></div>
             </div>
         `;
-        initFilters(); // создаст фильтры и вызовет renderProducts для liquids
+        initFilters();
     } else if (category === 'coils') {
-        // Испарители/Картриджи — только сетка, без фильтров
         categoryContent.innerHTML = `
             <div class="category-content active">
                 <div class="catalog__grid" id="productGrid"></div>
             </div>
         `;
-        // Сразу отрисовываем товары категории 'coils'
         renderProducts('coils', 'Все');
     } else {
-        // Остальные категории — заглушка
         const titles = {
             snus: 'Снюс',
             disposables: 'Одноразки / Pod-системы'
