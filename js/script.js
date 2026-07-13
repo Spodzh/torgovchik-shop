@@ -510,6 +510,92 @@ const products = [
         price: 12,
         image: 'https://i.ibb.co/MD9X53XD/image.png',
         category: 'coils'
+    },
+
+    // -------- СНЮС (category: 'snus') --------
+    // DRYMOST 150 Storm
+    {
+        id: 62,
+        name: 'Банановый Бум',
+        brand: 'DRYMOST 150 Storm',
+        price: 15,
+        image: 'https://i.ibb.co/hxsw1mFM/image.png',
+        category: 'snus'
+    },
+    {
+        id: 63,
+        name: 'Мята',
+        brand: 'DRYMOST 150 Storm',
+        price: 15,
+        image: 'https://i.ibb.co/KjLL91n9/image.png',
+        category: 'snus'
+    },
+    {
+        id: 64,
+        name: 'Мята Холодок',
+        brand: 'DRYMOST 150 Storm',
+        price: 15,
+        image: 'https://i.ibb.co/S7HtdjRN/image.png',
+        category: 'snus'
+    },
+    {
+        id: 65,
+        name: 'Ананасовый джем',
+        brand: 'DRYMOST 150 Storm',
+        price: 15,
+        image: 'https://i.ibb.co/KjJp3Jrp/image.png',
+        category: 'snus'
+    },
+    // DRYMOST Armagedon
+    {
+        id: 66,
+        name: 'Яблоко',
+        brand: 'DRYMOST Armagedon',
+        price: 15,
+        image: 'https://i.ibb.co/LDq65nT4/image.png',
+        category: 'snus'
+    },
+    {
+        id: 67,
+        name: 'Мята',
+        brand: 'DRYMOST Armagedon',
+        price: 15,
+        image: 'https://i.ibb.co/tP8z6XZF/image.png',
+        category: 'snus'
+    },
+    {
+        id: 68,
+        name: 'Эвкалипт Мята',
+        brand: 'DRYMOST Armagedon',
+        price: 15,
+        image: 'https://i.ibb.co/C5vk6ZVS/image.png',
+        category: 'snus'
+    },
+    // PODONKI Slick
+    {
+        id: 69,
+        name: 'Ментол',
+        brand: 'PODONKI Slick',
+        price: 15,
+        image: 'https://i.ibb.co/C5SDgSrW/image.png',
+        category: 'snus'
+    },
+    // Glitch Pouches
+    {
+        id: 70,
+        name: 'Аромат ментола',
+        brand: 'Glitch Pouches',
+        price: 15,
+        image: 'https://i.ibb.co/Kjg2PWJW/image.png',
+        category: 'snus'
+    },
+    {
+        id: 71,
+        name: 'Аромат эвкалиптовой мяты',
+        brand: 'Glitch Pouches',
+        price: 15,
+        image: 'https://i.ibb.co/xSvrRvjb/image.png',
+        category: 'snus'
     }
 ];
 
@@ -629,7 +715,6 @@ const promoInput = document.getElementById('promoCode');
 const applyPromoBtn = document.getElementById('applyPromoBtn');
 const promoMessage = document.getElementById('promoMessage');
 
-// Только один промокод spodzh на 13%
 const validPromos = {
     'spodzh': 13
 };
@@ -891,9 +976,15 @@ function switchCategory(category) {
             </div>
         `;
         renderProducts('coils', 'Все');
+    } else if (category === 'snus') {
+        categoryContent.innerHTML = `
+            <div class="category-content active">
+                <div class="catalog__grid" id="productGrid"></div>
+            </div>
+        `;
+        renderProducts('snus', 'Все');
     } else {
         const titles = {
-            snus: 'Снюс',
             disposables: 'Одноразки / Pod-системы'
         };
         categoryContent.innerHTML = `
@@ -947,10 +1038,6 @@ document.querySelectorAll('.faq__question').forEach(question => {
     question.addEventListener('click', function() {
         const parent = this.closest('.faq__item');
         if (!parent) return;
-        // Закрываем все остальные (опционально — можно закомментировать, чтобы открывать несколько)
-        // document.querySelectorAll('.faq__item.open').forEach(item => {
-        //     if (item !== parent) item.classList.remove('open');
-        // });
         parent.classList.toggle('open');
     });
 });
