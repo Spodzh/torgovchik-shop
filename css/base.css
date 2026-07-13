@@ -103,7 +103,7 @@ body {
     line-height: 1.8;
 }
 
-/* ===== О НАС ===== */
+/* ===== О НАС (карточки) ===== */
 .about {
     padding: 60px 0;
     background: rgba(26, 10, 46, 0.4);
@@ -115,17 +115,45 @@ body {
 .about__grid {
     display: flex;
     justify-content: center;
-    gap: 40px;
+    gap: 30px;
     flex-wrap: wrap;
 }
 
-.about__item {
-    font-size: 18px;
-    color: #c8b0e0;
+.about__card {
     background: rgba(255, 255, 255, 0.05);
-    padding: 12px 28px;
-    border-radius: 60px;
-    border: 1px solid rgba(200, 150, 255, 0.1);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 30px 24px;
+    max-width: 300px;
+    flex: 1 1 240px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.about__card:hover {
+    transform: translateY(-6px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(200, 150, 255, 0.3);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.about__icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.about__card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #f0eaff;
+    margin-bottom: 10px;
+}
+
+.about__card p {
+    font-size: 15px;
+    color: #c8b0e0;
+    line-height: 1.5;
 }
 
 /* ===== ЧАСТЫЕ ВОПРОСЫ ===== */
@@ -197,42 +225,45 @@ body {
     padding: 0 20px 20px 20px;
 }
 
-/* ===== КОНТАКТЫ ===== */
+/* ===== КОНТАКТЫ (простой вариант) ===== */
 .contacts {
     padding: 60px 0;
     background: transparent;
 }
 
-.contacts__text {
-    font-size: 18px;
-    color: #c8b0e0;
-    text-align: center;
+.contacts__simple {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-}
-
-.contacts__text a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.contacts__text a:hover {
-    text-decoration: underline;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 .contacts__icon {
-    width: 28px;
-    height: 28px;
     fill: #ffffff;
     transition: fill 0.2s;
-    flex-shrink: 0;
 }
 
 .contacts__icon:hover {
     fill: #e0c0ff;
+}
+
+.contacts__btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #a86eff, #e060b0);
+    color: #1a0a2e;
+    padding: 12px 32px;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 18px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 80, 180, 0.3);
+}
+
+.contacts__btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 80, 180, 0.5);
 }
 
 /* ===== ФУТЕР ===== */
@@ -244,13 +275,40 @@ body {
     border-top: 1px solid rgba(200, 150, 255, 0.05);
 }
 
-/* ===== АДАПТИВ ДЛЯ FAQ ===== */
+/* ===== АДАПТИВ ===== */
+@media (max-width: 768px) {
+    .hero__content h1 {
+        font-size: 36px;
+    }
+    .section-title {
+        font-size: 26px;
+        padding: 10px 18px;
+    }
+}
+
 @media (max-width: 600px) {
+    .hero__content h1 {
+        font-size: 28px;
+    }
+    .hero__content p {
+        font-size: 15px;
+    }
+
+    .about__card {
+        max-width: 100%;
+        flex: 1 1 100%;
+    }
+
     .faq__question {
         font-size: 15px;
         padding: 14px 16px;
     }
     .faq__answer {
         font-size: 14px;
+    }
+
+    .contacts__btn {
+        font-size: 16px;
+        padding: 10px 24px;
     }
 }
