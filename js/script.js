@@ -1,78 +1,417 @@
 // =============================================
 // ===== КОНФИГУРАЦИЯ =====
 // =============================================
-const WORKER_URL = 'https://torgovchik-bot.ernest-chanel.workers.dev'; // УБРАЛ СЛЕШ
+const WORKER_URL = 'https://torgovchik-bot.ernest-chanel.workers.dev/';
 
 // =============================================
-// ===== 1. ТОВАРЫ (ассортимент) =====
+// ===== 1. ТОВАРЫ (ассортимент с картинками) =====
 // =============================================
 const products = [
-    // Rick and Morty Bad acid (15)
-    { id: 1, name: 'Ананасовый леденец', brand: 'Rick and Morty Bad acid', price: 15, emoji: '🍍' },
-    { id: 2, name: 'Киви лайм', brand: 'Rick and Morty Bad acid', price: 15, emoji: '🥝' },
-    { id: 3, name: 'Клюква лайм', brand: 'Rick and Morty Bad acid', price: 15, emoji: '🍒' },
-    { id: 4, name: 'Вишня клюква', brand: 'Rick and Morty Bad acid', price: 15, emoji: '🍒' },
-    // Catswill extra (15)
-    { id: 5, name: 'Кислый швепс грейпфрут', brand: 'Catswill extra', price: 15, emoji: '🍊' },
-    // Подонки Подгон (15)
-    { id: 6, name: 'Апельсин мята', brand: 'Подонки Подгон', price: 15, emoji: '🍊' },
-    { id: 7, name: 'Апельсин', brand: 'Подонки Подгон', price: 15, emoji: '🍊' },
-    // Подонки (15)
-    { id: 8, name: 'Кола сода айс (критикал)', brand: 'Подонки', price: 15, emoji: '🥤' },
-    // Подонки Блуд (15)
-    { id: 9, name: 'Черная смородина', brand: 'Подонки Блуд', price: 15, emoji: '🫐' },
-    { id: 10, name: 'Классический бабл гам', brand: 'Подонки Блуд', price: 15, emoji: '🍬' },
-    { id: 11, name: 'Яблоко виноград', brand: 'Подонки Блуд', price: 15, emoji: '🍏' },
-    { id: 12, name: 'Персиковый лимонад', brand: 'Подонки Блуд', price: 15, emoji: '🍑' },
-    { id: 13, name: 'Скитлс', brand: 'Подонки Блуд', price: 15, emoji: '🍬' },
-    { id: 14, name: 'Сочная малина', brand: 'Подонки Блуд', price: 15, emoji: '🍓' },
-    { id: 15, name: 'Виноград черника', brand: 'Подонки Блуд', price: 15, emoji: '🍇' },
-    { id: 16, name: 'Конфеты смородина мята', brand: 'Подонки Блуд', price: 15, emoji: '🍬' },
-    { id: 17, name: 'Брусничный морс', brand: 'Подонки Блуд', price: 15, emoji: '🍒' },
-    { id: 18, name: 'Кислые вишневые червячки', brand: 'Подонки Блуд', price: 15, emoji: '🍒' },
-    { id: 19, name: 'Банан клубника', brand: 'Подонки Блуд', price: 15, emoji: '🍌' },
-    { id: 20, name: 'Клубника ежевика', brand: 'Подонки Блуд', price: 15, emoji: '🍓' },
-    // Подонки инферно (17)
-    { id: 21, name: 'Клубника грейпфрут малина', brand: 'Подонки инферно', price: 17, emoji: '🍓' },
-    { id: 22, name: 'Клубничная шипучка', brand: 'Подонки инферно', price: 17, emoji: '🍓' },
-    { id: 23, name: 'Клубника банан', brand: 'Подонки инферно', price: 17, emoji: '🍌' },
-    // Anime love zombi (17)
-    { id: 24, name: 'Алоэ виноград', brand: 'Anime love zombi', price: 17, emoji: '🍇' },
-    { id: 25, name: 'Киви клубника', brand: 'Anime love zombi', price: 17, emoji: '🥝' },
-    { id: 26, name: 'Персиковый шейк', brand: 'Anime love zombi', price: 17, emoji: '🍑' },
-    { id: 27, name: 'Морозный рэдбул', brand: 'Anime love zombi', price: 17, emoji: '🐂' },
-    { id: 28, name: 'Арбузный бабл гам', brand: 'Anime love zombi', price: 17, emoji: '🍉' },
-    { id: 29, name: 'Клубничный леденец', brand: 'Anime love zombi', price: 17, emoji: '🍓' },
-    { id: 30, name: 'Ананас киви', brand: 'Anime love zombi', price: 17, emoji: '🍍' },
-    { id: 31, name: 'Малина с кислинкой', brand: 'Anime love zombi', price: 17, emoji: '🍓' },
-    { id: 32, name: 'Фанта маракуйя', brand: 'Anime love zombi', price: 17, emoji: '🍊' },
-    { id: 33, name: 'Лесной микс', brand: 'Anime love zombi', price: 17, emoji: '🌲' },
-    { id: 34, name: 'Мандариновая фанта', brand: 'Anime love zombi', price: 17, emoji: '🍊' },
-    { id: 35, name: 'Вишня лед', brand: 'Anime love zombi', price: 17, emoji: '🍒' },
-    { id: 36, name: 'Ежевичный лимонад', brand: 'Anime love zombi', price: 17, emoji: '🍇' },
-    { id: 37, name: 'Яблоко персик', brand: 'Anime love zombi', price: 17, emoji: '🍏' },
-    { id: 38, name: 'Клубнично-вишневый лимонад', brand: 'Anime love zombi', price: 17, emoji: '🍓' },
-    { id: 39, name: 'Клубника банан', brand: 'Anime love zombi', price: 17, emoji: '🍌' },
-    { id: 40, name: 'Яблоко виноград', brand: 'Anime love zombi', price: 17, emoji: '🍏' },
-    { id: 41, name: 'Энергетик виноград', brand: 'Anime love zombi', price: 17, emoji: '⚡' },
-    // Long злой (17)
-    { id: 42, name: 'Морс из лесных ягод', brand: 'Long злой', price: 17, emoji: '🫐' },
-    { id: 43, name: 'Мандарин персик', brand: 'Long злой', price: 17, emoji: '🍊' },
-    { id: 44, name: 'Клюква апельсин', brand: 'Long злой', price: 17, emoji: '🍒' },
-    { id: 45, name: 'Виноград арбуз', brand: 'Long злой', price: 17, emoji: '🍇' },
-    { id: 46, name: 'Клубника банан', brand: 'Long злой', price: 17, emoji: '🍌' },
-    { id: 47, name: 'Фруктовый мармелад', brand: 'Long злой', price: 17, emoji: '🍬' },
-    { id: 48, name: 'Виноградный чупа-чупс', brand: 'Long злой', price: 17, emoji: '🍬' },
-    { id: 49, name: 'Мята спрайт', brand: 'Long злой', price: 17, emoji: '🌿' },
-    { id: 50, name: 'Персик абрикос', brand: 'Long злой', price: 17, emoji: '🍑' },
-    { id: 51, name: 'Малиновая газировка', brand: 'Long злой', price: 17, emoji: '🍓' },
-    // Rick and Morty & catswill (18)
-    { id: 52, name: 'Арбуз морозная черешня', brand: 'Rick and Morty & catswill', price: 18, emoji: '🍉' },
-    { id: 53, name: 'Фрутелла лайм лимон малина', brand: 'Rick and Morty & catswill', price: 18, emoji: '🍋' },
-    { id: 54, name: 'Малина яблоко лед', brand: 'Rick and Morty & catswill', price: 18, emoji: '🍓' },
-    { id: 55, name: 'Кислые ленточки клубника ежевика', brand: 'Rick and Morty & catswill', price: 18, emoji: '🍓' },
-    { id: 56, name: 'Голубика арбуз лед', brand: 'Rick and Morty & catswill', price: 18, emoji: '🫐' },
-    { id: 57, name: 'Банан дыня мята', brand: 'Rick and Morty & catswill', price: 18, emoji: '🍌' },
+    // -------- Rick and Morty Bad Acid (4 товара) --------
+    {
+        id: 1,
+        name: 'Ананасовый леденец',
+        brand: 'Rick and Morty Bad Acid',
+        price: 15,
+        image: 'https://i.ibb.co/Pv414S0f/image.png'
+    },
+    {
+        id: 2,
+        name: 'Киви Лайм',
+        brand: 'Rick and Morty Bad Acid',
+        price: 15,
+        image: 'https://i.ibb.co/wr4btGb7/image.png'
+    },
+    {
+        id: 3,
+        name: 'Клюква Лайм',
+        brand: 'Rick and Morty Bad Acid',
+        price: 15,
+        image: 'https://i.ibb.co/M5sYqrWy/image.png'
+    },
+    {
+        id: 4,
+        name: 'Вишня Клюква',
+        brand: 'Rick and Morty Bad Acid',
+        price: 15,
+        image: 'https://i.ibb.co/vrtTs55/image.png'
+    },
+
+    // -------- Подонки Подгон (3 товара) --------
+    {
+        id: 5,
+        name: 'Апельсин мята',
+        brand: 'Подонки Подгон',
+        price: 15,
+        image: 'https://i.ibb.co/Kpnn3QMB/image.png'
+    },
+    {
+        id: 6,
+        name: 'Апельсин',
+        brand: 'Подонки Подгон',
+        price: 15,
+        image: 'https://i.ibb.co/yFg8TvMd/image.png'
+    },
+    {
+        id: 7,
+        name: 'Малиновая конфета',
+        brand: 'Подонки Подгон',
+        price: 15,
+        image: 'https://i.ibb.co/BkQGJzy/image.png'
+    },
+
+    // -------- Подонки инферно (3 товара) --------
+    {
+        id: 8,
+        name: 'Клубника грейпфрут малина',
+        brand: 'Подонки инферно',
+        price: 17,
+        image: 'https://i.ibb.co/nMdy9kWx/image.png'
+    },
+    {
+        id: 9,
+        name: 'Клубничная шипучка',
+        brand: 'Подонки инферно',
+        price: 17,
+        image: 'https://i.ibb.co/b5d7KM0L/image.png'
+    },
+    {
+        id: 10,
+        name: 'Клубника банан',
+        brand: 'Подонки инферно',
+        price: 17,
+        image: 'https://i.ibb.co/LXjMvDCC/image.png'
+    },
+
+    // -------- Podonki Blood (бывшие Подонки Блуд) — 12 товаров с одной картинкой --------
+    {
+        id: 11,
+        name: 'Черная смородина',
+        brand: 'Podonki Blood',
+        price: 15,
+        image: 'https://i.ibb.co/gbcNGhK0/image.png'
+    },
+    {
+        id: 12,
+        name: 'Классический бабл гам',
+        brand: 'Podonki Blood',
+        price: 15,
+        image: 'https://i.ibb.co/gbcNGhK0/image.png'
+    },
+    {
+        id: 13,
+        name: 'Яблоко виноград',
+        brand: 'Podonki Blood',
+        price: 15,
+        image: 'https://i.ibb.co/gbcNGhK0/image.png'
+    },
+    {
+        id: 14,
+        name: 'Персиковый лимонад',
+        brand: 'Podonki Blood',
+        price: 15,
+        image: 'https://i.ibb.co/gbcNGhK0/image.png'
+    },
+    {
+        id: 15,
+        name: 'Скитлс',
+        brand: 'Podonki Blood',
+        price: 15,
+        image: 'https://i.ibb.co/gbcNGhK0/image.png'
+    },
+    {
+        id: 16,
+        name: 'Сочная малина',
+        brand: 'Podonki Blood',
+        price: 15,
+        image: 'https://i.ibb.co/gbcNGhK0/image.png'
+    },
+    {
+        id: 17,
+        name: 'Виноград черника',
+        brand: 'Podonki Blood',
+        price: 15,
+        image: 'https://i.ibb.co/gbcNGhK0/image.png'
+    },
+    {
+        id: 18,
+        name: 'Конфеты смородина мята',
+        brand: 'Podonki Blood',
+        price: 15,
+        image: 'https://i.ibb.co/gbcNGhK0/image.png'
+    },
+    {
+        id: 19,
+        name: 'Брусничный морс',
+        brand: 'Podonki Blood',
+        price: 15,
+        image: 'https://i.ibb.co/gbcNGhK0/image.png'
+    },
+    {
+        id: 20,
+        name: 'Кислые вишневые червячки',
+        brand: 'Podonki Blood',
+        price: 15,
+        image: 'https://i.ibb.co/gbcNGhK0/image.png'
+    },
+    {
+        id: 21,
+        name: 'Банан клубника',
+        brand: 'Podonki Blood',
+        price: 15,
+        image: 'https://i.ibb.co/gbcNGhK0/image.png'
+    },
+    {
+        id: 22,
+        name: 'Клубника ежевика',
+        brand: 'Podonki Blood',
+        price: 15,
+        image: 'https://i.ibb.co/gbcNGhK0/image.png'
+    },
+
+    // -------- Annima Love Zombi (бывшие Anime love zombi) — 18 товаров с одной картинкой --------
+    {
+        id: 23,
+        name: 'Алоэ виноград',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 24,
+        name: 'Киви клубника',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 25,
+        name: 'Персиковый шейк',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 26,
+        name: 'Морозный рэдбул',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 27,
+        name: 'Арбузный бабл гам',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 28,
+        name: 'Клубничный леденец',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 29,
+        name: 'Ананас киви',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 30,
+        name: 'Малина с кислинкой',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 31,
+        name: 'Фанта маракуйя',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 32,
+        name: 'Лесной микс',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 33,
+        name: 'Мандариновая фанта',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 34,
+        name: 'Вишня лед',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 35,
+        name: 'Ежевичный лимонад',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 36,
+        name: 'Яблоко персик',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 37,
+        name: 'Клубнично-вишневый лимонад',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 38,
+        name: 'Клубника банан',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 39,
+        name: 'Яблоко виноград',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+    {
+        id: 40,
+        name: 'Энергетик виноград',
+        brand: 'Annima Love Zombi',
+        price: 17,
+        image: 'https://i.ibb.co/wFfDBkK7/image.png'
+    },
+
+    // -------- Zloy Hard (бывшие Long злой) — 10 товаров с одной картинкой --------
+    {
+        id: 41,
+        name: 'Морс из лесных ягод',
+        brand: 'Zloy Hard',
+        price: 17,
+        image: 'https://i.ibb.co/zHHYpfYR/image.png'
+    },
+    {
+        id: 42,
+        name: 'Мандарин персик',
+        brand: 'Zloy Hard',
+        price: 17,
+        image: 'https://i.ibb.co/zHHYpfYR/image.png'
+    },
+    {
+        id: 43,
+        name: 'Клюква апельсин',
+        brand: 'Zloy Hard',
+        price: 17,
+        image: 'https://i.ibb.co/zHHYpfYR/image.png'
+    },
+    {
+        id: 44,
+        name: 'Виноград арбуз',
+        brand: 'Zloy Hard',
+        price: 17,
+        image: 'https://i.ibb.co/zHHYpfYR/image.png'
+    },
+    {
+        id: 45,
+        name: 'Клубника банан',
+        brand: 'Zloy Hard',
+        price: 17,
+        image: 'https://i.ibb.co/zHHYpfYR/image.png'
+    },
+    {
+        id: 46,
+        name: 'Фруктовый мармелад',
+        brand: 'Zloy Hard',
+        price: 17,
+        image: 'https://i.ibb.co/zHHYpfYR/image.png'
+    },
+    {
+        id: 47,
+        name: 'Виноградный чупа-чупс',
+        brand: 'Zloy Hard',
+        price: 17,
+        image: 'https://i.ibb.co/zHHYpfYR/image.png'
+    },
+    {
+        id: 48,
+        name: 'Мята спрайт',
+        brand: 'Zloy Hard',
+        price: 17,
+        image: 'https://i.ibb.co/zHHYpfYR/image.png'
+    },
+    {
+        id: 49,
+        name: 'Персик абрикос',
+        brand: 'Zloy Hard',
+        price: 17,
+        image: 'https://i.ibb.co/zHHYpfYR/image.png'
+    },
+    {
+        id: 50,
+        name: 'Малиновая газировка',
+        brand: 'Zloy Hard',
+        price: 17,
+        image: 'https://i.ibb.co/zHHYpfYR/image.png'
+    },
+
+    // -------- Rick and Morty & catswill (6 товаров) --------
+    {
+        id: 51,
+        name: 'Арбуз морозная черешня',
+        brand: 'Rick and Morty & catswill',
+        price: 18,
+        image: 'https://i.ibb.co/0R4TwBF3/image.png'
+    },
+    {
+        id: 52,
+        name: 'Малина яблоко лед',
+        brand: 'Rick and Morty & catswill',
+        price: 18,
+        image: 'https://i.ibb.co/mjssmH8/image.png'
+    },
+    {
+        id: 53,
+        name: 'Банан дыня мята',
+        brand: 'Rick and Morty & catswill',
+        price: 18,
+        image: 'https://i.ibb.co/Z64thsqD/image.png'
+    },
+    {
+        id: 54,
+        name: 'Кислые ленточки клубника ежевика',
+        brand: 'Rick and Morty & catswill',
+        price: 18,
+        image: 'https://i.ibb.co/My9syDsC/image.png'
+    },
+    {
+        id: 55,
+        name: 'Фрутелла лайм лимон малина',
+        brand: 'Rick and Morty & catswill',
+        price: 18,
+        image: 'https://i.ibb.co/fVNgQ30K/image.png'
+    },
+    {
+        id: 56,
+        name: 'Голубика арбуз лед',
+        brand: 'Rick and Morty & catswill',
+        price: 18,
+        image: 'https://i.ibb.co/KjqwSZkD/image.png'
+    }
 ];
 
 // =============================================
@@ -119,7 +458,10 @@ function updateCartUI() {
     cartItems.innerHTML = cart.map(item => `
         <div class="cart-item">
             <div class="cart-item__info">
-                <span class="cart-item__name">${item.emoji} ${item.name} × ${item.quantity}</span>
+                <span class="cart-item__name">
+                    <img src="${item.image}" alt="${item.name}" style="width:24px; height:24px; object-fit:cover; border-radius:4px; vertical-align:middle; margin-right:6px;">
+                    ${item.name} × ${item.quantity}
+                </span>
                 <span class="cart-item__price">${item.price} BYN</span>
             </div>
             <button class="cart-item__remove" data-id="${item.id}">✕</button>
@@ -178,7 +520,8 @@ function showToast(message, type = 'success') {
 function initFilters() {
     const container = document.getElementById('filterContainer');
     if (!container) return;
-    const excludeBrands = ['Подонки', 'Catswill extra'];
+    // Исключаем бренды, которые были удалены (Catswill extra и Подонки) — они уже не в массиве, поэтому не нужны
+    const excludeBrands = []; // теперь не нужно ничего исключать, т.к. этих брендов нет
     const brands = [...new Set(products.map(p => p.brand))]
         .filter(brand => !excludeBrands.includes(brand));
     
@@ -204,7 +547,7 @@ function initFilters() {
 }
 
 // =============================================
-// ===== 5. ОТРИСОВКА ТОВАРОВ =====
+// ===== 5. ОТРИСОВКА ТОВАРОВ (с картинками) =====
 // =============================================
 function renderProducts(filter) {
     const grid = document.getElementById('productGrid');
@@ -213,7 +556,7 @@ function renderProducts(filter) {
     
     grid.innerHTML = filtered.map(p => `
         <div class="product-card" data-id="${p.id}">
-            <div class="product-card__image">${p.emoji}</div>
+            <img src="${p.image}" alt="${p.name}" class="product-card__image">
             <div class="product-card__name">${p.name}</div>
             <div class="product-card__brand">${p.brand}</div>
             <div class="product-card__price">${p.price} BYN</div>
@@ -307,12 +650,11 @@ orderForm.addEventListener('submit', async (e) => {
     if (orderData.comment) message += `💬 Комментарий: ${orderData.comment}\n`;
     message += `\n📦 Товары:\n`;
     orderData.items.forEach(item => {
-        message += `  • ${item.emoji} ${item.name} × ${item.quantity} = ${item.price * item.quantity} BYN\n`;
+        message += `  • ${item.name} × ${item.quantity} = ${item.price * item.quantity} BYN\n`;
     });
     message += `\n💰 Итого: ${orderData.total} BYN`;
 
     try {
-        // ОТПРАВЛЯЕМ ЗАПРОС НА WORKER
         const response = await fetch(WORKER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -326,7 +668,6 @@ orderForm.addEventListener('submit', async (e) => {
             throw new Error(errorData.description || 'Ошибка отправки заказа');
         }
 
-        // Успешно
         orderMessage.style.display = 'block';
         orderMessage.textContent = '✅ Заказ успешно отправлен! Мы свяжемся с вами в Telegram.';
         orderMessage.style.color = '#8aff8a';
