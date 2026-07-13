@@ -20,6 +20,7 @@ body {
     padding: 0 24px;
 }
 
+/* ===== КНОПКИ ===== */
 .btn {
     display: inline-block;
     padding: 14px 36px;
@@ -43,6 +44,7 @@ body {
     box-shadow: 0 8px 35px rgba(255, 80, 180, 0.6);
 }
 
+/* ===== ЗАГОЛОВКИ ===== */
 .section-title {
     font-size: 32px;
     font-weight: 700;
@@ -126,52 +128,6 @@ body {
     border: 1px solid rgba(200, 150, 255, 0.1);
 }
 
-/* ===== КОНТАКТЫ ===== */
-.contacts {
-    padding: 60px 0;
-    background: transparent;
-}
-
-.contacts__text {
-    font-size: 18px;
-    color: #c8b0e0;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-}
-
-.contacts__text a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.contacts__text a:hover {
-    text-decoration: underline;
-}
-
-.contacts__icon {
-    width: 28px;
-    height: 28px;
-    fill: #ffffff;
-    transition: fill 0.2s;
-    flex-shrink: 0;
-}
-
-.contacts__icon:hover {
-    fill: #e0c0ff;
-}
-
-/* ===== ФУТЕР ===== */
-.footer {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 24px 0;
-    text-align: center;
-    color: #8888aa;
-    border-top: 1px solid rgba(200, 150, 255, 0.05);
-}
 /* ===== ЧАСТЫЕ ВОПРОСЫ ===== */
 .faq {
     padding: 60px 0;
@@ -241,6 +197,54 @@ body {
     padding: 0 20px 20px 20px;
 }
 
+/* ===== КОНТАКТЫ ===== */
+.contacts {
+    padding: 60px 0;
+    background: transparent;
+}
+
+.contacts__text {
+    font-size: 18px;
+    color: #c8b0e0;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.contacts__text a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.contacts__text a:hover {
+    text-decoration: underline;
+}
+
+.contacts__icon {
+    width: 28px;
+    height: 28px;
+    fill: #ffffff;
+    transition: fill 0.2s;
+    flex-shrink: 0;
+}
+
+.contacts__icon:hover {
+    fill: #e0c0ff;
+}
+
+/* ===== ФУТЕР ===== */
+.footer {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 24px 0;
+    text-align: center;
+    color: #8888aa;
+    border-top: 1px solid rgba(200, 150, 255, 0.05);
+}
+
+/* ===== АДАПТИВ ДЛЯ FAQ ===== */
 @media (max-width: 600px) {
     .faq__question {
         font-size: 15px;
