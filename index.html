@@ -4,10 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Torgovchik — жидкости для POD</title>
-    
-    <!-- ===== FAVICON (иконка во вкладке браузера) ===== -->
-    <link rel="icon" href="https://i.ibb.co/VWRmsGHt/logo.png" type="image/png">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
@@ -34,11 +30,13 @@
                 <button class="category-btn" data-category="snus">Снюс</button>
                 <button class="category-btn" data-category="disposables">Одноразки/Pod-системы</button>
             </nav>
+
             <button class="burger" id="burgerBtn" aria-label="Меню">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
+
             <div class="mobile-menu" id="mobileMenu">
                 <nav class="mobile-nav">
                     <button class="category-btn-mobile active" data-category="liquids">Жидкости</button>
@@ -47,6 +45,7 @@
                     <button class="category-btn-mobile" data-category="disposables">Одноразки/Pod-системы</button>
                 </nav>
             </div>
+
             <button class="cart-btn" id="cartToggle">
                 <span class="cart-icon">🛒</span>
                 <span class="cart-badge" id="cartCount">0</span>
@@ -150,10 +149,13 @@
     <footer class="footer">
         <div class="container">
             <p>© 2026 Torgovchik. Все права защищены.</p>
+            <p style="margin-top: 8px; font-size: 14px; opacity: 0.8;">
+                <a href="terms.html" style="color: #c8b0e0; text-decoration: none; border-bottom: 1px dashed #8888aa;">Пользовательское соглашение</a>
+            </p>
         </div>
     </footer>
 
-    <!-- ===== КОРЗИНА ===== -->
+    <!-- ===== КОРЗИНА (панель) ===== -->
     <div class="cart-panel" id="cartPanel">
         <div class="cart-panel__header">
             <h3>Корзина</h3>
@@ -168,7 +170,10 @@
         </div>
     </div>
 
+    <!-- ===== ЗАТЕМНЕНИЕ ===== -->
     <div class="overlay" id="overlay"></div>
+
+    <!-- ===== ТОСТЫ ===== -->
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА ===== -->
