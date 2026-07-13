@@ -629,9 +629,9 @@ const promoInput = document.getElementById('promoCode');
 const applyPromoBtn = document.getElementById('applyPromoBtn');
 const promoMessage = document.getElementById('promoMessage');
 
-// Только один валидный промокод
+// Только один промокод spodzh на 13%
 const validPromos = {
-    'SPODZH': 13   // скидка 13%
+    'spodzh': 13
 };
 
 function applyPromo() {
@@ -649,7 +649,6 @@ function applyPromo() {
         return;
     }
 
-    // Проверяем, есть ли промокод в списке
     if (validPromos[code] !== undefined) {
         discountPercent = validPromos[code];
         appliedPromo = code;
@@ -660,10 +659,8 @@ function applyPromo() {
         updateCartUI();
         showToast(`✅ Промокод "${code}" применён!`, 'success');
     } else {
-        // ❌ Промокод не найден
         promoMessage.textContent = `❌ Промокод "${code}" не найден`;
         promoMessage.style.color = '#ff7777';
-        // Не даём скидку, ничего не меняем
     }
 }
 
@@ -944,6 +941,21 @@ document.addEventListener('click', (e) => {
 });
 
 // =============================================
-// ===== 9. ЗАПУСК =====
+// ===== 9. FAQ АККОРДЕОН =====
+// =============================================
+document.querySelectorAll('.faq__question').forEach(question => {
+    question.addEventListener('click', function() {
+        const parent = this.closest('.faq__item');
+        if (!parent) return;
+        // Закрываем все остальные (опционально — можно закомментировать, чтобы открывать несколько)
+        // document.querySelectorAll('.faq__item.open').forEach(item => {
+        //     if (item !== parent) item.classList.remove('open');
+        // });
+        parent.classList.toggle('open');
+    });
+});
+
+// =============================================
+// ===== 10. ЗАПУСК =====
 // =============================================
 switchCategory('liquids');
