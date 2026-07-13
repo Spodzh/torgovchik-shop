@@ -17,6 +17,7 @@
 </head>
 <body>
 
+    <!-- ===== ШАПКА ===== -->
     <header class="header">
         <div class="container header__inner">
             <a href="#" class="logo">Torgovchik</a>
@@ -46,10 +47,11 @@
         </div>
     </header>
 
+    <!-- ===== ГЛАВНЫЙ БАННЕР ===== -->
     <section class="hero">
         <div class="container hero__inner">
             <div class="hero__content" style="flex: 1 1 100%;">
-                <h1>Большой ассортимент <br>для Pod-систем.</h1>
+                <h1>Ассортимент <br>для Pod-систем.</h1>
                 <p>
                     Ассортимент оригинальных вкусов.<br>
                     Только качественные бренды.<br>
@@ -60,12 +62,14 @@
         </div>
     </section>
 
+    <!-- ===== КАТАЛОГ ===== -->
     <section class="catalog" id="catalog">
         <div class="container">
             <div id="categoryContent"></div>
         </div>
     </section>
 
+    <!-- ===== О НАС ===== -->
     <section class="about" id="about">
         <div class="container">
             <h2 class="section-title">О нас</h2>
@@ -77,6 +81,40 @@
         </div>
     </section>
 
+    <!-- ===== ЧАСТЫЕ ВОПРОСЫ ===== -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <h2 class="section-title">Частые вопросы</h2>
+            <div class="faq__list">
+                <div class="faq__item">
+                    <div class="faq__question">Какие способы оплаты доступны?</div>
+                    <div class="faq__answer">Мы принимаем оплату наличными при самовывозе, а также банковскими картами (Visa, Mastercard) через систему расчёта на сайте. При заказе через Telegram вы можете оплатить картой или переводом.</div>
+                </div>
+                <div class="faq__item">
+                    <div class="faq__question">Как получить заказ?</div>
+                    <div class="faq__answer">Вы можете забрать заказ самовывозом из нашего магазина в Гомеле. Также мы организуем доставку по городу — уточняйте условия при оформлении заказа.</div>
+                </div>
+                <div class="faq__item">
+                    <div class="faq__question">Есть ли доставка за пределы Гомеля?</div>
+                    <div class="faq__answer">На данный момент мы работаем только по Гомелю. В ближайшее время планируем расширить зону доставки.</div>
+                </div>
+                <div class="faq__item">
+                    <div class="faq__question">Можно ли вернуть товар?</div>
+                    <div class="faq__answer">Да, вы можете вернуть товар надлежащего качества в течение 14 дней при сохранении упаковки и чека. Если жидкость оказалась неисправной или бракованной — замена или возврат в день обращения.</div>
+                </div>
+                <div class="faq__item">
+                    <div class="faq__question">Как долго обрабатывается заказ?</div>
+                    <div class="faq__answer">Обычно мы собираем заказ в течение 1–2 часов после подтверждения. Время доставки зависит от загруженности курьера.</div>
+                </div>
+                <div class="faq__item">
+                    <div class="faq__question">Что делать, если я не нашёл ответа на свой вопрос?</div>
+                    <div class="faq__answer">Напишите нам в Telegram — мы ответим в самое ближайшее время! Ссылка на наш Telegram есть в разделе «Контакты».</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== КОНТАКТЫ ===== -->
     <section class="contacts" id="contacts">
         <div class="container">
             <h2 class="section-title">Контакты</h2>
@@ -89,12 +127,14 @@
         </div>
     </section>
 
+    <!-- ===== ФУТЕР ===== -->
     <footer class="footer">
         <div class="container">
             <p>© 2026 Torgovchik. Все права защищены.</p>
         </div>
     </footer>
 
+    <!-- ===== КОРЗИНА ===== -->
     <div class="cart-panel" id="cartPanel">
         <div class="cart-panel__header">
             <h3>Корзина</h3>
@@ -112,6 +152,7 @@
     <div class="overlay" id="overlay"></div>
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА ===== -->
     <div class="order-modal" id="orderModal">
         <div class="order-modal__content">
             <button class="order-modal__close" id="orderModalClose">✕</button>
