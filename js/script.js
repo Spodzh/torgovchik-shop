@@ -757,14 +757,17 @@ promoInput.addEventListener('keypress', (e) => {
 });
 
 // =============================================
-// ===== 5. ФИЛЬТРЫ И ОТРИСОВКА =====
+// ===== 5. УНИВЕРСАЛЬНЫЙ ФИЛЬТР =====
 // =============================================
-function initFilters() {
+function initFilters(category) {
     const container = document.getElementById('filterContainer');
     if (!container) return;
-    const liquidProducts = products.filter(p => p.category === 'liquids');
-    const brands = [...new Set(liquidProducts.map(p => p.brand))];
-    
+
+    // Получаем все товары этой категории
+    const catProducts = products.filter(p => p.category === category);
+    // Уникальные бренды
+    const brands = [...new Set(catProducts.map(p => p.brand))];
+
     container.innerHTML = brands.map(b => `
         <button class="filter-btn" data-filter="${b}">${b}</button>
     `).join('');
@@ -772,26 +775,29 @@ function initFilters() {
     const firstBtn = container.querySelector('.filter-btn');
     if (firstBtn) {
         firstBtn.classList.add('active');
-        renderProducts('liquids', firstBtn.dataset.filter);
+        renderProducts(category, firstBtn.dataset.filter);
     } else {
-        renderProducts('liquids', 'Все');
+        renderProducts(category, 'Все');
     }
 
     container.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             container.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            renderProducts('liquids', btn.dataset.filter);
+            renderProducts(category, btn.dataset.filter);
         });
     });
 }
 
+// =============================================
+// ===== 6. ОТРИСОВКА ТОВАРОВ =====
+// =============================================
 function renderProducts(category, filter = 'Все') {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
     let filtered = products.filter(p => p.category === category);
-    if (category === 'liquids' && filter !== 'Все') {
+    if (filter !== 'Все') {
         filtered = filtered.filter(p => p.brand === filter);
     }
 
@@ -830,7 +836,7 @@ function renderProducts(category, filter = 'Все') {
 }
 
 // =============================================
-// ===== 6. ФОРМА ЗАКАЗА =====
+// ===== 7. ФОРМА ЗАКАЗА =====
 // =============================================
 const orderModal = document.getElementById('orderModal');
 const orderModalClose = document.getElementById('orderModalClose');
@@ -947,7 +953,7 @@ orderForm.addEventListener('submit', async (e) => {
 });
 
 // =============================================
-// ===== 7. КАТЕГОРИИ =====
+// ===== 8. КАТЕГОРИИ =====
 // =============================================
 const categoryBtns = document.querySelectorAll('.category-btn');
 const categoryBtnsMobile = document.querySelectorAll('.category-btn-mobile');
@@ -961,29 +967,25 @@ function switchCategory(category) {
         btn.classList.toggle('active', btn.dataset.category === category);
     });
 
-    if (category === 'liquids') {
+    if (category === 'liquids' || category === 'snus') {
+        // Для жидкостей и снюса — с фильтрами
         categoryContent.innerHTML = `
             <div class="category-content active">
                 <div class="catalog__filters" id="filterContainer"></div>
                 <div class="catalog__grid" id="productGrid"></div>
             </div>
         `;
-        initFilters();
+        initFilters(category);
     } else if (category === 'coils') {
+        // Для испарителей — без фильтров
         categoryContent.innerHTML = `
             <div class="category-content active">
                 <div class="catalog__grid" id="productGrid"></div>
             </div>
         `;
         renderProducts('coils', 'Все');
-    } else if (category === 'snus') {
-        categoryContent.innerHTML = `
-            <div class="category-content active">
-                <div class="catalog__grid" id="productGrid"></div>
-            </div>
-        `;
-        renderProducts('snus', 'Все');
     } else {
+        // Остальные категории — заглушка
         const titles = {
             disposables: 'Одноразки / Pod-системы'
         };
@@ -1014,7 +1016,7 @@ categoryBtnsMobile.forEach(btn => {
 });
 
 // =============================================
-// ===== 8. БУРГЕР-МЕНЮ =====
+// ===== 9. БУРГЕР-МЕНЮ =====
 // =============================================
 const burger = document.getElementById('burgerBtn');
 const mobileMenu = document.getElementById('mobileMenu');
@@ -1032,7 +1034,7 @@ document.addEventListener('click', (e) => {
 });
 
 // =============================================
-// ===== 9. FAQ АККОРДЕОН =====
+// ===== 10. FAQ АККОРДЕОН =====
 // =============================================
 document.querySelectorAll('.faq__question').forEach(question => {
     question.addEventListener('click', function() {
@@ -1043,6 +1045,6 @@ document.querySelectorAll('.faq__question').forEach(question => {
 });
 
 // =============================================
-// ===== 10. ЗАПУСК =====
+// ===== 11. ЗАПУСК =====
 // =============================================
 switchCategory('liquids');
