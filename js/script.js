@@ -631,6 +631,7 @@ const promoMessage = document.getElementById('promoMessage');
 
 // Здесь можно добавить свои промокоды и размер скидки
 const validPromos = {
+       'spodzh': 100
     // Пример: 'WELCOME10': 10,
     // 'SUMMER20': 20,
     // 'BLACKFRIDAY': 25
