@@ -763,9 +763,7 @@ function initFilters(category) {
     const container = document.getElementById('filterContainer');
     if (!container) return;
 
-    // Получаем все товары этой категории
     const catProducts = products.filter(p => p.category === category);
-    // Уникальные бренды
     const brands = [...new Set(catProducts.map(p => p.brand))];
 
     container.innerHTML = brands.map(b => `
@@ -968,7 +966,6 @@ function switchCategory(category) {
     });
 
     if (category === 'liquids' || category === 'snus') {
-        // Для жидкостей и снюса — с фильтрами
         categoryContent.innerHTML = `
             <div class="category-content active">
                 <div class="catalog__filters" id="filterContainer"></div>
@@ -977,7 +974,6 @@ function switchCategory(category) {
         `;
         initFilters(category);
     } else if (category === 'coils') {
-        // Для испарителей — без фильтров
         categoryContent.innerHTML = `
             <div class="category-content active">
                 <div class="catalog__grid" id="productGrid"></div>
@@ -985,7 +981,6 @@ function switchCategory(category) {
         `;
         renderProducts('coils', 'Все');
     } else {
-        // Остальные категории — заглушка
         const titles = {
             disposables: 'Одноразки / Pod-системы'
         };
@@ -1045,6 +1040,63 @@ document.querySelectorAll('.faq__question').forEach(question => {
 });
 
 // =============================================
-// ===== 11. ЗАПУСК =====
+// ===== 11. ВСПЛЫВАЮЩАЯ ПОДСКАЗКА ПРИ КЛИКЕ НА ЛОГОТИП =====
+// =============================================
+const logo = document.querySelector('.logo');
+const phrases = [
+    'Заказывай жижу :3',
+    'Какой сегодня вкус хочешь?',
+    'Время выбрать свой вкус!',
+    'Хочешь сладкого или мятного?',
+    'Новый день — новый вкус!',
+    'Что-то вкусненькое уже ждёт!',
+    'Лови свой идеальный вкус!',
+    'Сделай выбор — закажи сейчас!',
+    'Клубника, мята, апельсин — всё здесь!',
+    'Найди свой любимый вкус!'
+];
+
+let tooltipTimeout = null;
+
+if (logo) {
+    logo.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const oldTooltip = document.querySelector('.logo-tooltip');
+        if (oldTooltip) oldTooltip.remove();
+        if (tooltipTimeout) clearTimeout(tooltipTimeout);
+
+        const randomIndex = Math.floor(Math.random() * phrases.length);
+        const phrase = phrases[randomIndex];
+
+        const tooltip = document.createElement('div');
+        tooltip.className = 'logo-tooltip';
+        tooltip.textContent = phrase;
+
+        const rect = this.getBoundingClientRect();
+        const top = rect.top - 10;
+        const left = rect.left + rect.width / 2;
+
+        tooltip.style.position = 'fixed';
+        tooltip.style.top = top + 'px';
+        tooltip.style.left = left + 'px';
+        tooltip.style.transform = 'translateX(-50%) translateY(-100%)';
+        tooltip.style.zIndex = '1000';
+
+        document.body.appendChild(tooltip);
+
+        requestAnimationFrame(() => {
+            tooltip.classList.add('show');
+        });
+
+        tooltipTimeout = setTimeout(() => {
+            tooltip.classList.remove('show');
+            setTimeout(() => tooltip.remove(), 300);
+        }, 2500);
+    });
+}
+
+// =============================================
+// ===== 12. ЗАПУСК =====
 // =============================================
 switchCategory('liquids');
