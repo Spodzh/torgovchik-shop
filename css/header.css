@@ -3,7 +3,7 @@
     background: rgba(26, 10, 46, 0.9);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(200, 150, 255, 0.2);
-    padding: 4px 0;
+    padding: 6px 0;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -18,7 +18,7 @@
     position: relative;
 }
 
-/* ===== ЛОГОТИП С КАРТИНКОЙ (увеличен, выступает за шапку) ===== */
+/* ===== ЛОГОТИП С КАРТИНКОЙ (увеличен) ===== */
 .logo {
     display: flex;
     align-items: center;
@@ -26,7 +26,7 @@
 }
 
 .logo__image {
-    height: 90px;
+    height: 110px;
     width: auto;
     display: block;
     transition: opacity 0.2s;
@@ -178,9 +178,12 @@
     text-align: center;
 }
 
-/* ===== АДАПТИВ ДЛЯ ЛОГОТИПА ===== */
+/* ===== АДАПТИВ ДЛЯ МОБИЛЬНЫХ ===== */
 @media (max-width: 600px) {
+    .header {
+        padding: 4px 0;
+    }
     .logo__image {
-        height: 65px;
+        height: 70px;
     }
 }
