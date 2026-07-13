@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Torgovchik — жидкости для POD</title>
+    <title>Torgovchik — премиум жидкости для POD</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-    <!-- Подключаем все CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/header.css" />
     <link rel="stylesheet" href="css/catalog.css" />
@@ -21,33 +20,24 @@
     <!-- ===== ШАПКА ===== -->
     <header class="header">
         <div class="container header__inner">
-            <a href="#" class="logo">Torgovchik</a>
-
-            <!-- Навигация (десктоп) -->
+            <a href="#" class="logo">TORGOVCHIK</a>
             <nav class="nav nav--desktop" id="categoryNav">
                 <button class="category-btn active" data-category="liquids">Жидкости</button>
-                <button class="category-btn" data-category="coils">Испарители/Картриджи</button>
+                <button class="category-btn" data-category="coils">Испарители</button>
                 <button class="category-btn" data-category="snus">Снюс</button>
-                <button class="category-btn" data-category="disposables">Одноразки/Pod-системы</button>
+                <button class="category-btn" data-category="disposables">Одноразки</button>
             </nav>
-
-            <!-- Бургер-меню (мобильная версия) -->
             <button class="burger" id="burgerBtn" aria-label="Меню">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </button>
-
-            <!-- Мобильное меню -->
             <div class="mobile-menu" id="mobileMenu">
                 <nav class="mobile-nav">
                     <button class="category-btn-mobile active" data-category="liquids">Жидкости</button>
-                    <button class="category-btn-mobile" data-category="coils">Испарители/Картриджи</button>
+                    <button class="category-btn-mobile" data-category="coils">Испарители</button>
                     <button class="category-btn-mobile" data-category="snus">Снюс</button>
-                    <button class="category-btn-mobile" data-category="disposables">Одноразки/Pod-системы</button>
+                    <button class="category-btn-mobile" data-category="disposables">Одноразки</button>
                 </nav>
             </div>
-
             <button class="cart-btn" id="cartToggle">
                 <span class="cart-icon">🛒</span>
                 <span class="cart-badge" id="cartCount">0</span>
@@ -58,23 +48,20 @@
     <!-- ===== ГЛАВНЫЙ БАННЕР ===== -->
     <section class="hero">
         <div class="container hero__inner">
-            <div class="hero__content" style="flex: 1 1 100%;">
-                <h1>Большой ассортимент <br>для Pod-систем.</h1>
-                <p>
-                    Ассортимент оригинальных вкусов.<br>
-                    Только качественные бренды.<br>
-                    Работаем в Гомеле.
-                </p>
-                <a href="#catalog" class="btn btn-primary">Смотреть ассортимент</a>
+            <div class="hero__content">
+                <span class="hero__subtitle">Коллекция 2026</span>
+                <h1>Искусство вкуса<br>для вашего POD</h1>
+                <p>Ассортимент оригинальных жидкостей. Только качественные бренды. Работаем в Гомеле.</p>
+                <a href="#catalog" class="btn btn-primary">Изучить ассортимент</a>
             </div>
         </div>
     </section>
 
-    <!-- ===== КАТАЛОГ (АССОРТИМЕНТ) ===== -->
+    <!-- ===== КАТАЛОГ ===== -->
     <section class="catalog" id="catalog">
         <div class="container">
             <div id="categoryContent">
-                <!-- Заполняется скриптом -->
+                <!-- Заполняется из JS -->
             </div>
         </div>
     </section>
@@ -84,9 +71,9 @@
         <div class="container">
             <h2 class="section-title">О нас</h2>
             <div class="about__grid">
-                <div class="about__item">🍓 Оригинальные жидкости</div>
-                <div class="about__item">🤝 Вежливый персонал</div>
-                <div class="about__item">🎁 Выгодные акции</div>
+                <div class="about__item">✦ Оригинальные жидкости</div>
+                <div class="about__item">✦ Вежливый персонал</div>
+                <div class="about__item">✦ Выгодные акции</div>
             </div>
         </div>
     </section>
@@ -94,12 +81,12 @@
     <!-- ===== КОНТАКТЫ ===== -->
     <section class="contacts" id="contacts">
         <div class="container">
-            <h2 class="section-title">Контакты</h2>
+            <h2 class="section-title">Связь</h2>
             <p class="contacts__text">
                 <svg class="contacts__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
                     <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
                 </svg>
-                Telegram: <a href="https://t.me/+oB1FldrU8v02NjEx" target="_blank">@Torgovchik</a>
+                <a href="https://t.me/+oB1FldrU8v02NjEx" target="_blank">@Torgovchik</a>
             </p>
         </div>
     </section>
@@ -132,7 +119,7 @@
     <!-- ===== ТОСТЫ ===== -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА ===== -->
+    <!-- ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ===== -->
     <div class="order-modal" id="orderModal">
         <div class="order-modal__content">
             <button class="order-modal__close" id="orderModalClose">✕</button>
@@ -143,37 +130,31 @@
                     <input type="text" id="orderName" required placeholder="Иван Иванов">
                 </div>
                 <div class="form-group">
-                    <label for="orderTelegram">Ваш Telegram (username) *</label>
+                    <label for="orderTelegram">Ваш Telegram *</label>
                     <input type="text" id="orderTelegram" required placeholder="@username">
                 </div>
                 <div class="form-group">
-                    <label for="orderAddress">Адрес (для доставки)</label>
+                    <label for="orderAddress">Адрес</label>
                     <input type="text" id="orderAddress" placeholder="г. Гомель, ул. ...">
                 </div>
                 <div class="form-group">
-                    <label for="orderComment">Комментарий к заказу</label>
+                    <label for="orderComment">Комментарий</label>
                     <textarea id="orderComment" rows="3" placeholder="Пожелания, особые условия"></textarea>
                 </div>
-
-                <!-- ===== ПРОМОКОД ===== -->
                 <div class="form-group">
                     <label for="promoCode">Промокод</label>
-                    <div style="display:flex; gap:10px;">
-                        <input type="text" id="promoCode" placeholder="Введите промокод" style="flex:1;">
-                        <button type="button" class="btn btn-primary" id="applyPromoBtn" style="padding:12px 20px; font-size:14px; white-space:nowrap;">Применить</button>
+                    <div class="promo-group">
+                        <input type="text" id="promoCode" placeholder="Введите промокод">
+                        <button type="button" class="btn btn-primary" id="applyPromoBtn">Применить</button>
                     </div>
-                    <div id="promoMessage" style="font-size:14px; margin-top:6px; color:#c8b0e0;"></div>
+                    <div id="promoMessage" class="promo-message"></div>
                 </div>
-
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary" id="orderSubmit">Отправить заказ</button>
-                </div>
+                <button type="submit" class="btn btn-primary" id="orderSubmit">Отправить заказ</button>
             </form>
-            <div id="orderMessage" style="display:none; text-align:center; margin-top:10px;"></div>
+            <div id="orderMessage" class="order-message"></div>
         </div>
     </div>
 
-    <!-- Подключаем JS -->
     <script type="module" src="js/script.js"></script>
 </body>
 </html>
