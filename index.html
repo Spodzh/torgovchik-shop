@@ -62,8 +62,8 @@
                 <h1>Большой ассортимент <br>для Pod-систем.</h1>
                 <p>
                     Ассортимент оригинальных вкусов.<br>
-    Только качественные бренды.<br>
-    Работаем в Гомеле.
+                    Только качественные бренды.<br>
+                    Работаем в Гомеле.
                 </p>
                 <a href="#catalog" class="btn btn-primary">Смотреть ассортимент</a>
             </div>
@@ -154,6 +154,17 @@
                     <label for="orderComment">Комментарий к заказу</label>
                     <textarea id="orderComment" rows="3" placeholder="Пожелания, особые условия"></textarea>
                 </div>
+
+                <!-- ===== ПРОМОКОД ===== -->
+                <div class="form-group">
+                    <label for="promoCode">Промокод</label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="promoCode" placeholder="Введите промокод" style="flex:1;">
+                        <button type="button" class="btn btn-primary" id="applyPromoBtn" style="padding:12px 20px; font-size:14px; white-space:nowrap;">Применить</button>
+                    </div>
+                    <div id="promoMessage" style="font-size:14px; margin-top:6px; color:#c8b0e0;"></div>
+                </div>
+
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary" id="orderSubmit">Отправить заказ</button>
                 </div>
@@ -162,7 +173,7 @@
         </div>
     </div>
 
-    <!-- Подключаем ОДИН JS-файл (все функции внутри) -->
+    <!-- Подключаем JS -->
     <script src="js/script.js"></script>
 </body>
 </html>
