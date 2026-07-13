@@ -18,17 +18,22 @@
     position: relative;
 }
 
+/* ===== ЛОГОТИП С КАРТИНКОЙ ===== */
 .logo {
-    font-size: 24px;
-    font-weight: 800;
-    color: #e0c0ff;
+    display: flex;
+    align-items: center;
     text-decoration: none;
-    letter-spacing: -0.5px;
-    text-shadow: 0 0 25px rgba(255, 100, 200, 0.3);
 }
 
-.logo:hover {
-    color: #ffffff;
+.logo__image {
+    height: 32px;
+    width: auto;
+    display: block;
+    transition: opacity 0.2s;
+}
+
+.logo:hover .logo__image {
+    opacity: 0.85;
 }
 
 /* ===== НАВИГАЦИЯ (ДЕСКТОП) - КАТЕГОРИИ ===== */
@@ -171,4 +176,11 @@
     line-height: 22px;
     min-width: 22px;
     text-align: center;
+}
+
+/* ===== АДАПТИВ ДЛЯ ЛОГОТИПА ===== */
+@media (max-width: 600px) {
+    .logo__image {
+        height: 26px;
+    }
 }
