@@ -1,3 +1,4 @@
+/* ===== ТОСТЫ ===== */
 .toast-container {
     position: fixed;
     top: 80px;
@@ -10,12 +11,13 @@
 }
 
 .toast {
-    background: #fff;
-    border: 1px solid #ece8e4;
+    background: rgba(26, 10, 46, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(200, 150, 255, 0.2);
     border-radius: 16px;
     padding: 14px 20px;
-    color: #2b2825;
-    box-shadow: 0 8px 30px rgba(43, 40, 37, 0.06);
+    color: #f0eaff;
+    box-shadow: 0 8px 30px rgba(255, 80, 180, 0.15);
     animation: slideIn 0.3s ease forwards;
     display: flex;
     align-items: center;
