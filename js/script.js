@@ -1040,7 +1040,7 @@ document.querySelectorAll('.faq__question').forEach(question => {
 });
 
 // =============================================
-// ===== ВСПЛЫВАЮЩАЯ ПОДСКАЗКА ПРИ КЛИКЕ НА ЛОГОТИП =====
+// ===== 11. ВСПЛЫВАЮЩАЯ ПОДСКАЗКА ПРИ КЛИКЕ НА ЛОГОТИП =====
 // =============================================
 document.addEventListener('DOMContentLoaded', function() {
     const logo = document.querySelector('.logo');
@@ -1064,21 +1064,17 @@ document.addEventListener('DOMContentLoaded', function() {
     logo.addEventListener('click', function(e) {
         e.preventDefault();
 
-        // Удаляем старую подсказку
         const oldTooltip = document.querySelector('.logo-tooltip');
         if (oldTooltip) oldTooltip.remove();
         if (tooltipTimeout) clearTimeout(tooltipTimeout);
 
-        // Случайная фраза
         const randomIndex = Math.floor(Math.random() * phrases.length);
         const phrase = phrases[randomIndex];
 
-        // Создаём элемент
         const tooltip = document.createElement('div');
         tooltip.className = 'logo-tooltip';
         tooltip.textContent = phrase;
 
-        // Позиционируем
         const rect = this.getBoundingClientRect();
         const top = rect.top - 10;
         const left = rect.left + rect.width / 2;
@@ -1091,19 +1087,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         document.body.appendChild(tooltip);
 
-        // Анимация появления
         requestAnimationFrame(() => {
             tooltip.classList.add('show');
         });
 
-        // Удаление через 2.5 секунды
         tooltipTimeout = setTimeout(() => {
             tooltip.classList.remove('show');
             setTimeout(() => tooltip.remove(), 300);
         }, 2500);
     });
 });
-}
 
 // =============================================
 // ===== 12. ЗАПУСК =====
