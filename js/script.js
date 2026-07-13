@@ -629,9 +629,9 @@ const promoInput = document.getElementById('promoCode');
 const applyPromoBtn = document.getElementById('applyPromoBtn');
 const promoMessage = document.getElementById('promoMessage');
 
+// Только один валидный промокод
 const validPromos = {
-    // Пример: 'WELCOME10': 10,
-    // 'SUMMER20': 20,
+    'SPODZH': 13   // скидка 13%
 };
 
 function applyPromo() {
@@ -649,6 +649,7 @@ function applyPromo() {
         return;
     }
 
+    // Проверяем, есть ли промокод в списке
     if (validPromos[code] !== undefined) {
         discountPercent = validPromos[code];
         appliedPromo = code;
@@ -659,15 +660,10 @@ function applyPromo() {
         updateCartUI();
         showToast(`✅ Промокод "${code}" применён!`, 'success');
     } else {
-        // Для теста любой промокод даёт 10% скидку
-        discountPercent = 10;
-        appliedPromo = code;
-        promoMessage.textContent = `✅ Промокод "${code}" применён! Скидка 10%`;
-        promoMessage.style.color = '#8aff8a';
-        promoInput.disabled = true;
-        applyPromoBtn.disabled = true;
-        updateCartUI();
-        showToast(`✅ Промокод "${code}" применён!`, 'success');
+        // ❌ Промокод не найден
+        promoMessage.textContent = `❌ Промокод "${code}" не найден`;
+        promoMessage.style.color = '#ff7777';
+        // Не даём скидку, ничего не меняем
     }
 }
 
