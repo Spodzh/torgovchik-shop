@@ -517,6 +517,8 @@ const products = [
 // ===== 2. КОРЗИНА =====
 // =============================================
 let cart = [];
+let appliedPromo = null;
+let discountPercent = 0;
 
 const cartCount = document.getElementById('cartCount');
 const cartPanel = document.getElementById('cartPanel');
@@ -541,6 +543,14 @@ function addToCart(productId) {
 function removeFromCart(productId) {
     cart = cart.filter(item => item.id !== productId);
     updateCartUI();
+}
+
+function getCartTotal() {
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    if (discountPercent > 0) {
+        return subtotal * (1 - discountPercent / 100);
+    }
+    return subtotal;
 }
 
 function updateCartUI() {
@@ -573,8 +583,8 @@ function updateCartUI() {
         });
     });
 
-    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    cartTotal.textContent = total;
+    const total = getCartTotal();
+    cartTotal.textContent = Math.round(total);
 }
 
 function openCart() {
@@ -613,7 +623,68 @@ function showToast(message, type = 'success') {
 }
 
 // =============================================
-// ===== 4. ФИЛЬТРЫ (только для жидкостей) =====
+// ===== 4. ПРОМОКОДЫ =====
+// =============================================
+const promoInput = document.getElementById('promoCode');
+const applyPromoBtn = document.getElementById('applyPromoBtn');
+const promoMessage = document.getElementById('promoMessage');
+
+// Здесь можно добавить свои промокоды и размер скидки
+const validPromos = {
+    // Пример: 'WELCOME10': 10,
+    // 'SUMMER20': 20,
+    // 'BLACKFRIDAY': 25
+};
+
+function applyPromo() {
+    const code = promoInput.value.trim().toUpperCase();
+    
+    if (!code) {
+        promoMessage.textContent = '⚠️ Введите промокод';
+        promoMessage.style.color = '#ff7777';
+        return;
+    }
+
+    if (appliedPromo === code) {
+        promoMessage.textContent = 'ℹ️ Этот промокод уже применён';
+        promoMessage.style.color = '#c8b0e0';
+        return;
+    }
+
+    // Проверяем валидность промокода
+    if (validPromos[code] !== undefined) {
+        // Применяем скидку
+        discountPercent = validPromos[code];
+        appliedPromo = code;
+        promoMessage.textContent = `✅ Промокод "${code}" применён! Скидка ${discountPercent}%`;
+        promoMessage.style.color = '#8aff8a';
+        promoInput.disabled = true;
+        applyPromoBtn.disabled = true;
+        updateCartUI();
+        showToast(`✅ Промокод "${code}" применён!`, 'success');
+    } else {
+        // Пока для теста любой промокод даёт 10% скидку
+        // Позже ты сможешь заменить эту логику на проверку из validPromos
+        discountPercent = 10;
+        appliedPromo = code;
+        promoMessage.textContent = `✅ Промокод "${code}" применён! Скидка 10%`;
+        promoMessage.style.color = '#8aff8a';
+        promoInput.disabled = true;
+        applyPromoBtn.disabled = true;
+        updateCartUI();
+        showToast(`✅ Промокод "${code}" применён!`, 'success');
+    }
+}
+
+applyPromoBtn.addEventListener('click', applyPromo);
+promoInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        applyPromo();
+    }
+});
+
+// =============================================
+// ===== 5. ФИЛЬТРЫ (только для жидкостей) =====
 // =============================================
 function initFilters() {
     const container = document.getElementById('filterContainer');
@@ -643,7 +714,7 @@ function initFilters() {
 }
 
 // =============================================
-// ===== 5. ОТРИСОВКА ТОВАРОВ =====
+// ===== 6. ОТРИСОВКА ТОВАРОВ =====
 // =============================================
 function renderProducts(category, filter = 'Все') {
     const grid = document.getElementById('productGrid');
@@ -689,7 +760,7 @@ function renderProducts(category, filter = 'Все') {
 }
 
 // =============================================
-// ===== 6. ФОРМА ЗАКАЗА (с брендом в сообщении) =====
+// ===== 7. ФОРМА ЗАКАЗА =====
 // =============================================
 const orderModal = document.getElementById('orderModal');
 const orderModalClose = document.getElementById('orderModalClose');
@@ -701,6 +772,9 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
         showToast('Корзина пуста. Добавьте товары.', 'error');
         return;
     }
+    // Сбрасываем промокод при открытии формы (опционально)
+    // Если хочешь сохранять промокод между открытиями — удали эти строки
+    // resetPromo();
     orderModal.classList.add('open');
     orderMessage.style.display = 'none';
     orderMessage.textContent = '';
@@ -742,7 +816,10 @@ orderForm.addEventListener('submit', async (e) => {
         address,
         comment,
         items: cart,
-        total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+        subtotal: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+        total: getCartTotal(),
+        promo: appliedPromo,
+        discount: discountPercent
     };
 
     let message = `🛒 Новый заказ!\n\n`;
@@ -752,10 +829,15 @@ orderForm.addEventListener('submit', async (e) => {
     if (orderData.comment) message += `💬 Комментарий: ${orderData.comment}\n`;
     message += `\n📦 Товары:\n`;
     orderData.items.forEach(item => {
-        // ✅ Теперь выводим бренд и название
         message += `  • ${item.brand} | ${item.name} × ${item.quantity} = ${item.price * item.quantity} BYN\n`;
     });
-    message += `\n💰 Итого: ${orderData.total} BYN`;
+    message += `\n💰 Сумма: ${orderData.subtotal} BYN`;
+    if (orderData.discount > 0) {
+        message += `\n🎉 Скидка: ${orderData.discount}%`;
+        message += `\n💰 Итого: ${Math.round(orderData.total)} BYN`;
+    } else {
+        message += `\n💰 Итого: ${Math.round(orderData.total)} BYN`;
+    }
 
     try {
         const response = await fetch(WORKER_URL, {
@@ -775,11 +857,18 @@ orderForm.addEventListener('submit', async (e) => {
 
         setTimeout(() => {
             cart = [];
+            appliedPromo = null;
+            discountPercent = 0;
             updateCartUI();
             closeCart();
             orderModal.classList.remove('open');
             orderForm.reset();
             orderMessage.style.display = 'none';
+            // Сбрасываем поле промокода
+            promoInput.value = '';
+            promoInput.disabled = false;
+            applyPromoBtn.disabled = false;
+            promoMessage.textContent = '';
             showToast('✅ Заказ оформлен! Спасибо!', 'success');
         }, 2000);
 
@@ -792,7 +881,7 @@ orderForm.addEventListener('submit', async (e) => {
 });
 
 // =============================================
-// ===== 7. КАТЕГОРИИ =====
+// ===== 8. КАТЕГОРИИ =====
 // =============================================
 const categoryBtns = document.querySelectorAll('.category-btn');
 const categoryBtnsMobile = document.querySelectorAll('.category-btn-mobile');
@@ -853,7 +942,7 @@ categoryBtnsMobile.forEach(btn => {
 });
 
 // =============================================
-// ===== 8. БУРГЕР-МЕНЮ =====
+// ===== 9. БУРГЕР-МЕНЮ =====
 // =============================================
 const burger = document.getElementById('burgerBtn');
 const mobileMenu = document.getElementById('mobileMenu');
@@ -871,6 +960,6 @@ document.addEventListener('click', (e) => {
 });
 
 // =============================================
-// ===== 9. ЗАПУСК =====
+// ===== 10. ЗАПУСК =====
 // =============================================
 switchCategory('liquids');
