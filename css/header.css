@@ -18,7 +18,7 @@
     position: relative;
 }
 
-/* ===== ЛОГОТИП С КАРТИНКОЙ ===== */
+/* ===== ЛОГОТИП С КАРТИНКОЙ (увеличен в 2 раза) ===== */
 .logo {
     display: flex;
     align-items: center;
@@ -26,7 +26,7 @@
 }
 
 .logo__image {
-    height: 32px;
+    height: 64px;
     width: auto;
     display: block;
     transition: opacity 0.2s;
@@ -181,6 +181,6 @@
 /* ===== АДАПТИВ ДЛЯ ЛОГОТИПА ===== */
 @media (max-width: 600px) {
     .logo__image {
-        height: 26px;
+        height: 52px;
     }
 }
