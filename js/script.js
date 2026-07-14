@@ -332,7 +332,6 @@ orderForm.addEventListener('submit', async (e) => {
     discount: discountPercent
   };
 
-  // Формируем текст сообщения для Telegram
   let message = `🛒 Новый заказ!\n\n`;
   message += `👤 Имя: ${orderData.name}\n`;
   message += `📱 Telegram: ${orderData.telegram}\n`;
@@ -351,7 +350,6 @@ orderForm.addEventListener('submit', async (e) => {
   }
 
   try {
-    // Отправляем заказ на Worker (сохранит в статистику и отправит уведомление)
     const response = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -427,22 +425,20 @@ function switchCategory(category) {
       </div>
     `;
     initFilters(category);
-  } else if (category === 'coils') {
+  } else if (category === 'coils' || category === 'disposables') {
+    // Для испарителей и одноразок — без фильтров
     categoryContent.innerHTML = `
       <div class="category-content active">
         <div class="catalog__grid" id="productGrid"></div>
       </div>
     `;
-    renderProducts('coils', 'Все');
+    renderProducts(category, 'Все');
   } else {
-    const titles = {
-      disposables: 'Одноразки / Pod-системы'
-    };
+    // Заглушка для неизвестных категорий (не должно возникать)
     categoryContent.innerHTML = `
       <div class="category-content active">
         <div class="placeholder">
-          <h3>${titles[category]}</h3>
-          <p>🛠 Скоро появится!</p>
+          <h3>Скоро появится!</h3>
           <p style="font-size: 14px; margin-top: 8px; color: #8888aa;">Следите за обновлениями</p>
         </div>
       </div>
