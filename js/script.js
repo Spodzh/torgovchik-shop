@@ -20,7 +20,6 @@ async function loadProducts() {
     const response = await fetch(WORKER_URL + 'products');
     if (!response.ok) throw new Error('Ошибка загрузки товаров');
     products = await response.json();
-    // Загружаем промокоды параллельно
     await loadPromocodes();
     const activeCategory = document.querySelector('.category-btn.active');
     if (activeCategory) {
@@ -152,7 +151,7 @@ function showToast(message, type = 'success') {
 }
 
 // =============================================
-// ===== ПРОМОКОДЫ (динамические) =====
+// ===== ПРОМОКОДЫ =====
 // =============================================
 const promoInput = document.getElementById('promoCode');
 const applyPromoBtn = document.getElementById('applyPromoBtn');
@@ -197,7 +196,7 @@ promoInput.addEventListener('keypress', (e) => {
 });
 
 // =============================================
-// ===== УНИВЕРСАЛЬНЫЙ ФИЛЬТР =====
+// ===== ФИЛЬТРЫ =====
 // =============================================
 function initFilters(category) {
   const container = document.getElementById('filterContainer');
@@ -333,6 +332,7 @@ orderForm.addEventListener('submit', async (e) => {
     discount: discountPercent
   };
 
+  // Формируем текст сообщения для Telegram
   let message = `🛒 Новый заказ!\n\n`;
   message += `👤 Имя: ${orderData.name}\n`;
   message += `📱 Telegram: ${orderData.telegram}\n`;
@@ -351,10 +351,24 @@ orderForm.addEventListener('submit', async (e) => {
   }
 
   try {
+    // Отправляем заказ на Worker (сохранит в статистику и отправит уведомление)
     const response = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({ 
+        message: message,
+        order: {
+          name,
+          telegram,
+          address,
+          comment,
+          items: cart,
+          subtotal: orderData.subtotal,
+          total: orderData.total,
+          promo: appliedPromo,
+          discount: discountPercent
+        }
+      })
     });
 
     if (!response.ok) {
