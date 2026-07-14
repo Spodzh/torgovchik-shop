@@ -371,7 +371,7 @@ orderForm.addEventListener('submit', async (e) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.description || 'Ошибка отправки заказа');
+      throw new Error(errorData.error || 'Ошибка отправки заказа');
     }
 
     orderMessage.style.display = 'block';
@@ -397,7 +397,7 @@ orderForm.addEventListener('submit', async (e) => {
   } catch (error) {
     console.error('Ошибка отправки:', error);
     orderMessage.style.display = 'block';
-    orderMessage.textContent = `⚠️ Ошибка: ${error.message}. Попробуйте позже.`;
+    orderMessage.textContent = `⚠️ Ошибка: ${error.message || 'Неизвестная ошибка'}. Попробуйте позже.`;
     orderMessage.style.color = '#ff7777';
   }
 });
@@ -426,7 +426,6 @@ function switchCategory(category) {
     `;
     initFilters(category);
   } else if (category === 'coils' || category === 'disposables') {
-    // Для испарителей и одноразок — без фильтров
     categoryContent.innerHTML = `
       <div class="category-content active">
         <div class="catalog__grid" id="productGrid"></div>
@@ -434,7 +433,6 @@ function switchCategory(category) {
     `;
     renderProducts(category, 'Все');
   } else {
-    // Заглушка для неизвестных категорий (не должно возникать)
     categoryContent.innerHTML = `
       <div class="category-content active">
         <div class="placeholder">
@@ -479,7 +477,7 @@ document.addEventListener('click', (e) => {
 });
 
 // =============================================
-// ===== FAQ АККОРДЕОН =====
+// ===== FAQ =====
 // =============================================
 document.querySelectorAll('.faq__question').forEach(question => {
   question.addEventListener('click', function() {
@@ -490,7 +488,7 @@ document.querySelectorAll('.faq__question').forEach(question => {
 });
 
 // =============================================
-// ===== ВСПЛЫВАЮЩАЯ ПОДСКАЗКА ПРИ КЛИКЕ НА ЛОГОТИП =====
+// ===== ПОДСКАЗКА НА ЛОГОТИПЕ =====
 // =============================================
 document.addEventListener('DOMContentLoaded', function() {
   const logo = document.querySelector('.logo');
