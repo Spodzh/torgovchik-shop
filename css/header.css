@@ -144,7 +144,7 @@
     color: #e0c0ff;
 }
 
-/* ===== КОРЗИНА В ШАПКЕ ===== */
+/* ===== КНОПКА КОРЗИНЫ ===== */
 .cart-btn {
     background: rgba(255, 255, 255, 0.05);
     border: 1.5px solid rgba(200, 150, 255, 0.3);
@@ -178,56 +178,46 @@
     text-align: center;
 }
 
-/* ===== ВСПЛЫВАЮЩАЯ ПОДСКАЗКА ПРИ КЛИКЕ НА ЛОГОТИП ===== */
-.logo-tooltip {
-    background: rgba(20, 10, 40, 0.92);
-    backdrop-filter: blur(8px);
-    color: #f0eaff;
-    padding: 10px 20px;
-    border-radius: 12px;
-    font-size: 18px;
-    font-weight: 600;
+/* ===== КНОПКА ВХОДА / ПРОФИЛЬ (НОВАЯ, ПРОЗРАЧНАЯ) ===== */
+.header__user {
+    display: flex;
+    align-items: center;
+}
+
+.user-btn {
+    background: transparent;           /* прозрачный фон */
+    border: none;                      /* без рамки */
+    color: #c8b0e0;                    /* цвет текста как у навигации */
+    font-weight: 500;
+    font-size: 15px;
+    padding: 6px 12px;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: all 0.2s;
     font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 6px;
     white-space: nowrap;
-    box-shadow: 0 8px 30px rgba(255, 80, 180, 0.3);
-    border: 1px solid rgba(200, 150, 255, 0.2);
-    pointer-events: none;
-    opacity: 0;
-    transform: translateX(-50%) translateY(-100%) scale(0.9);
-    transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
-.logo-tooltip.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(-100%) scale(1);
+.user-btn:hover {
+    color: #ffffff;
+    background: rgba(255,255,255,0.05); /* лёгкое свечение при наведении */
 }
 
-.logo-tooltip::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 8px solid rgba(20, 10, 40, 0.92);
+/* Если пользователь залогинен — можно выделить чуть ярче */
+.user-btn.logged-in {
+    color: #f0eaff;
 }
 
-/* ===== АДАПТИВ ДЛЯ МОБИЛЬНЫХ ===== */
+/* Адаптив для маленьких экранов */
 @media (max-width: 600px) {
-    .header {
-        padding: 4px 0;
+    .user-btn {
+        font-size: 13px;
+        padding: 4px 10px;
     }
     .logo__image {
         height: 38px;
-    }
-    .logo-tooltip {
-        font-size: 15px;
-        padding: 8px 16px;
-        white-space: normal;
-        max-width: 280px;
-        text-align: center;
     }
 }
