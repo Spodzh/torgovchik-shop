@@ -11,6 +11,7 @@ let promocodes = [];
 let cart = [];
 let appliedPromo = null;
 let discountPercent = 0;
+let currentUser = null; // { telegram, totalTickets, orders, tickets }
 
 // =============================================
 // ===== ЗАГРУЗКА ТОВАРОВ И ПРОМОКОДОВ =====
@@ -46,7 +47,130 @@ async function loadPromocodes() {
 }
 
 // =============================================
-// ===== КОРЗИНА =====
+// ===== СИСТЕМА ПРОФИЛЕЙ =====
+// =============================================
+async function loadUserProfile(telegram) {
+  try {
+    const response = await fetch(WORKER_URL + 'user/' + encodeURIComponent(telegram));
+    if (!response.ok) throw new Error('Ошибка загрузки профиля');
+    const data = await response.json();
+    currentUser = data;
+    updateProfileUI();
+    return data;
+  } catch (error) {
+    console.error('Ошибка загрузки профиля:', error);
+    showToast('⚠️ Не удалось загрузить профиль', 'error');
+    return null;
+  }
+}
+
+function updateProfileUI() {
+  const userBtn = document.getElementById('userBtn');
+  if (currentUser && currentUser.telegram) {
+    const tickets = currentUser.totalTickets || 0;
+    userBtn.innerHTML = `👤 ${currentUser.telegram} 🎟️${tickets}`;
+    // Показываем профиль
+    document.getElementById('profileTelegram').textContent = currentUser.telegram;
+    document.getElementById('profileTickets').textContent = tickets;
+    const ordersDiv = document.getElementById('profileOrders');
+    if (currentUser.orders && currentUser.orders.length > 0) {
+      let html = '';
+      currentUser.orders.forEach(order => {
+        const status = order.approved ? '✅ Одобрен' : '❌ Отклонён';
+        const date = new Date(order.date).toLocaleDateString();
+        html += `<div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:12px; margin-bottom:10px;">`;
+        html += `<p><strong>Дата:</strong> ${date}</p>`;
+        html += `<p><strong>Сумма:</strong> ${Math.round(order.total)} BYN</p>`;
+        html += `<p><strong>Статус:</strong> ${status}</p>`;
+        if (order.tickets) html += `<p><strong>Билетиков:</strong> ${order.tickets}</p>`;
+        html += `</div>`;
+      });
+      ordersDiv.innerHTML = html;
+    } else {
+      ordersDiv.innerHTML = '<p>Заказов пока нет.</p>';
+    }
+  } else {
+    userBtn.innerHTML = '👤 Войти';
+    // Очищаем профиль
+    document.getElementById('profileTelegram').textContent = '';
+    document.getElementById('profileTickets').textContent = '0';
+    document.getElementById('profileOrders').innerHTML = '<p>Войдите, чтобы увидеть историю.</p>';
+  }
+}
+
+// ---- Вход ----
+function login() {
+  const input = document.getElementById('loginInput');
+  const username = input.value.trim();
+  if (!username) {
+    showToast('⚠️ Введите Telegram username', 'error');
+    return;
+  }
+  // Сохраняем в localStorage
+  localStorage.setItem('user_telegram', username);
+  loadUserProfile(username).then(() => {
+    document.getElementById('loginModal').classList.remove('open');
+    showToast(`✅ Добро пожаловать, ${username}!`, 'success');
+    updateProfileUI();
+  });
+}
+
+// ---- Выход ----
+function logout() {
+  localStorage.removeItem('user_telegram');
+  currentUser = null;
+  updateProfileUI();
+  document.getElementById('profileModal').classList.remove('open');
+  showToast('👋 Вы вышли из профиля', 'info');
+}
+
+// ---- Инициализация профиля при загрузке ----
+function initProfile() {
+  const saved = localStorage.getItem('user_telegram');
+  if (saved) {
+    loadUserProfile(saved).then(() => {
+      updateProfileUI();
+    });
+  }
+}
+
+// ---- Обработчики для модалок профиля ----
+document.getElementById('userBtn').addEventListener('click', () => {
+  if (currentUser && currentUser.telegram) {
+    // Открываем профиль
+    document.getElementById('profileModal').classList.add('open');
+    updateProfileUI();
+  } else {
+    // Открываем модалку входа
+    document.getElementById('loginModal').classList.add('open');
+    document.getElementById('loginInput').value = '';
+  }
+});
+
+document.getElementById('loginModalClose').addEventListener('click', () => {
+  document.getElementById('loginModal').classList.remove('open');
+});
+
+document.getElementById('loginSubmit').addEventListener('click', login);
+
+document.getElementById('loginInput').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') login();
+});
+
+document.getElementById('profileModalClose').addEventListener('click', () => {
+  document.getElementById('profileModal').classList.remove('open');
+});
+
+document.getElementById('profileLogout').addEventListener('click', logout);
+
+// Закрываем модалки при клике на overlay
+document.getElementById('overlay').addEventListener('click', () => {
+  document.getElementById('loginModal').classList.remove('open');
+  document.getElementById('profileModal').classList.remove('open');
+});
+
+// =============================================
+// ===== КОРЗИНА (без изменений) =====
 // =============================================
 const cartCount = document.getElementById('cartCount');
 const cartPanel = document.getElementById('cartPanel');
@@ -137,7 +261,7 @@ const toastContainer = document.getElementById('toastContainer');
 function showToast(message, type = 'success') {
   const toast = document.createElement('div');
   toast.className = 'toast';
-  const icon = type === 'success' ? '✅' : '❌';
+  const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
   toast.innerHTML = `
     <span class="toast-icon">${icon}</span>
     <span class="toast-message">${message}</span>
@@ -355,17 +479,7 @@ orderForm.addEventListener('submit', async (e) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         message: message,
-        order: {
-          name,
-          telegram,
-          address,
-          comment,
-          items: cart,
-          subtotal: orderData.subtotal,
-          total: orderData.total,
-          promo: appliedPromo,
-          discount: discountPercent
-        }
+        order: orderData
       })
     });
 
@@ -392,6 +506,10 @@ orderForm.addEventListener('submit', async (e) => {
       applyPromoBtn.disabled = false;
       promoMessage.textContent = '';
       showToast('✅ Заказ оформлен! Спасибо!', 'success');
+      // Обновить профиль, если пользователь залогинен
+      if (currentUser && currentUser.telegram) {
+        loadUserProfile(currentUser.telegram);
+      }
     }, 2000);
 
   } catch (error) {
@@ -550,3 +668,4 @@ document.addEventListener('DOMContentLoaded', function() {
 // ===== ЗАПУСК =====
 // =============================================
 loadProducts();
+initProfile();
