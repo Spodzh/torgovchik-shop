@@ -11,7 +11,8 @@ let promocodes = [];
 let cart = [];
 let appliedPromo = null;
 let discountPercent = 0;
-let currentUser = null; // { telegram, totalTickets, orders, tickets, registeredAt }
+let currentUser = null;
+let referralCode = null;
 
 // =============================================
 // ===== ЗАГРУЗКА ТОВАРОВ И ПРОМОКОДОВ =====
@@ -47,6 +48,18 @@ async function loadPromocodes() {
 }
 
 // =============================================
+// ===== РЕФЕРАЛЬНАЯ СИСТЕМА =====
+// =============================================
+function checkReferral() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const ref = urlParams.get('ref');
+  if (ref && !localStorage.getItem('user_telegram')) {
+    localStorage.setItem('referralCode', ref);
+  }
+  referralCode = localStorage.getItem('referralCode') || null;
+}
+
+// =============================================
 // ===== СИСТЕМА ПРОФИЛЕЙ (с паролями) =====
 // =============================================
 async function loadUserProfile(telegram) {
@@ -69,14 +82,26 @@ function updateProfileUI() {
   if (currentUser && currentUser.telegram) {
     const tickets = currentUser.totalTickets || 0;
     userBtn.innerHTML = `👤 ${currentUser.telegram} 🎟️${tickets}`;
-    // Заполняем профиль
     document.getElementById('profileName').textContent = currentUser.telegram;
     document.getElementById('profileTickets').textContent = tickets;
     document.getElementById('profileOrdersCount').textContent = (currentUser.orders || []).length;
-    // Аватар
-    const avatar = document.getElementById('profileAvatar');
-    avatar.textContent = currentUser.telegram.charAt(0).toUpperCase();
+    document.getElementById('profileAvatar').textContent = currentUser.telegram.charAt(0).toUpperCase();
 
+    // ---- Реферальная ссылка ----
+    const referralLink = `${window.location.origin}${window.location.pathname}?ref=${currentUser.telegram}`;
+    const referralDiv = document.getElementById('profileReferral');
+    if (referralDiv) {
+      referralDiv.innerHTML = `
+        <p><strong>Реферальная ссылка:</strong></p>
+        <div style="display:flex; gap:8px; align-items:center; background:rgba(255,255,255,0.05); border-radius:12px; padding:8px; word-break:break-all;">
+          <span style="flex:1; font-size:14px; color:#c8b0e0;">${referralLink}</span>
+          <button onclick="copyReferralLink('${referralLink}')" class="btn btn-primary" style="padding:6px 14px; font-size:13px;">Копировать</button>
+        </div>
+        <p style="margin-top:8px; color:#a080b8; font-size:14px;">Приглашено: <strong>${currentUser.referralCount || 0}</strong> человек</p>
+      `;
+    }
+
+    // Заказы
     const ordersDiv = document.getElementById('profileOrders');
     if (currentUser.orders && currentUser.orders.length > 0) {
       let html = '';
@@ -108,8 +133,27 @@ function updateProfileUI() {
     document.getElementById('profileOrdersCount').textContent = '0';
     document.getElementById('profileAvatar').textContent = '👤';
     document.getElementById('profileOrders').innerHTML = '<p style="color:#a080b8;">Войдите, чтобы увидеть историю.</p>';
+    const referralDiv = document.getElementById('profileReferral');
+    if (referralDiv) {
+      referralDiv.innerHTML = '';
+    }
   }
 }
+
+// ---- ФУНКЦИЯ КОПИРОВАНИЯ РЕФЕРАЛЬНОЙ ССЫЛКИ ----
+window.copyReferralLink = function(link) {
+  navigator.clipboard.writeText(link).then(() => {
+    showToast('🔗 Реферальная ссылка скопирована!', 'success');
+  }).catch(() => {
+    const input = document.createElement('input');
+    input.value = link;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    document.body.removeChild(input);
+    showToast('🔗 Реферальная ссылка скопирована!', 'success');
+  });
+};
 
 // ---- ВХОД ----
 async function login() {
@@ -141,7 +185,7 @@ async function login() {
   }
 }
 
-// ---- РЕГИСТРАЦИЯ ----
+// ---- РЕГИСТРАЦИЯ (с реферальным кодом) ----
 async function register() {
   const input = document.getElementById('loginInput');
   const passwordInput = document.getElementById('loginPassword');
@@ -159,14 +203,18 @@ async function register() {
     const response = await fetch(WORKER_URL + 'register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ telegram: username, password })
+      body: JSON.stringify({
+        telegram: username,
+        password,
+        ref: referralCode || null
+      })
     });
     const data = await response.json();
     if (!response.ok) {
       throw new Error(data.error || 'Ошибка регистрации');
     }
     showToast('✅ Регистрация успешна! Теперь войдите.', 'success');
-    // Автоматический вход
+    localStorage.removeItem('referralCode');
     await login();
   } catch (err) {
     showToast(`❌ ${err.message}`, 'error');
@@ -468,7 +516,6 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
     showToast('Корзина пуста. Добавьте товары.', 'error');
     return;
   }
-  // Если пользователь залогинен, подставить его Telegram
   if (currentUser && currentUser.telegram) {
     document.getElementById('orderTelegram').value = '@' + currentUser.telegram;
   }
@@ -540,7 +587,7 @@ orderForm.addEventListener('submit', async (e) => {
     const response = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         message: message,
         order: orderData
       })
@@ -569,7 +616,6 @@ orderForm.addEventListener('submit', async (e) => {
       applyPromoBtn.disabled = false;
       promoMessage.textContent = '';
       showToast('✅ Заказ оформлен! Спасибо!', 'success');
-      // Обновить профиль, если пользователь залогинен
       if (currentUser && currentUser.telegram) {
         loadUserProfile(currentUser.telegram);
       }
@@ -730,5 +776,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // =============================================
 // ===== ЗАПУСК =====
 // =============================================
+checkReferral();
 loadProducts();
 initProfile();
