@@ -11,7 +11,7 @@ let promocodes = [];
 let cart = [];
 let appliedPromo = null;
 let discountPercent = 0;
-let currentUser = null; // { telegram, totalTickets, orders, tickets }
+let currentUser = null; // { telegram, totalTickets, orders, tickets, registeredAt }
 
 // =============================================
 // ===== ЗАГРУЗКА ТОВАРОВ И ПРОМОКОДОВ =====
@@ -47,7 +47,7 @@ async function loadPromocodes() {
 }
 
 // =============================================
-// ===== СИСТЕМА ПРОФИЛЕЙ =====
+// ===== СИСТЕМА ПРОФИЛЕЙ (с паролями) =====
 // =============================================
 async function loadUserProfile(telegram) {
   try {
@@ -69,62 +69,111 @@ function updateProfileUI() {
   if (currentUser && currentUser.telegram) {
     const tickets = currentUser.totalTickets || 0;
     userBtn.innerHTML = `👤 ${currentUser.telegram} 🎟️${tickets}`;
-    // Показываем профиль
-    document.getElementById('profileTelegram').textContent = currentUser.telegram;
+    // Заполняем профиль
+    document.getElementById('profileName').textContent = currentUser.telegram;
     document.getElementById('profileTickets').textContent = tickets;
+    document.getElementById('profileOrdersCount').textContent = (currentUser.orders || []).length;
+    // Аватар
+    const avatar = document.getElementById('profileAvatar');
+    avatar.textContent = currentUser.telegram.charAt(0).toUpperCase();
+
     const ordersDiv = document.getElementById('profileOrders');
     if (currentUser.orders && currentUser.orders.length > 0) {
       let html = '';
-      currentUser.orders.forEach(order => {
-        const status = order.approved ? '✅ Одобрен' : '❌ Отклонён';
-        const date = new Date(order.date).toLocaleDateString();
-        html += `<div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:12px; margin-bottom:10px;">`;
-        html += `<p><strong>Дата:</strong> ${date}</p>`;
-        html += `<p><strong>Сумма:</strong> ${Math.round(order.total)} BYN</p>`;
-        html += `<p><strong>Статус:</strong> ${status}</p>`;
-        if (order.tickets) html += `<p><strong>Билетиков:</strong> ${order.tickets}</p>`;
-        html += `</div>`;
+      currentUser.orders.slice().reverse().forEach(order => {
+        const status = order.approved === true ? 'approved' : (order.approved === false ? 'rejected' : 'pending');
+        const statusLabel = order.approved === true ? '✅ Одобрен' : (order.approved === false ? '❌ Отклонён' : '⏳ Ожидает');
+        const date = new Date(order.date).toLocaleDateString('ru-RU', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+        const total = order.total || 0;
+        html += `
+          <div class="order-card ${status}">
+            <div class="order-header">
+              <span>Заказ #${order.id ? order.id.slice(-6) : '—'}</span>
+              <span class="order-total">${Math.round(total)} BYN</span>
+            </div>
+            <div class="order-date">${date}</div>
+            <span class="order-status ${status}">${statusLabel}</span>
+            ${order.tickets ? `&nbsp;<span style="color:#f7c948; font-size:13px;">🎟️ ${order.tickets} бил.</span>` : ''}
+          </div>
+        `;
       });
       ordersDiv.innerHTML = html;
     } else {
-      ordersDiv.innerHTML = '<p>Заказов пока нет.</p>';
+      ordersDiv.innerHTML = '<p style="color:#a080b8;">Заказов пока нет.</p>';
     }
   } else {
     userBtn.innerHTML = '👤 Войти';
-    // Очищаем профиль
-    document.getElementById('profileTelegram').textContent = '';
+    document.getElementById('profileName').textContent = 'Пользователь';
     document.getElementById('profileTickets').textContent = '0';
-    document.getElementById('profileOrders').innerHTML = '<p>Войдите, чтобы увидеть историю.</p>';
+    document.getElementById('profileOrdersCount').textContent = '0';
+    document.getElementById('profileAvatar').textContent = '👤';
+    document.getElementById('profileOrders').innerHTML = '<p style="color:#a080b8;">Войдите, чтобы увидеть историю.</p>';
   }
 }
 
-// ---- Вход ----
-function login() {
+// ---- ВХОД ----
+async function login() {
   const input = document.getElementById('loginInput');
+  const passwordInput = document.getElementById('loginPassword');
   const username = input.value.trim();
-  if (!username) {
-    showToast('⚠️ Введите Telegram username', 'error');
+  const password = passwordInput.value.trim();
+  if (!username || !password) {
+    showToast('⚠️ Заполните все поля', 'error');
     return;
   }
-  // Сохраняем в localStorage
-  localStorage.setItem('user_telegram', username);
-  loadUserProfile(username).then(() => {
+  try {
+    const response = await fetch(WORKER_URL + 'login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telegram: username, password })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || 'Ошибка входа');
+    }
+    localStorage.setItem('user_telegram', username);
+    currentUser = data;
+    updateProfileUI();
     document.getElementById('loginModal').classList.remove('open');
     showToast(`✅ Добро пожаловать, ${username}!`, 'success');
-    updateProfileUI();
-  });
+  } catch (err) {
+    showToast(`❌ ${err.message}`, 'error');
+  }
 }
 
-// ---- Выход ----
-function logout() {
-  localStorage.removeItem('user_telegram');
-  currentUser = null;
-  updateProfileUI();
-  document.getElementById('profileModal').classList.remove('open');
-  showToast('👋 Вы вышли из профиля', 'info');
+// ---- РЕГИСТРАЦИЯ ----
+async function register() {
+  const input = document.getElementById('loginInput');
+  const passwordInput = document.getElementById('loginPassword');
+  const username = input.value.trim();
+  const password = passwordInput.value.trim();
+  if (!username || !password) {
+    showToast('⚠️ Заполните все поля', 'error');
+    return;
+  }
+  if (password.length < 4) {
+    showToast('⚠️ Пароль должен быть не менее 4 символов', 'error');
+    return;
+  }
+  try {
+    const response = await fetch(WORKER_URL + 'register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telegram: username, password })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || 'Ошибка регистрации');
+    }
+    showToast('✅ Регистрация успешна! Теперь войдите.', 'success');
+    // Автоматический вход
+    await login();
+  } catch (err) {
+    showToast(`❌ ${err.message}`, 'error');
+  }
 }
 
-// ---- Инициализация профиля при загрузке ----
+// ---- ИНИЦИАЛИЗАЦИЯ ПРОФИЛЯ ----
 function initProfile() {
   const saved = localStorage.getItem('user_telegram');
   if (saved) {
@@ -134,16 +183,15 @@ function initProfile() {
   }
 }
 
-// ---- Обработчики для модалок профиля ----
+// ---- ОБРАБОТЧИКИ ДЛЯ МОДАЛОК ПРОФИЛЯ ----
 document.getElementById('userBtn').addEventListener('click', () => {
   if (currentUser && currentUser.telegram) {
-    // Открываем профиль
     document.getElementById('profileModal').classList.add('open');
     updateProfileUI();
   } else {
-    // Открываем модалку входа
     document.getElementById('loginModal').classList.add('open');
     document.getElementById('loginInput').value = '';
+    document.getElementById('loginPassword').value = '';
   }
 });
 
@@ -152,6 +200,11 @@ document.getElementById('loginModalClose').addEventListener('click', () => {
 });
 
 document.getElementById('loginSubmit').addEventListener('click', login);
+document.getElementById('registerSubmit').addEventListener('click', register);
+
+document.getElementById('loginPassword').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') login();
+});
 
 document.getElementById('loginInput').addEventListener('keypress', (e) => {
   if (e.key === 'Enter') login();
@@ -161,7 +214,13 @@ document.getElementById('profileModalClose').addEventListener('click', () => {
   document.getElementById('profileModal').classList.remove('open');
 });
 
-document.getElementById('profileLogout').addEventListener('click', logout);
+document.getElementById('profileLogout').addEventListener('click', () => {
+  localStorage.removeItem('user_telegram');
+  currentUser = null;
+  updateProfileUI();
+  document.getElementById('profileModal').classList.remove('open');
+  showToast('👋 Вы вышли из профиля', 'info');
+});
 
 // Закрываем модалки при клике на overlay
 document.getElementById('overlay').addEventListener('click', () => {
@@ -170,7 +229,7 @@ document.getElementById('overlay').addEventListener('click', () => {
 });
 
 // =============================================
-// ===== КОРЗИНА (без изменений) =====
+// ===== КОРЗИНА =====
 // =============================================
 const cartCount = document.getElementById('cartCount');
 const cartPanel = document.getElementById('cartPanel');
@@ -408,6 +467,10 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
   if (cart.length === 0) {
     showToast('Корзина пуста. Добавьте товары.', 'error');
     return;
+  }
+  // Если пользователь залогинен, подставить его Telegram
+  if (currentUser && currentUser.telegram) {
+    document.getElementById('orderTelegram').value = '@' + currentUser.telegram;
   }
   orderModal.classList.add('open');
   orderMessage.style.display = 'none';
