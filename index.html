@@ -186,9 +186,13 @@
         <div class="login-modal__content">
             <button class="login-modal__close" id="loginModalClose">✕</button>
             <h2>Вход в профиль</h2>
-            <p>Введите ваш Telegram username (без @):</p>
-            <input type="text" id="loginInput" placeholder="spodzh" style="width:100%; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#f0eaff; font-size:16px; margin:12px 0;">
-            <button class="btn btn-primary" id="loginSubmit">Войти</button>
+            <p>Введите ваш Telegram username и пароль:</p>
+            <input type="text" id="loginInput" placeholder="username (без @)">
+            <input type="password" id="loginPassword" placeholder="Пароль">
+            <div class="login-modal__buttons">
+                <button class="btn btn-primary" id="loginSubmit">Войти</button>
+                <button class="btn btn-secondary" id="registerSubmit">Регистрация</button>
+            </div>
         </div>
     </div>
 
@@ -197,13 +201,27 @@
         <div class="profile-modal__content">
             <button class="profile-modal__close" id="profileModalClose">✕</button>
             <h2>👤 Мой профиль</h2>
-            <div id="profileInfo">
-                <p><strong>Telegram:</strong> <span id="profileTelegram"></span></p>
-                <p><strong>🎟️ Билетиков:</strong> <span id="profileTickets">0</span></p>
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">👤</div>
+                <div>
+                    <div style="font-size:20px; font-weight:600; color:#f0eaff;" id="profileName">Пользователь</div>
+                    <div class="profile-stats">
+                        <div class="profile-stats-item">
+                            <div class="value" id="profileTickets">0</div>
+                            <div class="label">Билетиков</div>
+                        </div>
+                        <div class="profile-stats-item">
+                            <div class="value" id="profileOrdersCount">0</div>
+                            <div class="label">Заказов</div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <h3>📦 История заказов</h3>
-            <div id="profileOrders"></div>
-            <button class="btn btn-danger" id="profileLogout" style="margin-top:16px;">Выйти</button>
+            <div class="profile-orders" id="profileOrders">
+                <p>Заказов пока нет.</p>
+            </div>
+            <button class="btn-danger" id="profileLogout" style="margin-top:16px;">Выйти</button>
         </div>
     </div>
 
