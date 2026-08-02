@@ -46,6 +46,11 @@
                 </nav>
             </div>
 
+            <!-- Кнопка входа / профиль -->
+            <div class="header__user">
+                <button class="user-btn" id="userBtn">👤 Войти</button>
+            </div>
+
             <button class="cart-btn" id="cartToggle">
                 <span class="cart-icon">🛒</span>
                 <span class="cart-badge" id="cartCount">0</span>
@@ -175,6 +180,32 @@
 
     <!-- ===== ТОСТЫ ===== -->
     <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== МОДАЛКА ВХОДА (LOGIN) ===== -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-modal__content">
+            <button class="login-modal__close" id="loginModalClose">✕</button>
+            <h2>Вход в профиль</h2>
+            <p>Введите ваш Telegram username (без @):</p>
+            <input type="text" id="loginInput" placeholder="spodzh" style="width:100%; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#f0eaff; font-size:16px; margin:12px 0;">
+            <button class="btn btn-primary" id="loginSubmit">Войти</button>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛКА ПРОФИЛЯ ===== -->
+    <div class="profile-modal" id="profileModal">
+        <div class="profile-modal__content">
+            <button class="profile-modal__close" id="profileModalClose">✕</button>
+            <h2>👤 Мой профиль</h2>
+            <div id="profileInfo">
+                <p><strong>Telegram:</strong> <span id="profileTelegram"></span></p>
+                <p><strong>🎟️ Билетиков:</strong> <span id="profileTickets">0</span></p>
+            </div>
+            <h3>📦 История заказов</h3>
+            <div id="profileOrders"></div>
+            <button class="btn btn-danger" id="profileLogout" style="margin-top:16px;">Выйти</button>
+        </div>
+    </div>
 
     <!-- ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА ===== -->
     <div class="order-modal" id="orderModal">
