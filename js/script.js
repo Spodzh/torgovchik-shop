@@ -101,6 +101,16 @@ function updateProfileUI() {
       `;
     }
 
+    // ---- Подписка на уведомления ----
+    const subscriptionDiv = document.getElementById('subscriptionStatus');
+    if (currentUser.chatId) {
+      subscriptionDiv.innerHTML = '✅ Вы подписаны на уведомления в Telegram.';
+      subscriptionDiv.style.color = '#8aff8a';
+    } else {
+      subscriptionDiv.innerHTML = '❌ Вы не подписаны на уведомления. <br> Напишите нашему боту <a href="https://t.me/torgovchikbot" target="_blank" style="color:#f7c948;">@TorgovchikBot</a> и нажмите <strong>/start</strong>, чтобы получать уведомления о заказах.';
+      subscriptionDiv.style.color = '#ff7777';
+    }
+
     // Заказы
     const ordersDiv = document.getElementById('profileOrders');
     if (currentUser.orders && currentUser.orders.length > 0) {
@@ -136,6 +146,11 @@ function updateProfileUI() {
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) {
       referralDiv.innerHTML = '';
+    }
+    const subscriptionDiv = document.getElementById('subscriptionStatus');
+    if (subscriptionDiv) {
+      subscriptionDiv.innerHTML = 'Войдите, чтобы проверить подписку.';
+      subscriptionDiv.style.color = '#a080b8';
     }
   }
 }
@@ -268,6 +283,19 @@ document.getElementById('profileLogout').addEventListener('click', () => {
   updateProfileUI();
   document.getElementById('profileModal').classList.remove('open');
   showToast('👋 Вы вышли из профиля', 'info');
+});
+
+// Кнопка обновления статуса подписки
+document.getElementById('checkSubscriptionBtn').addEventListener('click', () => {
+  if (currentUser && currentUser.telegram) {
+    showToast('🔄 Проверка подписки...', 'info');
+    loadUserProfile(currentUser.telegram).then(() => {
+      updateProfileUI();
+      showToast('✅ Статус обновлён', 'success');
+    });
+  } else {
+    showToast('⚠️ Войдите в профиль', 'error');
+  }
 });
 
 // Закрываем модалки при клике на overlay
