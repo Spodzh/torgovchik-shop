@@ -101,16 +101,6 @@ function updateProfileUI() {
       `;
     }
 
-    // ---- Подписка на уведомления ----
-    const subscriptionDiv = document.getElementById('subscriptionStatus');
-    if (currentUser.chatId) {
-      subscriptionDiv.innerHTML = '✅ Вы подписаны на уведомления в Telegram.';
-      subscriptionDiv.style.color = '#8aff8a';
-    } else {
-      subscriptionDiv.innerHTML = '❌ Вы не подписаны на уведомления. <br> Напишите нашему боту <a href="https://t.me/torgovchikbot" target="_blank" style="color:#f7c948;">@TorgovchikBot</a> и нажмите <strong>/start</strong>, чтобы получать уведомления о заказах.';
-      subscriptionDiv.style.color = '#ff7777';
-    }
-
     // ---- Заказы ----
     const ordersDiv = document.getElementById('profileOrders');
     if (currentUser.orders && currentUser.orders.length > 0) {
@@ -145,11 +135,6 @@ function updateProfileUI() {
     document.getElementById('profileOrders').innerHTML = '<p style="color:#a080b8;">Войдите, чтобы увидеть историю.</p>';
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) referralDiv.innerHTML = '';
-    const subscriptionDiv = document.getElementById('subscriptionStatus');
-    if (subscriptionDiv) {
-      subscriptionDiv.innerHTML = 'Войдите, чтобы проверить подписку.';
-      subscriptionDiv.style.color = '#a080b8';
-    }
   }
 }
 
@@ -280,23 +265,6 @@ document.getElementById('profileLogout').addEventListener('click', () => {
   updateProfileUI();
   document.getElementById('profileModal').classList.remove('open');
   showToast('👋 Вы вышли из профиля', 'info');
-});
-
-// ---- КНОПКА ОБНОВЛЕНИЯ СТАТУСА ПОДПИСКИ ----
-document.getElementById('checkSubscriptionBtn').addEventListener('click', () => {
-  if (currentUser && currentUser.telegram) {
-    showToast('🔄 Проверка подписки...', 'info');
-    loadUserProfile(currentUser.telegram).then(() => {
-      updateProfileUI();
-      if (currentUser.chatId) {
-        showToast('✅ Вы подписаны на уведомления!', 'success');
-      } else {
-        showToast('❌ Вы не подписаны. Напишите боту @TorgovchikBot и нажмите /start', 'error');
-      }
-    });
-  } else {
-    showToast('⚠️ Войдите в профиль', 'error');
-  }
 });
 
 // ---- ЗАКРЫТИЕ МОДАЛОК ПО OVERLAY ----
