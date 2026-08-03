@@ -111,7 +111,7 @@ function updateProfileUI() {
       subscriptionDiv.style.color = '#ff7777';
     }
 
-    // Заказы
+    // ---- Заказы ----
     const ordersDiv = document.getElementById('profileOrders');
     if (currentUser.orders && currentUser.orders.length > 0) {
       let html = '';
@@ -144,9 +144,7 @@ function updateProfileUI() {
     document.getElementById('profileAvatar').textContent = '👤';
     document.getElementById('profileOrders').innerHTML = '<p style="color:#a080b8;">Войдите, чтобы увидеть историю.</p>';
     const referralDiv = document.getElementById('profileReferral');
-    if (referralDiv) {
-      referralDiv.innerHTML = '';
-    }
+    if (referralDiv) referralDiv.innerHTML = '';
     const subscriptionDiv = document.getElementById('subscriptionStatus');
     if (subscriptionDiv) {
       subscriptionDiv.innerHTML = 'Войдите, чтобы проверить подписку.';
@@ -155,7 +153,7 @@ function updateProfileUI() {
   }
 }
 
-// ---- ФУНКЦИЯ КОПИРОВАНИЯ РЕФЕРАЛЬНОЙ ССЫЛКИ ----
+// ---- КОПИРОВАНИЕ РЕФЕРАЛЬНОЙ ССЫЛКИ ----
 window.copyReferralLink = function(link) {
   navigator.clipboard.writeText(link).then(() => {
     showToast('🔗 Реферальная ссылка скопирована!', 'success');
@@ -246,7 +244,7 @@ function initProfile() {
   }
 }
 
-// ---- ОБРАБОТЧИКИ ДЛЯ МОДАЛОК ПРОФИЛЯ ----
+// ---- ОБРАБОТЧИКИ ДЛЯ МОДАЛОК ----
 document.getElementById('userBtn').addEventListener('click', () => {
   if (currentUser && currentUser.telegram) {
     document.getElementById('profileModal').classList.add('open');
@@ -268,7 +266,6 @@ document.getElementById('registerSubmit').addEventListener('click', register);
 document.getElementById('loginPassword').addEventListener('keypress', (e) => {
   if (e.key === 'Enter') login();
 });
-
 document.getElementById('loginInput').addEventListener('keypress', (e) => {
   if (e.key === 'Enter') login();
 });
@@ -285,20 +282,24 @@ document.getElementById('profileLogout').addEventListener('click', () => {
   showToast('👋 Вы вышли из профиля', 'info');
 });
 
-// Кнопка обновления статуса подписки
+// ---- КНОПКА ОБНОВЛЕНИЯ СТАТУСА ПОДПИСКИ ----
 document.getElementById('checkSubscriptionBtn').addEventListener('click', () => {
   if (currentUser && currentUser.telegram) {
     showToast('🔄 Проверка подписки...', 'info');
     loadUserProfile(currentUser.telegram).then(() => {
       updateProfileUI();
-      showToast('✅ Статус обновлён', 'success');
+      if (currentUser.chatId) {
+        showToast('✅ Вы подписаны на уведомления!', 'success');
+      } else {
+        showToast('❌ Вы не подписаны. Напишите боту @TorgovchikBot и нажмите /start', 'error');
+      }
     });
   } else {
     showToast('⚠️ Войдите в профиль', 'error');
   }
 });
 
-// Закрываем модалки при клике на overlay
+// ---- ЗАКРЫТИЕ МОДАЛОК ПО OVERLAY ----
 document.getElementById('overlay').addEventListener('click', () => {
   document.getElementById('loginModal').classList.remove('open');
   document.getElementById('profileModal').classList.remove('open');
