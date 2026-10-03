@@ -6,7 +6,7 @@
     <title>Torgovchik — жидкости для POD</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/header.css" />
     <link rel="stylesheet" href="css/catalog.css" />
@@ -58,20 +58,30 @@
         </div>
     </header>
 
-    <!-- ===== ГЛАВНЫЙ БАННЕР ===== -->
-    <section class="hero">
-        <div class="container hero__inner">
-            <div class="hero__content" style="flex: 1 1 100%;">
-                <h1>Ассортимент <br>для Pod-систем.</h1>
+   <!-- ===== ГЛАВНЫЙ БАННЕР ===== -->
+<section class="hero">
+    <span class="hero__leaf hero__leaf--tl">🍁</span>
+    <span class="hero__leaf hero__leaf--tr">🍂</span>
+    <span class="hero__leaf hero__leaf--bl">🍂</span>
+    <span class="hero__leaf hero__leaf--br">🍁</span>
+
+    <div class="container">
+        <div class="hero__box">
+            <div class="hero__content">
+                <h1>Ассортимент <br>для <span class="accent">Pod-систем.</span></h1>
                 <p>
                     Ассортимент оригинальных вкусов.<br>
                     Только качественные бренды.<br>
                     Работаем в Гомеле.
                 </p>
-                <a href="#catalog" class="btn btn-primary">Смотреть ассортимент</a>
+                <a href="#catalog" class="btn btn-primary">
+                    Смотреть ассортимент
+                    <span class="btn-arrow">→</span>
+                </a>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- ===== КАТАЛОГ ===== -->
     <section class="catalog" id="catalog">
@@ -87,18 +97,24 @@
             <div class="about__grid">
                 <div class="about__card">
                     <div class="about__icon">🍓</div>
-                    <h3>Оригинальная продукция</h3>
-                    <p>Мы работаем только с проверенными поставщиками и предлагаем сертифицированные жидкости от ведущих брендов.</p>
+                    <div>
+                        <h3>Оригинальная продукция</h3>
+                        <p>Мы работаем только с проверенными поставщиками и предлагаем сертифицированные жидкости от ведущих брендов.</p>
+                    </div>
                 </div>
                 <div class="about__card">
                     <div class="about__icon">🤝</div>
-                    <h3>Профессиональный подход</h3>
-                    <p>Наши консультанты всегда готовы помочь с выбором вкуса, ответить на вопросы и подобрать идеальный вариант.</p>
+                    <div>
+                        <h3>Профессиональный подход</h3>
+                        <p>Наши консультанты всегда готовы помочь с выбором вкуса, ответить на вопросы и подобрать идеальный вариант.</p>
+                    </div>
                 </div>
                 <div class="about__card">
                     <div class="about__icon">🎁</div>
-                    <h3>Выгодные условия</h3>
-                    <p>Регулярные акции, накопительные скидки и приятные бонусы для постоянных клиентов — мы ценим каждого.</p>
+                    <div>
+                        <h3>Выгодные условия</h3>
+                        <p>Регулярные акции, накопительные скидки и приятные бонусы для постоянных клиентов — мы ценим каждого.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -154,8 +170,8 @@
     <footer class="footer">
         <div class="container">
             <p>© 2026 Torgovchik. Все права защищены.</p>
-            <p style="margin-top: 8px; font-size: 14px; opacity: 0.8;">
-                <a href="terms.html" style="color: #c8b0e0; text-decoration: none; border-bottom: 1px dashed #8888aa;">Пользовательское соглашение</a>
+            <p style="margin-top: 8px; font-size: 14px; opacity: 0.85;">
+                <a href="terms.html">Пользовательское соглашение</a>
             </p>
         </div>
     </footer>
@@ -204,7 +220,7 @@
             <div class="profile-header">
                 <div class="profile-avatar" id="profileAvatar">👤</div>
                 <div>
-                    <div style="font-size:20px; font-weight:600; color:#f0eaff;" id="profileName">Пользователь</div>
+                    <div style="font-size:20px; font-weight:600; color:#F4E8D5; font-family:'Bitter', serif;" id="profileName">Пользователь</div>
                     <div class="profile-stats">
                         <div class="profile-stats-item">
                             <div class="value" id="profileTickets">0</div>
@@ -217,12 +233,13 @@
                     </div>
                 </div>
             </div>
+
             <!-- Блок реферальной ссылки -->
             <div id="profileReferral" style="margin-top:12px;"></div>
 
             <h3>📦 История заказов</h3>
             <div class="profile-orders" id="profileOrders">
-                <p>Заказов пока нет.</p>
+                <p style="color:#9D887A;">Заказов пока нет.</p>
             </div>
             <button class="btn-danger" id="profileLogout" style="margin-top:16px;">Выйти</button>
         </div>
@@ -256,7 +273,7 @@
                         <input type="text" id="promoCode" placeholder="Введите промокод" style="flex:1;">
                         <button type="button" class="btn btn-primary" id="applyPromoBtn" style="padding:12px 20px; font-size:14px; white-space:nowrap;">Применить</button>
                     </div>
-                    <div id="promoMessage" style="font-size:14px; margin-top:6px; color:#c8b0e0;"></div>
+                    <div id="promoMessage" style="font-size:14px; margin-top:6px; color:#B9A99A;"></div>
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary" id="orderSubmit">Отправить заказ</button>
