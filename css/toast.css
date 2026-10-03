@@ -1,4 +1,4 @@
-/* ===== ТОСТЫ ===== */
+/* ===== ТОСТЫ / ОСЕННИЙ ВАЙБ ===== */
 .toast-container {
     position: fixed;
     top: 80px;
@@ -11,30 +11,23 @@
 }
 
 .toast {
-    background: rgba(26, 10, 46, 0.95);
+    background: var(--bg-card);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(200, 150, 255, 0.2);
+    border: 1px solid var(--border-medium);
     border-radius: 16px;
     padding: 14px 20px;
-    color: #f0eaff;
-    box-shadow: 0 8px 30px rgba(255, 80, 180, 0.15);
+    color: var(--text-primary);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(184, 92, 50, 0.15);
     animation: slideIn 0.3s ease forwards;
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.toast.hide {
-    animation: slideOut 0.3s ease forwards;
-}
+.toast.hide { animation: slideOut 0.3s ease forwards; }
 
-.toast-icon {
-    font-size: 20px;
-}
-.toast-message {
-    font-size: 14px;
-    flex: 1;
-}
+.toast-icon { font-size: 20px; }
+.toast-message { font-size: 14px; flex: 1; }
 
 @keyframes slideIn {
     from { transform: translateX(100%); opacity: 0; }
