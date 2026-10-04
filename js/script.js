@@ -29,6 +29,9 @@ const AVATARS = [
     { id: 20, image: 'https://i.ibb.co/Nz2SQ4w/image.png' }
 ];
 
+// ID аватарки по умолчанию (для тех, кто ещё не выбрал)
+const DEFAULT_AVATAR_ID = 6;
+
 // =============================================
 // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
 // =============================================
@@ -106,6 +109,7 @@ async function loadUserProfile(telegram) {
 
 // ---- Применяет аватарку к элементу ----
 function applyAvatar(el, avatarId, fallbackText) {
+  if (!el) return;
   el.innerHTML = '';
 
   const avatar = AVATARS.find(a => a.id === avatarId);
@@ -124,17 +128,28 @@ function updateProfileUI() {
   const userBtn = document.getElementById('userBtn');
   if (currentUser && currentUser.telegram) {
     const tickets = currentUser.totalTickets || 0;
-    userBtn.innerHTML = `👤 ${currentUser.telegram} 🎟️${tickets}`;
+    // Если пользователь не выбрал аватарку — используем #6 по умолчанию
+    const avatarId = currentUser.avatar || DEFAULT_AVATAR_ID;
+
+    userBtn.innerHTML = `
+      <span class="user-btn__avatar"></span>
+      <span class="user-btn__name">${currentUser.telegram}</span>
+      <span class="user-btn__tickets">🎟️${tickets}</span>
+    `;
+    applyAvatar(userBtn.querySelector('.user-btn__avatar'), avatarId, currentUser.telegram);
+
     document.getElementById('profileName').textContent = currentUser.telegram;
     document.getElementById('profileTickets').textContent = tickets;
     document.getElementById('profileOrdersCount').textContent = (currentUser.orders || []).length;
 
+    // В профиле тоже показываем #6, если аватарка не выбрана
     applyAvatar(
       document.getElementById('profileAvatar'),
-      currentUser.avatar,
+      avatarId,
       currentUser.telegram
     );
 
+    // Реферальная ссылка
     const referralLink = `${window.location.origin}${window.location.pathname}?ref=${currentUser.telegram}`;
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) {
@@ -148,6 +163,7 @@ function updateProfileUI() {
       `;
     }
 
+    // Заказы
     const ordersDiv = document.getElementById('profileOrders');
     if (currentUser.orders && currentUser.orders.length > 0) {
       let html = '';
@@ -188,7 +204,7 @@ function updateProfileUI() {
 // ===== ЛОГИКА ВЫБОРА АВАТАРКИ =====
 // =============================================
 function openAvatarModal() {
-  pendingAvatarId = currentUser ? currentUser.avatar : null;
+  pendingAvatarId = (currentUser && currentUser.avatar) ? currentUser.avatar : DEFAULT_AVATAR_ID;
   renderAvatarGrid();
   document.getElementById('avatarModal').classList.add('open');
 }
