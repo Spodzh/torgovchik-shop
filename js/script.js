@@ -32,6 +32,17 @@ const AVATARS = [
 const DEFAULT_AVATAR_ID = 6;
 
 // =============================================
+// ===== ШАПКИ ПРОФИЛЯ (5 шт.) =====
+// =============================================
+const BANNERS = [
+    { id: 1, image: 'https://i.ibb.co/FbQzf5tN/image.png' },
+    { id: 2, image: 'https://i.ibb.co/rRHB6BV4/image.png' },
+    { id: 3, image: 'https://i.ibb.co/wNB7K5VH/image.png' },
+    { id: 4, image: 'https://i.ibb.co/W4Dm8kq9/image.png' },
+    { id: 5, image: 'https://i.ibb.co/8gsHWLD5/image.png' }
+];
+
+// =============================================
 // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
 // =============================================
 let products = [];
@@ -42,6 +53,7 @@ let discountPercent = 0;
 let currentUser = null;
 let referralCode = null;
 let pendingAvatarId = null;
+let pendingBannerId = null;
 let currentAuthTab = 'login';
 
 // =============================================
@@ -142,6 +154,19 @@ function updateProfileUI() {
 
     applyAvatar(document.getElementById('profileAvatar'), avatarId, currentUser.telegram);
 
+    // Шапка профиля
+    const profileHeader = document.getElementById('profileHeader');
+    if (profileHeader) {
+      const banner = BANNERS.find(b => b.id === currentUser.banner);
+      if (banner) {
+        profileHeader.style.backgroundImage = `url('${banner.image}')`;
+        profileHeader.classList.add('has-banner');
+      } else {
+        profileHeader.style.backgroundImage = '';
+        profileHeader.classList.remove('has-banner');
+      }
+    }
+
     const referralLink = `${window.location.origin}${window.location.pathname}?ref=${currentUser.telegram}`;
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) {
@@ -185,6 +210,13 @@ function updateProfileUI() {
     document.getElementById('profileTickets').textContent = '0';
     document.getElementById('profileOrdersCount').textContent = '0';
     applyAvatar(document.getElementById('profileAvatar'), null, null);
+
+    const profileHeader = document.getElementById('profileHeader');
+    if (profileHeader) {
+      profileHeader.style.backgroundImage = '';
+      profileHeader.classList.remove('has-banner');
+    }
+
     document.getElementById('profileOrders').innerHTML = '<p style="color:#9D887A;">Войдите, чтобы увидеть историю.</p>';
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) referralDiv.innerHTML = '';
@@ -261,6 +293,79 @@ async function saveAvatar() {
     saveBtn.disabled = false;
     saveBtn.textContent = 'Сохранить';
   }
+}
+
+// =============================================
+// ===== ЛОГИКА ВЫБОРА ШАПКИ ПРОФИЛЯ =====
+// =============================================
+function openBannerModal() {
+  pendingBannerId = (currentUser && currentUser.banner) ? currentUser.banner : null;
+  renderBannerGrid();
+  document.getElementById('bannerModal').classList.add('open');
+}
+
+function closeBannerModal() {
+  document.getElementById('bannerModal').classList.remove('open');
+  pendingBannerId = null;
+}
+
+function renderBannerGrid() {
+  const grid = document.getElementById('bannerGrid');
+  grid.innerHTML = BANNERS.map(b => `
+    <div class="banner-option ${pendingBannerId === b.id ? 'selected' : ''}"
+         data-banner-id="${b.id}"
+         style="background-image: url('${b.image}');"
+         title="Шапка ${b.id}"></div>
+  `).join('');
+
+  grid.querySelectorAll('.banner-option').forEach(el => {
+    el.addEventListener('click', () => {
+      pendingBannerId = parseInt(el.dataset.bannerId);
+      grid.querySelectorAll('.banner-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+    });
+  });
+}
+
+async function saveBanner() {
+  if (!currentUser || !currentUser.telegram) {
+    showToast('⚠️ Войдите в профиль', 'error');
+    return;
+  }
+
+  const saveBtn = document.getElementById('bannerSaveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Сохранение...';
+
+  try {
+    const response = await fetch(WORKER_URL + 'update-banner', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        telegram: currentUser.telegram,
+        banner: pendingBannerId
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Ошибка сохранения');
+
+    currentUser.banner = pendingBannerId;
+    updateProfileUI();
+    closeBannerModal();
+    showToast(pendingBannerId ? '✅ Шапка обновлена!' : '✅ Шапка убрана', 'success');
+  } catch (err) {
+    showToast(`❌ ${err.message}`, 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Сохранить';
+  }
+}
+
+function removeBanner() {
+  pendingBannerId = null;
+  const grid = document.getElementById('bannerGrid');
+  grid.querySelectorAll('.banner-option').forEach(o => o.classList.remove('selected'));
 }
 
 // =============================================
@@ -486,7 +591,6 @@ document.getElementById('authForm').addEventListener('submit', (e) => {
   else login();
 });
 
-// Показ пароля
 document.getElementById('togglePassword').addEventListener('click', function() {
   const input = document.getElementById('loginPassword');
   const isPassword = input.type === 'password';
@@ -494,7 +598,6 @@ document.getElementById('togglePassword').addEventListener('click', function() {
   this.textContent = isPassword ? '🙈' : '👁';
 });
 
-// Focus-состояния полей
 document.querySelectorAll('.auth-field input').forEach(input => {
   input.addEventListener('focus', () => input.closest('.auth-field').classList.add('focused'));
   input.addEventListener('blur', () => input.closest('.auth-field').classList.remove('focused'));
@@ -503,13 +606,11 @@ document.querySelectorAll('.auth-field input').forEach(input => {
   });
 });
 
-// Забыли пароль
 document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
   e.preventDefault();
   showToast('📩 Напишите в наш Telegram — поможем восстановить пароль', 'info');
 });
 
-// Профиль
 document.getElementById('profileModalClose').addEventListener('click', () => {
   document.getElementById('profileModal').classList.remove('open');
 });
@@ -528,11 +629,18 @@ document.getElementById('avatarModalClose').addEventListener('click', closeAvata
 document.getElementById('avatarCancelBtn').addEventListener('click', closeAvatarModal);
 document.getElementById('avatarSaveBtn').addEventListener('click', saveAvatar);
 
+// Шапка профиля
+document.getElementById('bannerEditBtn').addEventListener('click', openBannerModal);
+document.getElementById('bannerModalClose').addEventListener('click', closeBannerModal);
+document.getElementById('bannerRemoveBtn').addEventListener('click', removeBanner);
+document.getElementById('bannerSaveBtn').addEventListener('click', saveBanner);
+
 // Закрытие по overlay
 document.getElementById('overlay').addEventListener('click', () => {
   document.getElementById('loginModal').classList.remove('open');
   document.getElementById('profileModal').classList.remove('open');
   document.getElementById('avatarModal').classList.remove('open');
+  document.getElementById('bannerModal').classList.remove('open');
 });
 
 // =============================================
@@ -834,139 +942,4 @@ orderForm.addEventListener('submit', async (e) => {
       promoInput.disabled = false;
       applyPromoBtn.disabled = false;
       promoMessage.textContent = '';
-      showToast('✅ Заказ оформлен! Спасибо!', 'success');
-      if (currentUser && currentUser.telegram) loadUserProfile(currentUser.telegram);
-    }, 2000);
-
-  } catch (error) {
-    console.error('Ошибка отправки:', error);
-    orderMessage.style.display = 'block';
-    orderMessage.textContent = `⚠️ Ошибка: ${error.message || 'Неизвестная ошибка'}. Попробуйте позже.`;
-    orderMessage.style.color = '#ff7777';
-  }
-});
-
-// =============================================
-// ===== КАТЕГОРИИ =====
-// =============================================
-const categoryBtns = document.querySelectorAll('.category-btn');
-const categoryBtnsMobile = document.querySelectorAll('.category-btn-mobile');
-const categoryContent = document.getElementById('categoryContent');
-
-function switchCategory(category) {
-  categoryBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.category === category));
-  categoryBtnsMobile.forEach(btn => btn.classList.toggle('active', btn.dataset.category === category));
-
-  if (category === 'liquids' || category === 'snus') {
-    categoryContent.innerHTML = `
-      <div class="category-content active">
-        <div class="catalog__filters" id="filterContainer"></div>
-        <div class="catalog__grid" id="productGrid"></div>
-      </div>`;
-    initFilters(category);
-  } else if (category === 'coils' || category === 'disposables') {
-    categoryContent.innerHTML = `
-      <div class="category-content active">
-        <div class="catalog__grid" id="productGrid"></div>
-      </div>`;
-    renderProducts(category, 'Все');
-  } else {
-    categoryContent.innerHTML = `
-      <div class="category-content active">
-        <div class="placeholder">
-          <h3>Скоро появится!</h3>
-          <p style="font-size: 14px; margin-top: 8px; color: #9D887A;">Следите за обновлениями</p>
-        </div>
-      </div>`;
-  }
-}
-
-categoryBtns.forEach(btn => btn.addEventListener('click', () => switchCategory(btn.dataset.category)));
-categoryBtnsMobile.forEach(btn => {
-  btn.addEventListener('click', () => {
-    switchCategory(btn.dataset.category);
-    burger.classList.remove('active');
-    mobileMenu.classList.remove('open');
-  });
-});
-
-// =============================================
-// ===== БУРГЕР-МЕНЮ =====
-// =============================================
-const burger = document.getElementById('burgerBtn');
-const mobileMenu = document.getElementById('mobileMenu');
-
-burger.addEventListener('click', () => {
-  burger.classList.toggle('active');
-  mobileMenu.classList.toggle('open');
-});
-
-document.addEventListener('click', e => {
-  if (!e.target.closest('.header__inner')) {
-    burger.classList.remove('active');
-    mobileMenu.classList.remove('open');
-  }
-});
-
-// =============================================
-// ===== FAQ =====
-// =============================================
-document.querySelectorAll('.faq__question').forEach(question => {
-  question.addEventListener('click', function() {
-    const parent = this.closest('.faq__item');
-    if (!parent) return;
-    parent.classList.toggle('open');
-  });
-});
-
-// =============================================
-// ===== ПОДСКАЗКА НА ЛОГОТИПЕ =====
-// =============================================
-document.addEventListener('DOMContentLoaded', function() {
-  const logo = document.querySelector('.logo');
-  if (!logo) return;
-
-  const phrases = [
-    'Заказывай жижу :3', 'Какой сегодня вкус хочешь?', 'Время выбрать свой вкус!',
-    'Хочешь сладкого или мятного?', 'Новый день — новый вкус!',
-    'Что-то вкусненькое уже ждёт!', 'Лови свой идеальный вкус!',
-    'Сделай выбор — закажи сейчас!', 'Клубника, мята, апельсин — всё здесь!',
-    'Найди свой любимый вкус!'
-  ];
-
-  let tooltipTimeout = null;
-
-  logo.addEventListener('click', function(e) {
-    e.preventDefault();
-    const oldTooltip = document.querySelector('.logo-tooltip');
-    if (oldTooltip) oldTooltip.remove();
-    if (tooltipTimeout) clearTimeout(tooltipTimeout);
-
-    const phrase = phrases[Math.floor(Math.random() * phrases.length)];
-    const tooltip = document.createElement('div');
-    tooltip.className = 'logo-tooltip';
-    tooltip.textContent = phrase;
-
-    const rect = this.getBoundingClientRect();
-    tooltip.style.position = 'fixed';
-    tooltip.style.top = (rect.top - 10) + 'px';
-    tooltip.style.left = (rect.left + rect.width / 2) + 'px';
-    tooltip.style.transform = 'translateX(-50%) translateY(-100%)';
-    tooltip.style.zIndex = '1000';
-    document.body.appendChild(tooltip);
-
-    requestAnimationFrame(() => tooltip.classList.add('show'));
-
-    tooltipTimeout = setTimeout(() => {
-      tooltip.classList.remove('show');
-      setTimeout(() => tooltip.remove(), 300);
-    }, 2500);
-  });
-});
-
-// =============================================
-// ===== ЗАПУСК =====
-// =============================================
-checkReferral();
-loadProducts();
-initProfile();
+      showToast('✅ Заказ
