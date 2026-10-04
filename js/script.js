@@ -117,6 +117,78 @@ function checkReferral() {
 }
 
 // =============================================
+// ===== ОБЪЯВЛЕНИЕ (ВСПЛЫВАЮЩЕЕ ОКНО С САЙТА) =====
+// =============================================
+async function checkAnnouncement() {
+  try {
+    const response = await fetch(WORKER_URL + 'announcement');
+    if (!response.ok) return;
+    const data = await response.json();
+
+    // Показываем только если включено и есть хоть что-то
+    if (!data || !data.enabled) return;
+    if (!data.text && !data.image) return;
+
+    // Ключ показа завязан на updatedAt — если админ обновит объявление, покажется снова
+    const version = data.updatedAt || 'default';
+    const seenKey = 'announcement_seen_' + version;
+    if (localStorage.getItem(seenKey)) return;
+
+    // Показ через 2 секунды после загрузки
+    setTimeout(() => showAnnouncement(data, seenKey), 2000);
+  } catch (error) {
+    console.error('Announcement error:', error);
+  }
+}
+
+function showAnnouncement(data, seenKey) {
+  const modal = document.getElementById('announcementModal');
+  const img = document.getElementById('announcementImage');
+  const text = document.getElementById('announcementText');
+  if (!modal) return;
+
+  if (data.image) {
+    img.src = data.image;
+    img.style.display = 'block';
+  } else {
+    img.removeAttribute('src');
+    img.style.display = 'none';
+  }
+
+  if (data.text) {
+    text.textContent = data.text;
+    text.style.display = 'block';
+  } else {
+    text.textContent = '';
+    text.style.display = 'none';
+  }
+
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Помечаем как увиденное — повторно не всплывёт даже после F5
+  localStorage.setItem(seenKey, '1');
+
+  const close = () => {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  document.getElementById('announcementClose').onclick = close;
+  document.getElementById('announcementOk').onclick = close;
+  modal.onclick = (e) => { if (e.target === modal) close(); };
+
+  // Esc тоже закрывает
+  const escHandler = (e) => {
+    if (e.key === 'Escape') {
+      close();
+      document.removeEventListener('keydown', escHandler);
+    }
+  };
+  document.addEventListener('keydown', escHandler);
+}
+
+// =============================================
 // ===== СИСТЕМА ПРОФИЛЕЙ =====
 // =============================================
 async function loadUserProfile(telegram) {
@@ -1095,24 +1167,18 @@ document.addEventListener('DOMContentLoaded', function() {
   logo.addEventListener('click', function(e) {
     e.preventDefault();
 
-    // Удаляем старый тултип, если есть
     const oldTooltip = logo.querySelector('.logo-tooltip');
     if (oldTooltip) oldTooltip.remove();
     if (tooltipTimeout) clearTimeout(tooltipTimeout);
 
-    // Случайная фраза
     const phrase = LOGO_PHRASES[Math.floor(Math.random() * LOGO_PHRASES.length)];
     const tooltip = document.createElement('div');
     tooltip.className = 'logo-tooltip';
     tooltip.textContent = phrase;
 
-    // Вставляем внутрь логотипа (там position: relative)
     logo.appendChild(tooltip);
-
-    // Анимированное появление
     requestAnimationFrame(() => tooltip.classList.add('show'));
 
-    // Автоскрытие через 2.5 сек
     tooltipTimeout = setTimeout(() => {
       tooltip.classList.remove('show');
       setTimeout(() => tooltip.remove(), 300);
@@ -1126,3 +1192,4 @@ document.addEventListener('DOMContentLoaded', function() {
 checkReferral();
 loadProducts();
 initProfile();
+checkAnnouncement();
