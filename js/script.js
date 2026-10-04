@@ -155,31 +155,60 @@ function updateProfileUI() {
     applyAvatar(document.getElementById('profileAvatar'), avatarId, currentUser.telegram);
 
     // Шапка профиля
-    const profileHeader = document.getElementById('profileHeader');
-    if (profileHeader) {
+    const profileBanner = document.getElementById('profileHeader');
+    if (profileBanner) {
       const banner = BANNERS.find(b => b.id === currentUser.banner);
       if (banner) {
-        profileHeader.style.backgroundImage = `url('${banner.image}')`;
-        profileHeader.classList.add('has-banner');
+        profileBanner.style.backgroundImage = `url('${banner.image}')`;
       } else {
-        profileHeader.style.backgroundImage = '';
-        profileHeader.classList.remove('has-banner');
+        profileBanner.style.backgroundImage = '';
       }
     }
 
+    // Реферальная карточка
     const referralLink = `${window.location.origin}${window.location.pathname}?ref=${currentUser.telegram}`;
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) {
       referralDiv.innerHTML = `
-        <p><strong>Реферальная ссылка:</strong></p>
-        <div style="display:flex; gap:8px; align-items:center; background:rgba(255,255,255,0.05); border-radius:12px; padding:8px; word-break:break-all;">
-          <span style="flex:1; font-size:14px; color:#B9A99A;">${referralLink}</span>
-          <button onclick="copyReferralLink('${referralLink}')" class="btn btn-primary" style="padding:6px 14px; font-size:13px;">Копировать</button>
+        <div class="profile-referral-card">
+          <div class="profile-referral-card__header">
+            <span class="profile-referral-card__icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+            </span>
+            <span class="profile-referral-card__title">Реферальная ссылка</span>
+          </div>
+          <div class="profile-referral-card__body">
+            <span class="profile-referral-card__link">${referralLink}</span>
+            <button class="profile-referral-card__copy" id="copyReferralBtn">Копировать</button>
+          </div>
+          <div class="profile-referral-card__footer">
+            👥 Приглашено: <strong>${currentUser.referralCount || 0}</strong> человек
+          </div>
         </div>
-        <p style="margin-top:8px; color:#9D887A; font-size:14px;">Приглашено: <strong>${currentUser.referralCount || 0}</strong> человек</p>
       `;
+
+      const copyBtn = document.getElementById('copyReferralBtn');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+          navigator.clipboard.writeText(referralLink).then(() => {
+            this.textContent = '✓ Скопировано';
+            this.classList.add('copied');
+            showToast('🔗 Реферальная ссылка скопирована!', 'success');
+            setTimeout(() => {
+              this.textContent = 'Копировать';
+              this.classList.remove('copied');
+            }, 2000);
+          }).catch(() => {
+            showToast('⚠️ Не удалось скопировать', 'error');
+          });
+        });
+      }
     }
 
+    // История заказов
     const ordersDiv = document.getElementById('profileOrders');
     if (currentUser.orders && currentUser.orders.length > 0) {
       let html = '';
@@ -202,7 +231,16 @@ function updateProfileUI() {
       });
       ordersDiv.innerHTML = html;
     } else {
-      ordersDiv.innerHTML = '<p style="color:#9D887A;">Заказов пока нет.</p>';
+      ordersDiv.innerHTML = `
+        <div class="profile-empty">
+          <div class="profile-empty__icon">📦</div>
+          <div class="profile-empty__title">Пока здесь пусто</div>
+          <div class="profile-empty__text">
+            Ваши заказы появятся в этом разделе.<br>
+            Оформите первый заказ — и он появится в истории.
+          </div>
+        </div>
+      `;
     }
   } else {
     userBtn.innerHTML = '👤 Войти';
@@ -211,13 +249,23 @@ function updateProfileUI() {
     document.getElementById('profileOrdersCount').textContent = '0';
     applyAvatar(document.getElementById('profileAvatar'), null, null);
 
-    const profileHeader = document.getElementById('profileHeader');
-    if (profileHeader) {
-      profileHeader.style.backgroundImage = '';
-      profileHeader.classList.remove('has-banner');
+    const profileBanner = document.getElementById('profileHeader');
+    if (profileBanner) {
+      profileBanner.style.backgroundImage = '';
     }
 
-    document.getElementById('profileOrders').innerHTML = '<p style="color:#9D887A;">Войдите, чтобы увидеть историю.</p>';
+    const ordersDiv = document.getElementById('profileOrders');
+    if (ordersDiv) {
+      ordersDiv.innerHTML = `
+        <div class="profile-empty">
+          <div class="profile-empty__icon">📦</div>
+          <div class="profile-empty__title">Пока здесь пусто</div>
+          <div class="profile-empty__text">
+            Войдите, чтобы увидеть свои заказы.
+          </div>
+        </div>
+      `;
+    }
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) referralDiv.innerHTML = '';
   }
