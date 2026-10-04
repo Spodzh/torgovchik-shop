@@ -741,46 +741,47 @@
 .order-card .order-status.rejected { color: #E39070; background: rgba(184, 92, 50, 0.25); }
 .order-card .order-status.pending { color: var(--accent); background: rgba(216, 137, 50, 0.2); }
 
-/* Пустое состояние */
+/* Пустое состояние — история заказов */
 .orders-empty {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(184, 92, 50, 0.14);
+    position: relative;
+    background: rgba(48, 35, 31, 0.35);
+    border: 1.5px solid rgba(184, 92, 50, 0.4);
     border-radius: 16px;
-    padding: 30px 20px;
+    padding: 36px 20px 32px;
     text-align: center;
+    box-shadow:
+        inset 0 0 40px rgba(184, 92, 50, 0.05),
+        0 0 30px rgba(216, 137, 50, 0.06);
+}
+
+/* Внутренняя декоративная пунктирная рамка */
+.orders-empty::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px dashed rgba(216, 137, 50, 0.28);
+    border-radius: 11px;
+    pointer-events: none;
 }
 
 .orders-empty__icon {
-    font-size: 46px;
+    font-size: 42px;
     line-height: 1;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     filter: sepia(0.4) saturate(1.3) brightness(1.05);
     display: inline-block;
+    position: relative;
+    z-index: 1;
 }
 
 .orders-empty__title {
     font-family: 'Bitter', serif;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     color: #F4E8D5;
-    margin-bottom: 6px;
     letter-spacing: -0.2px;
-}
-
-.orders-empty__text {
-    font-family: 'Manrope', sans-serif;
-    font-size: 13.5px;
-    color: #9D887A;
-    line-height: 1.5;
-    margin-bottom: 4px;
-}
-
-.orders-empty__hint {
-    font-family: 'Manrope', sans-serif;
-    font-size: 12.5px;
-    color: #7A6A5E;
-    line-height: 1.5;
-    font-style: italic;
+    position: relative;
+    z-index: 1;
 }
 
 /* ===== КНОПКА ВЫЙТИ ===== */
@@ -868,7 +869,7 @@
 
 .banner-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 14px;
     margin-bottom: 22px;
 }
@@ -999,8 +1000,8 @@
     .referral-copy-btn { font-size: 12px; padding: 7px 12px; }
 
     .orders-section__title { font-size: 17px; }
-    .orders-empty { padding: 24px 16px; }
-    .orders-empty__icon { font-size: 40px; }
+    .orders-empty { padding: 28px 16px 24px; }
+    .orders-empty__icon { font-size: 36px; }
     .orders-empty__title { font-size: 16px; }
 
     .avatar-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
