@@ -17,26 +17,18 @@
 </head>
 <body>
 
-    <!-- ===== ШАПКА ===== -->
     <header class="header">
         <div class="container header__inner">
             <a href="#" class="logo">
                 <img src="https://i.ibb.co/VWRmsGHt/logo.png" alt="Torgovchik" class="logo__image">
             </a>
-
             <nav class="nav nav--desktop" id="categoryNav">
                 <button class="category-btn active" data-category="liquids">Жидкости</button>
                 <button class="category-btn" data-category="coils">Испарители/Картриджи</button>
                 <button class="category-btn" data-category="snus">Снюс</button>
                 <button class="category-btn" data-category="disposables">Одноразки/Pod-системы</button>
             </nav>
-
-            <button class="burger" id="burgerBtn" aria-label="Меню">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-
+            <button class="burger" id="burgerBtn" aria-label="Меню"><span></span><span></span><span></span></button>
             <div class="mobile-menu" id="mobileMenu">
                 <nav class="mobile-nav">
                     <button class="category-btn-mobile active" data-category="liquids">Жидкости</button>
@@ -45,12 +37,9 @@
                     <button class="category-btn-mobile" data-category="disposables">Одноразки/Pod-системы</button>
                 </nav>
             </div>
-
-            <!-- Кнопка входа / профиль -->
             <div class="header__user">
                 <button class="user-btn" id="userBtn">👤 Войти</button>
             </div>
-
             <button class="cart-btn" id="cartToggle">
                 <span class="cart-icon">🛒</span>
                 <span class="cart-badge" id="cartCount">0</span>
@@ -58,102 +47,60 @@
         </div>
     </header>
 
-   <!-- ===== ГЛАВНЫЙ БАННЕР ===== -->
-<section class="hero">
-    <span class="hero__leaf hero__leaf--tl">🍁</span>
-    <span class="hero__leaf hero__leaf--tr">🍂</span>
-    <span class="hero__leaf hero__leaf--bl">🍂</span>
-    <span class="hero__leaf hero__leaf--br">🍁</span>
-
-    <div class="container">
-        <div class="hero__box">
-            <div class="hero__content">
-                <h1>Ассортимент <br>для <span class="accent">Pod-систем.</span></h1>
-                <p>
-                    Ассортимент оригинальных вкусов.<br>
-                    Только качественные бренды.<br>
-                    Работаем в Гомеле.
-                </p>
-                <a href="#catalog" class="btn btn-primary">
-                    Смотреть ассортимент
-                    <span class="btn-arrow">→</span>
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
-    <!-- ===== КАТАЛОГ ===== -->
-    <section class="catalog" id="catalog">
+    <section class="hero">
+        <span class="hero__leaf hero__leaf--tl">🍁</span>
+        <span class="hero__leaf hero__leaf--tr">🍂</span>
+        <span class="hero__leaf hero__leaf--bl">🍂</span>
+        <span class="hero__leaf hero__leaf--br">🍁</span>
         <div class="container">
-            <div id="categoryContent"></div>
+            <div class="hero__box">
+                <div class="hero__content">
+                    <h1>Ассортимент <br>для <span class="accent">Pod-систем.</span></h1>
+                    <p>Ассортимент оригинальных вкусов.<br>Только качественные бренды.<br>Работаем в Гомеле.</p>
+                    <a href="#catalog" class="btn btn-primary">Смотреть ассортимент <span class="btn-arrow">→</span></a>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- ===== О НАС ===== -->
+    <section class="catalog" id="catalog">
+        <div class="container"><div id="categoryContent"></div></div>
+    </section>
+
     <section class="about" id="about">
         <div class="container">
             <h2 class="section-title">О нас</h2>
             <div class="about__grid">
                 <div class="about__card">
                     <div class="about__icon">🍓</div>
-                    <div>
-                        <h3>Оригинальная продукция</h3>
-                        <p>Мы работаем только с проверенными поставщиками и предлагаем сертифицированные жидкости от ведущих брендов.</p>
-                    </div>
+                    <div><h3>Оригинальная продукция</h3><p>Мы работаем только с проверенными поставщиками.</p></div>
                 </div>
                 <div class="about__card">
                     <div class="about__icon">🤝</div>
-                    <div>
-                        <h3>Профессиональный подход</h3>
-                        <p>Наши консультанты всегда готовы помочь с выбором вкуса, ответить на вопросы и подобрать идеальный вариант.</p>
-                    </div>
+                    <div><h3>Профессиональный подход</h3><p>Консультанты помогут подобрать идеальный вкус.</p></div>
                 </div>
                 <div class="about__card">
                     <div class="about__icon">🎁</div>
-                    <div>
-                        <h3>Выгодные условия</h3>
-                        <p>Регулярные акции, накопительные скидки и приятные бонусы для постоянных клиентов — мы ценим каждого.</p>
-                    </div>
+                    <div><h3>Выгодные условия</h3><p>Акции, скидки и бонусы для постоянных клиентов.</p></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ===== ЧАСТЫЕ ВОПРОСЫ ===== -->
     <section class="faq" id="faq">
         <div class="container">
             <h2 class="section-title">Частые вопросы</h2>
             <div class="faq__list">
-                <div class="faq__item">
-                    <div class="faq__question">Какие способы оплаты доступны?</div>
-                    <div class="faq__answer">Оплата принимается только наличными при самовывозе.</div>
-                </div>
-                <div class="faq__item">
-                    <div class="faq__question">Как получить заказ?</div>
-                    <div class="faq__answer">Вы можете забрать заказ самовывозом из нашего магазина в Гомеле. Также мы организуем доставку по городу — уточняйте условия при оформлении заказа.</div>
-                </div>
-                <div class="faq__item">
-                    <div class="faq__question">Есть ли доставка за пределы Гомеля?</div>
-                    <div class="faq__answer">На данный момент мы работаем только по Гомелю.</div>
-                </div>
-                <div class="faq__item">
-                    <div class="faq__question">Можно ли вернуть товар?</div>
-                    <div class="faq__answer">Возврат или обмен товара надлежащего качества возможен в течение 14 дней при сохранении заводской упаковки и чека. Однако, если жидкость была вскрыта или использована, она не подлежит возврату или обмену по гигиеническим причинам. В случае брака или неисправности — мы заменим товар или вернём деньги в день обращения.</div>
-                </div>
-                <div class="faq__item">
-                    <div class="faq__question">Как долго обрабатывается заказ?</div>
-                    <div class="faq__answer">Обычно мы собираем заказ в течение 1–2 часов после подтверждения. Время доставки зависит от загруженности курьера.</div>
-                </div>
-                <div class="faq__item">
-                    <div class="faq__question">Что делать, если я не нашёл ответа на свой вопрос?</div>
-                    <div class="faq__answer">Напишите нам в Telegram — мы ответим в самое ближайшее время! Ссылка на наш Telegram есть в разделе «Контакты».</div>
-                </div>
+                <div class="faq__item"><div class="faq__question">Какие способы оплаты доступны?</div><div class="faq__answer">Оплата принимается только наличными при самовывозе.</div></div>
+                <div class="faq__item"><div class="faq__question">Как получить заказ?</div><div class="faq__answer">Самовывоз из магазина в Гомеле или доставка по городу.</div></div>
+                <div class="faq__item"><div class="faq__question">Есть ли доставка за пределы Гомеля?</div><div class="faq__answer">На данный момент работаем только по Гомелю.</div></div>
+                <div class="faq__item"><div class="faq__question">Можно ли вернуть товар?</div><div class="faq__answer">Да, в течение 14 дней при сохранении упаковки. Вскрытый товар возврату не подлежит.</div></div>
+                <div class="faq__item"><div class="faq__question">Как долго обрабатывается заказ?</div><div class="faq__answer">Обычно 1–2 часа после подтверждения.</div></div>
+                <div class="faq__item"><div class="faq__question">Что делать, если я не нашёл ответ?</div><div class="faq__answer">Напишите нам в Telegram — ответим быстро!</div></div>
             </div>
         </div>
     </section>
 
-    <!-- ===== КОНТАКТЫ ===== -->
     <section class="contacts" id="contacts">
         <div class="container">
             <h2 class="section-title">Контакты</h2>
@@ -166,38 +113,28 @@
         </div>
     </section>
 
-    <!-- ===== ФУТЕР ===== -->
     <footer class="footer">
         <div class="container">
             <p>© 2026 Torgovchik. Все права защищены.</p>
-            <p style="margin-top: 8px; font-size: 14px; opacity: 0.85;">
+            <p style="margin-top: 8px; font-size: 14px; opacity: 0.8;">
                 <a href="terms.html">Пользовательское соглашение</a>
             </p>
         </div>
     </footer>
 
-    <!-- ===== КОРЗИНА (панель) ===== -->
     <div class="cart-panel" id="cartPanel">
-        <div class="cart-panel__header">
-            <h3>Корзина</h3>
-            <button class="cart-panel__close" id="cartClose">✕</button>
-        </div>
-        <div class="cart-panel__body" id="cartItems">
-            <p class="cart-empty">Корзина пуста</p>
-        </div>
+        <div class="cart-panel__header"><h3>Корзина</h3><button class="cart-panel__close" id="cartClose">✕</button></div>
+        <div class="cart-panel__body" id="cartItems"><p class="cart-empty">Корзина пуста</p></div>
         <div class="cart-panel__footer">
             <p><strong>Итого: <span id="cartTotal">0</span> BYN</strong></p>
             <button class="btn btn-primary" id="checkoutBtn">Оформить заказ</button>
         </div>
     </div>
 
-    <!-- ===== ЗАТЕМНЕНИЕ ===== -->
     <div class="overlay" id="overlay"></div>
-
-    <!-- ===== ТОСТЫ ===== -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ===== МОДАЛКА ВХОДА (LOGIN) ===== -->
+    <!-- МОДАЛКА ВХОДА -->
     <div class="login-modal" id="loginModal">
         <div class="login-modal__content">
             <button class="login-modal__close" id="loginModalClose">✕</button>
@@ -212,15 +149,19 @@
         </div>
     </div>
 
-    <!-- ===== МОДАЛКА ПРОФИЛЯ ===== -->
+    <!-- МОДАЛКА ПРОФИЛЯ -->
     <div class="profile-modal" id="profileModal">
         <div class="profile-modal__content">
             <button class="profile-modal__close" id="profileModalClose">✕</button>
             <h2>👤 Мой профиль</h2>
+
             <div class="profile-header">
-                <div class="profile-avatar" id="profileAvatar">👤</div>
+                <div class="profile-avatar-wrap">
+                    <div class="profile-avatar" id="profileAvatar">👤</div>
+                    <button class="avatar-edit-btn" id="avatarEditBtn" title="Сменить аватарку">✏️</button>
+                </div>
                 <div>
-                    <div style="font-size:20px; font-weight:600; color:#F4E8D5; font-family:'Bitter', serif;" id="profileName">Пользователь</div>
+                    <div class="profile-name" id="profileName">Пользователь</div>
                     <div class="profile-stats">
                         <div class="profile-stats-item">
                             <div class="value" id="profileTickets">0</div>
@@ -234,39 +175,39 @@
                 </div>
             </div>
 
-            <!-- Блок реферальной ссылки -->
             <div id="profileReferral" style="margin-top:12px;"></div>
 
             <h3>📦 История заказов</h3>
-            <div class="profile-orders" id="profileOrders">
-                <p style="color:#9D887A;">Заказов пока нет.</p>
-            </div>
+            <div class="profile-orders" id="profileOrders"><p>Заказов пока нет.</p></div>
+
             <button class="btn-danger" id="profileLogout" style="margin-top:16px;">Выйти</button>
         </div>
     </div>
 
-    <!-- ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА ===== -->
+    <!-- МОДАЛКА ВЫБОРА АВАТАРКИ -->
+    <div class="avatar-modal" id="avatarModal">
+        <div class="avatar-modal__content">
+            <button class="avatar-modal__close" id="avatarModalClose">✕</button>
+            <h2>🎨 Выберите аватарку</h2>
+            <p class="avatar-modal__hint">Нажмите на понравившуюся и подтвердите выбор</p>
+            <div class="avatar-grid" id="avatarGrid"></div>
+            <div class="avatar-modal__buttons">
+                <button class="btn btn-secondary" id="avatarCancelBtn">Отмена</button>
+                <button class="btn btn-primary" id="avatarSaveBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА -->
     <div class="order-modal" id="orderModal">
         <div class="order-modal__content">
             <button class="order-modal__close" id="orderModalClose">✕</button>
             <h2>Оформление заказа</h2>
             <form id="orderForm">
-                <div class="form-group">
-                    <label for="orderName">Ваше имя *</label>
-                    <input type="text" id="orderName" required placeholder="Иван Иванов">
-                </div>
-                <div class="form-group">
-                    <label for="orderTelegram">Ваш Telegram (username) *</label>
-                    <input type="text" id="orderTelegram" required placeholder="@username">
-                </div>
-                <div class="form-group">
-                    <label for="orderAddress">Адрес (для доставки)</label>
-                    <input type="text" id="orderAddress" placeholder="г. Гомель, ул. ...">
-                </div>
-                <div class="form-group">
-                    <label for="orderComment">Комментарий к заказу</label>
-                    <textarea id="orderComment" rows="3" placeholder="Пожелания, особые условия"></textarea>
-                </div>
+                <div class="form-group"><label for="orderName">Ваше имя *</label><input type="text" id="orderName" required placeholder="Иван Иванов"></div>
+                <div class="form-group"><label for="orderTelegram">Ваш Telegram (username) *</label><input type="text" id="orderTelegram" required placeholder="@username"></div>
+                <div class="form-group"><label for="orderAddress">Адрес (для доставки)</label><input type="text" id="orderAddress" placeholder="г. Гомель, ул. ..."></div>
+                <div class="form-group"><label for="orderComment">Комментарий к заказу</label><textarea id="orderComment" rows="3" placeholder="Пожелания, особые условия"></textarea></div>
                 <div class="form-group">
                     <label for="promoCode">Промокод</label>
                     <div style="display:flex; gap:10px;">
@@ -275,9 +216,7 @@
                     </div>
                     <div id="promoMessage" style="font-size:14px; margin-top:6px; color:#B9A99A;"></div>
                 </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary" id="orderSubmit">Отправить заказ</button>
-                </div>
+                <div class="form-group"><button type="submit" class="btn btn-primary" id="orderSubmit">Отправить заказ</button></div>
             </form>
             <div id="orderMessage" style="display:none; text-align:center; margin-top:10px;"></div>
         </div>
