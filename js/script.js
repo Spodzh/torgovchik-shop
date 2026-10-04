@@ -942,4 +942,139 @@ orderForm.addEventListener('submit', async (e) => {
       promoInput.disabled = false;
       applyPromoBtn.disabled = false;
       promoMessage.textContent = '';
-      showToast('✅ Заказ
+      showToast('✅ Заказ оформлен! Спасибо!', 'success');
+      if (currentUser && currentUser.telegram) loadUserProfile(currentUser.telegram);
+    }, 2000);
+
+  } catch (error) {
+    console.error('Ошибка отправки:', error);
+    orderMessage.style.display = 'block';
+    orderMessage.textContent = `⚠️ Ошибка: ${error.message || 'Неизвестная ошибка'}. Попробуйте позже.`;
+    orderMessage.style.color = '#ff7777';
+  }
+});
+
+// =============================================
+// ===== КАТЕГОРИИ =====
+// =============================================
+const categoryBtns = document.querySelectorAll('.category-btn');
+const categoryBtnsMobile = document.querySelectorAll('.category-btn-mobile');
+const categoryContent = document.getElementById('categoryContent');
+
+function switchCategory(category) {
+  categoryBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.category === category));
+  categoryBtnsMobile.forEach(btn => btn.classList.toggle('active', btn.dataset.category === category));
+
+  if (category === 'liquids' || category === 'snus') {
+    categoryContent.innerHTML = `
+      <div class="category-content active">
+        <div class="catalog__filters" id="filterContainer"></div>
+        <div class="catalog__grid" id="productGrid"></div>
+      </div>`;
+    initFilters(category);
+  } else if (category === 'coils' || category === 'disposables') {
+    categoryContent.innerHTML = `
+      <div class="category-content active">
+        <div class="catalog__grid" id="productGrid"></div>
+      </div>`;
+    renderProducts(category, 'Все');
+  } else {
+    categoryContent.innerHTML = `
+      <div class="category-content active">
+        <div class="placeholder">
+          <h3>Скоро появится!</h3>
+          <p style="font-size: 14px; margin-top: 8px; color: #9D887A;">Следите за обновлениями</p>
+        </div>
+      </div>`;
+  }
+}
+
+categoryBtns.forEach(btn => btn.addEventListener('click', () => switchCategory(btn.dataset.category)));
+categoryBtnsMobile.forEach(btn => {
+  btn.addEventListener('click', () => {
+    switchCategory(btn.dataset.category);
+    burger.classList.remove('active');
+    mobileMenu.classList.remove('open');
+  });
+});
+
+// =============================================
+// ===== БУРГЕР-МЕНЮ =====
+// =============================================
+const burger = document.getElementById('burgerBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+
+burger.addEventListener('click', () => {
+  burger.classList.toggle('active');
+  mobileMenu.classList.toggle('open');
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.header__inner')) {
+    burger.classList.remove('active');
+    mobileMenu.classList.remove('open');
+  }
+});
+
+// =============================================
+// ===== FAQ =====
+// =============================================
+document.querySelectorAll('.faq__question').forEach(question => {
+  question.addEventListener('click', function() {
+    const parent = this.closest('.faq__item');
+    if (!parent) return;
+    parent.classList.toggle('open');
+  });
+});
+
+// =============================================
+// ===== ПОДСКАЗКА НА ЛОГОТИПЕ =====
+// =============================================
+document.addEventListener('DOMContentLoaded', function() {
+  const logo = document.querySelector('.logo');
+  if (!logo) return;
+
+  const phrases = [
+    'Заказывай жижу :3', 'Какой сегодня вкус хочешь?', 'Время выбрать свой вкус!',
+    'Хочешь сладкого или мятного?', 'Новый день — новый вкус!',
+    'Что-то вкусненькое уже ждёт!', 'Лови свой идеальный вкус!',
+    'Сделай выбор — закажи сейчас!', 'Клубника, мята, апельсин — всё здесь!',
+    'Найди свой любимый вкус!'
+  ];
+
+  let tooltipTimeout = null;
+
+  logo.addEventListener('click', function(e) {
+    e.preventDefault();
+    const oldTooltip = document.querySelector('.logo-tooltip');
+    if (oldTooltip) oldTooltip.remove();
+    if (tooltipTimeout) clearTimeout(tooltipTimeout);
+
+    const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+    const tooltip = document.createElement('div');
+    tooltip.className = 'logo-tooltip';
+    tooltip.textContent = phrase;
+
+    const rect = this.getBoundingClientRect();
+    tooltip.style.position = 'fixed';
+    tooltip.style.top = (rect.top - 10) + 'px';
+    tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+    tooltip.style.transform = 'translateX(-50%) translateY(-100%)';
+    tooltip.style.zIndex = '1000';
+    document.body.appendChild(tooltip);
+
+    requestAnimationFrame(() => tooltip.classList.add('show'));
+
+    tooltipTimeout = setTimeout(() => {
+      tooltip.classList.remove('show');
+      setTimeout(() => tooltip.remove(), 300);
+    }, 2500);
+  });
+});
+
+// =============================================
+// ===== ЗАПУСК =====
+// =============================================
+checkReferral();
+loadProducts();
+initProfile();
