@@ -134,6 +134,20 @@
     <div class="overlay" id="overlay"></div>
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- ===== МОДАЛКА ОБЪЯВЛЕНИЯ (УПРАВЛЯЕТСЯ ИЗ БОТА) ===== -->
+    <div class="announcement-modal" id="announcementModal">
+        <div class="announcement-modal__content">
+            <button class="announcement-modal__close" id="announcementClose" aria-label="Закрыть">✕</button>
+            <div class="announcement-modal__badge">
+                <span class="announcement-modal__badge-dot"></span>
+                Новость
+            </div>
+            <img class="announcement-modal__image" id="announcementImage" alt="">
+            <p class="announcement-modal__text" id="announcementText"></p>
+            <button class="btn btn-primary announcement-modal__ok" id="announcementOk">Понятно</button>
+        </div>
+    </div>
+
     <!-- ===== МОДАЛКА ВХОДА / РЕГИСТРАЦИИ ===== -->
     <div class="login-modal" id="loginModal">
         <div class="login-modal__content">
