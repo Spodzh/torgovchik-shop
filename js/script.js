@@ -42,6 +42,22 @@ const BANNERS = [
 ];
 
 // =============================================
+// ===== ФРАЗЫ НА ЛОГОТИПЕ (пасхалка) =====
+// =============================================
+const LOGO_PHRASES = [
+    'Купил жижу? 😏',
+    'Заправиться не хочешь?',
+    'Есть вкусненькое 😉',
+    'Скучал по нам?',
+    'Как насчёт новой вкусняшки?',
+    'Жижа сама себя не купит!',
+    'Пара затяжек — и день ярче 🌿',
+    'Твой Pod скучает по новой жиже 👀',
+    'Вкусный день сегодня, да?',
+    'Псс, есть кое-что новенькое...'
+];
+
+// =============================================
 // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
 // =============================================
 let products = [];
@@ -1068,19 +1084,11 @@ document.querySelectorAll('.faq__question').forEach(question => {
 });
 
 // =============================================
-// ===== ПОДСКАЗКА НА ЛОГОТИПЕ =====
+// ===== ПОДСКАЗКА НА ЛОГОТИПЕ (ПАСХАЛКА) =====
 // =============================================
 document.addEventListener('DOMContentLoaded', function() {
   const logo = document.querySelector('.logo');
   if (!logo) return;
-
-  const phrases = [
-    'Заказывай жижу :3', 'Какой сегодня вкус хочешь?', 'Время выбрать свой вкус!',
-    'Хочешь сладкого или мятного?', 'Новый день — новый вкус!',
-    'Что-то вкусненькое уже ждёт!', 'Лови свой идеальный вкус!',
-    'Сделай выбор — закажи сейчас!', 'Клубника, мята, апельсин — всё здесь!',
-    'Найди свой любимый вкус!'
-  ];
 
   let tooltipTimeout = null;
 
@@ -1090,7 +1098,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (oldTooltip) oldTooltip.remove();
     if (tooltipTimeout) clearTimeout(tooltipTimeout);
 
-    const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+    const phrase = LOGO_PHRASES[Math.floor(Math.random() * LOGO_PHRASES.length)];
     const tooltip = document.createElement('div');
     tooltip.className = 'logo-tooltip';
     tooltip.textContent = phrase;
