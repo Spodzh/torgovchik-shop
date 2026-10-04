@@ -4,7 +4,7 @@
 const WORKER_URL = 'https://torgovchik-bot.ernest-chanel.workers.dev/';
 
 // =============================================
-// ===== ДОСТУПНЫЕ АВАТАРКИ =====
+// ===== ДОСТУПНЫЕ АВАТАРКИ (20 шт.) =====
 // =============================================
 const AVATARS = [
     { id: 1,  image: 'https://i.ibb.co/vvmQyYqG/image.png' },
@@ -32,7 +32,7 @@ const AVATARS = [
 const DEFAULT_AVATAR_ID = 6;
 
 // =============================================
-// ===== ШАПКИ ПРОФИЛЯ =====
+// ===== ШАПКИ ПРОФИЛЯ (5 шт.) =====
 // =============================================
 const BANNERS = [
     { id: 1, image: 'https://i.ibb.co/FbQzf5tN/image.png' },
@@ -41,11 +41,6 @@ const BANNERS = [
     { id: 4, image: 'https://i.ibb.co/W4Dm8kq9/image.png' },
     { id: 5, image: 'https://i.ibb.co/8gsHWLD5/image.png' }
 ];
-
-// SVG-иконки для referral
-const ICON_LINK = `<svg class="referral-card__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`;
-const ICON_COPY = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
-const ICON_USERS = `<svg class="referral-card__footer-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>`;
 
 // =============================================
 // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
@@ -165,42 +160,26 @@ function updateProfileUI() {
       const banner = BANNERS.find(b => b.id === currentUser.banner);
       if (banner) {
         profileHeader.style.backgroundImage = `url('${banner.image}')`;
+        profileHeader.classList.add('has-banner');
       } else {
         profileHeader.style.backgroundImage = '';
+        profileHeader.classList.remove('has-banner');
       }
     }
 
-    // Реферальная карточка
     const referralLink = `${window.location.origin}${window.location.pathname}?ref=${currentUser.telegram}`;
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) {
       referralDiv.innerHTML = `
-        <div class="referral-card__header">
-          ${ICON_LINK}
-          <span class="referral-card__title">Реферальная ссылка</span>
+        <p><strong>Реферальная ссылка:</strong></p>
+        <div style="display:flex; gap:8px; align-items:center; background:rgba(255,255,255,0.05); border-radius:12px; padding:8px; word-break:break-all;">
+          <span style="flex:1; font-size:14px; color:#B9A99A;">${referralLink}</span>
+          <button onclick="copyReferralLink('${referralLink}')" class="btn btn-primary" style="padding:6px 14px; font-size:13px;">Копировать</button>
         </div>
-        <div class="referral-card__row">
-          <span class="referral-card__url">${referralLink}</span>
-          <button type="button" class="referral-copy-btn" id="referralCopyBtn" data-link="${referralLink}">
-            ${ICON_COPY}
-            <span>Копировать</span>
-          </button>
-        </div>
-        <div class="referral-card__footer">
-          ${ICON_USERS}
-          Приглашено: <strong>${currentUser.referralCount || 0}</strong> человек
-        </div>
+        <p style="margin-top:8px; color:#9D887A; font-size:14px;">Приглашено: <strong>${currentUser.referralCount || 0}</strong> человек</p>
       `;
-
-      const copyBtn = document.getElementById('referralCopyBtn');
-      if (copyBtn) {
-        copyBtn.addEventListener('click', () => {
-          copyReferralLink(referralLink, copyBtn);
-        });
-      }
     }
 
-    // История заказов
     const ordersDiv = document.getElementById('profileOrders');
     if (currentUser.orders && currentUser.orders.length > 0) {
       let html = '';
@@ -223,14 +202,7 @@ function updateProfileUI() {
       });
       ordersDiv.innerHTML = html;
     } else {
-      ordersDiv.innerHTML = `
-        <div class="orders-empty">
-          <div class="orders-empty__icon">📦</div>
-          <div class="orders-empty__title">Пока здесь пусто</div>
-          <div class="orders-empty__text">Ваши заказы появятся в этом разделе.</div>
-          <div class="orders-empty__hint">Оформите первый заказ — и он появится в истории.</div>
-        </div>
-      `;
+      ordersDiv.innerHTML = '<p style="color:#9D887A;">Заказов пока нет.</p>';
     }
   } else {
     userBtn.innerHTML = '👤 Войти';
@@ -240,9 +212,12 @@ function updateProfileUI() {
     applyAvatar(document.getElementById('profileAvatar'), null, null);
 
     const profileHeader = document.getElementById('profileHeader');
-    if (profileHeader) profileHeader.style.backgroundImage = '';
+    if (profileHeader) {
+      profileHeader.style.backgroundImage = '';
+      profileHeader.classList.remove('has-banner');
+    }
 
-    document.getElementById('profileOrders').innerHTML = '';
+    document.getElementById('profileOrders').innerHTML = '<p style="color:#9D887A;">Войдите, чтобы увидеть историю.</p>';
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) referralDiv.innerHTML = '';
   }
@@ -321,7 +296,7 @@ async function saveAvatar() {
 }
 
 // =============================================
-// ===== ЛОГИКА ВЫБОРА ШАПКИ =====
+// ===== ЛОГИКА ВЫБОРА ШАПКИ ПРОФИЛЯ =====
 // =============================================
 function openBannerModal() {
   pendingBannerId = (currentUser && currentUser.banner) ? currentUser.banner : null;
@@ -396,30 +371,19 @@ function removeBanner() {
 // =============================================
 // ===== КОПИРОВАНИЕ РЕФЕРАЛЬНОЙ ССЫЛКИ =====
 // =============================================
-function copyReferralLink(link, btn) {
-  const done = () => {
+window.copyReferralLink = function(link) {
+  navigator.clipboard.writeText(link).then(() => {
     showToast('🔗 Реферальная ссылка скопирована!', 'success');
-    if (btn) {
-      const originalHTML = btn.innerHTML;
-      btn.classList.add('copied');
-      btn.innerHTML = `<span>✓ Скопировано</span>`;
-      setTimeout(() => {
-        btn.classList.remove('copied');
-        btn.innerHTML = originalHTML;
-      }, 1800);
-    }
-  };
-
-  navigator.clipboard.writeText(link).then(done).catch(() => {
+  }).catch(() => {
     const input = document.createElement('input');
     input.value = link;
     document.body.appendChild(input);
     input.select();
     document.execCommand('copy');
     document.body.removeChild(input);
-    done();
+    showToast('🔗 Реферальная ссылка скопирована!', 'success');
   });
-}
+};
 
 // =============================================
 // ===== ВКЛАДКИ ВХОД / РЕГИСТРАЦИЯ =====
@@ -665,7 +629,7 @@ document.getElementById('avatarModalClose').addEventListener('click', closeAvata
 document.getElementById('avatarCancelBtn').addEventListener('click', closeAvatarModal);
 document.getElementById('avatarSaveBtn').addEventListener('click', saveAvatar);
 
-// Шапка
+// Шапка профиля
 document.getElementById('bannerEditBtn').addEventListener('click', openBannerModal);
 document.getElementById('bannerModalClose').addEventListener('click', closeBannerModal);
 document.getElementById('bannerRemoveBtn').addEventListener('click', removeBanner);
@@ -1005,4 +969,112 @@ function switchCategory(category) {
     categoryContent.innerHTML = `
       <div class="category-content active">
         <div class="catalog__filters" id="filterContainer"></div>
-       
+        <div class="catalog__grid" id="productGrid"></div>
+      </div>`;
+    initFilters(category);
+  } else if (category === 'coils' || category === 'disposables') {
+    categoryContent.innerHTML = `
+      <div class="category-content active">
+        <div class="catalog__grid" id="productGrid"></div>
+      </div>`;
+    renderProducts(category, 'Все');
+  } else {
+    categoryContent.innerHTML = `
+      <div class="category-content active">
+        <div class="placeholder">
+          <h3>Скоро появится!</h3>
+          <p style="font-size: 14px; margin-top: 8px; color: #9D887A;">Следите за обновлениями</p>
+        </div>
+      </div>`;
+  }
+}
+
+categoryBtns.forEach(btn => btn.addEventListener('click', () => switchCategory(btn.dataset.category)));
+categoryBtnsMobile.forEach(btn => {
+  btn.addEventListener('click', () => {
+    switchCategory(btn.dataset.category);
+    burger.classList.remove('active');
+    mobileMenu.classList.remove('open');
+  });
+});
+
+// =============================================
+// ===== БУРГЕР-МЕНЮ =====
+// =============================================
+const burger = document.getElementById('burgerBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+
+burger.addEventListener('click', () => {
+  burger.classList.toggle('active');
+  mobileMenu.classList.toggle('open');
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.header__inner')) {
+    burger.classList.remove('active');
+    mobileMenu.classList.remove('open');
+  }
+});
+
+// =============================================
+// ===== FAQ =====
+// =============================================
+document.querySelectorAll('.faq__question').forEach(question => {
+  question.addEventListener('click', function() {
+    const parent = this.closest('.faq__item');
+    if (!parent) return;
+    parent.classList.toggle('open');
+  });
+});
+
+// =============================================
+// ===== ПОДСКАЗКА НА ЛОГОТИПЕ =====
+// =============================================
+document.addEventListener('DOMContentLoaded', function() {
+  const logo = document.querySelector('.logo');
+  if (!logo) return;
+
+  const phrases = [
+    'Заказывай жижу :3', 'Какой сегодня вкус хочешь?', 'Время выбрать свой вкус!',
+    'Хочешь сладкого или мятного?', 'Новый день — новый вкус!',
+    'Что-то вкусненькое уже ждёт!', 'Лови свой идеальный вкус!',
+    'Сделай выбор — закажи сейчас!', 'Клубника, мята, апельсин — всё здесь!',
+    'Найди свой любимый вкус!'
+  ];
+
+  let tooltipTimeout = null;
+
+  logo.addEventListener('click', function(e) {
+    e.preventDefault();
+    const oldTooltip = document.querySelector('.logo-tooltip');
+    if (oldTooltip) oldTooltip.remove();
+    if (tooltipTimeout) clearTimeout(tooltipTimeout);
+
+    const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+    const tooltip = document.createElement('div');
+    tooltip.className = 'logo-tooltip';
+    tooltip.textContent = phrase;
+
+    const rect = this.getBoundingClientRect();
+    tooltip.style.position = 'fixed';
+    tooltip.style.top = (rect.top - 10) + 'px';
+    tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+    tooltip.style.transform = 'translateX(-50%) translateY(-100%)';
+    tooltip.style.zIndex = '1000';
+    document.body.appendChild(tooltip);
+
+    requestAnimationFrame(() => tooltip.classList.add('show'));
+
+    tooltipTimeout = setTimeout(() => {
+      tooltip.classList.remove('show');
+      setTimeout(() => tooltip.remove(), 300);
+    }, 2500);
+  });
+});
+
+// =============================================
+// ===== ЗАПУСК =====
+// =============================================
+checkReferral();
+loadProducts();
+initProfile();
