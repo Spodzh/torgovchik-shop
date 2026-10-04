@@ -32,14 +32,13 @@ const AVATARS = [
 const DEFAULT_AVATAR_ID = 6;
 
 // =============================================
-// ===== ШАПКИ ПРОФИЛЯ (5 шт.) =====
+// ===== ШАПКИ ПРОФИЛЯ (4 шт.) =====
 // =============================================
 const BANNERS = [
     { id: 1, image: 'https://i.ibb.co/FbQzf5tN/image.png' },
     { id: 2, image: 'https://i.ibb.co/rRHB6BV4/image.png' },
     { id: 3, image: 'https://i.ibb.co/wNB7K5VH/image.png' },
-    { id: 4, image: 'https://i.ibb.co/W4Dm8kq9/image.png' },
-    { id: 5, image: 'https://i.ibb.co/8gsHWLD5/image.png' }
+    { id: 4, image: 'https://i.ibb.co/W4Dm8kq9/image.png' }
 ];
 
 // =============================================
@@ -232,13 +231,9 @@ function updateProfileUI() {
       ordersDiv.innerHTML = html;
     } else {
       ordersDiv.innerHTML = `
-        <div class="profile-empty">
-          <div class="profile-empty__icon">📦</div>
-          <div class="profile-empty__title">Пока здесь пусто</div>
-          <div class="profile-empty__text">
-            Ваши заказы появятся в этом разделе.<br>
-            Оформите первый заказ — и он появится в истории.
-          </div>
+        <div class="orders-empty">
+          <div class="orders-empty__icon">📦</div>
+          <div class="orders-empty__title">Пока здесь пусто</div>
         </div>
       `;
     }
@@ -257,12 +252,9 @@ function updateProfileUI() {
     const ordersDiv = document.getElementById('profileOrders');
     if (ordersDiv) {
       ordersDiv.innerHTML = `
-        <div class="profile-empty">
-          <div class="profile-empty__icon">📦</div>
-          <div class="profile-empty__title">Пока здесь пусто</div>
-          <div class="profile-empty__text">
-            Войдите, чтобы увидеть свои заказы.
-          </div>
+        <div class="orders-empty">
+          <div class="orders-empty__icon">📦</div>
+          <div class="orders-empty__title">Пока здесь пусто</div>
         </div>
       `;
     }
