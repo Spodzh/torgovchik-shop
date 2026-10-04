@@ -4,6 +4,32 @@
 const WORKER_URL = 'https://torgovchik-bot.ernest-chanel.workers.dev/';
 
 // =============================================
+// ===== ДОСТУПНЫЕ АВАТАРКИ (20 шт.) =====
+// =============================================
+const AVATARS = [
+    { id: 1,  image: 'https://i.ibb.co/vvmQyYqG/image.png' },
+    { id: 2,  image: 'https://i.ibb.co/XZ99y2Y4/image.png' },
+    { id: 3,  image: 'https://i.ibb.co/j9c7vSW0/image.png' },
+    { id: 4,  image: 'https://i.ibb.co/KxwDPKRc/image.png' },
+    { id: 5,  image: 'https://i.ibb.co/0pX5p3SJ/image.png' },
+    { id: 6,  image: 'https://i.ibb.co/JRRrkvYc/image.png' },
+    { id: 7,  image: 'https://i.ibb.co/H64GB86/image.png' },
+    { id: 8,  image: 'https://i.ibb.co/tw8HBvBr/image.png' },
+    { id: 9,  image: 'https://i.ibb.co/NdVVyhNS/image.png' },
+    { id: 10, image: 'https://i.ibb.co/C3CFsxGm/image.png' },
+    { id: 11, image: 'https://i.ibb.co/8gYmjq4V/image.png' },
+    { id: 12, image: 'https://i.ibb.co/1J4y8QQV/image.png' },
+    { id: 13, image: 'https://i.ibb.co/SXPrTVTR/image.png' },
+    { id: 14, image: 'https://i.ibb.co/SwSFWgTR/image.png' },
+    { id: 15, image: 'https://i.ibb.co/g11MxGY/image.png' },
+    { id: 16, image: 'https://i.ibb.co/ccmPQ6Tz/image.png' },
+    { id: 17, image: 'https://i.ibb.co/jkCdhV3P/image.png' },
+    { id: 18, image: 'https://i.ibb.co/Y49QDG0S/image.png' },
+    { id: 19, image: 'https://i.ibb.co/k6GxF5ks/image.png' },
+    { id: 20, image: 'https://i.ibb.co/Nz2SQ4w/image.png' }
+];
+
+// =============================================
 // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
 // =============================================
 let products = [];
@@ -13,6 +39,7 @@ let appliedPromo = null;
 let discountPercent = 0;
 let currentUser = null;
 let referralCode = null;
+let pendingAvatarId = null;
 
 // =============================================
 // ===== ЗАГРУЗКА ТОВАРОВ И ПРОМОКОДОВ =====
@@ -60,7 +87,7 @@ function checkReferral() {
 }
 
 // =============================================
-// ===== СИСТЕМА ПРОФИЛЕЙ (с паролями) =====
+// ===== СИСТЕМА ПРОФИЛЕЙ =====
 // =============================================
 async function loadUserProfile(telegram) {
   try {
@@ -77,6 +104,22 @@ async function loadUserProfile(telegram) {
   }
 }
 
+// ---- Применяет аватарку к элементу ----
+function applyAvatar(el, avatarId, fallbackText) {
+  el.innerHTML = '';
+
+  const avatar = AVATARS.find(a => a.id === avatarId);
+  if (avatar && avatar.image) {
+    const img = document.createElement('img');
+    img.src = avatar.image;
+    img.alt = 'avatar';
+    img.style.cssText = 'width:100%; height:100%; object-fit:cover; display:block; border-radius:50%;';
+    el.appendChild(img);
+  } else {
+    el.textContent = fallbackText ? fallbackText.charAt(0).toUpperCase() : '👤';
+  }
+}
+
 function updateProfileUI() {
   const userBtn = document.getElementById('userBtn');
   if (currentUser && currentUser.telegram) {
@@ -85,23 +128,26 @@ function updateProfileUI() {
     document.getElementById('profileName').textContent = currentUser.telegram;
     document.getElementById('profileTickets').textContent = tickets;
     document.getElementById('profileOrdersCount').textContent = (currentUser.orders || []).length;
-    document.getElementById('profileAvatar').textContent = currentUser.telegram.charAt(0).toUpperCase();
 
-    // ---- Реферальная ссылка ----
+    applyAvatar(
+      document.getElementById('profileAvatar'),
+      currentUser.avatar,
+      currentUser.telegram
+    );
+
     const referralLink = `${window.location.origin}${window.location.pathname}?ref=${currentUser.telegram}`;
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) {
       referralDiv.innerHTML = `
         <p><strong>Реферальная ссылка:</strong></p>
         <div style="display:flex; gap:8px; align-items:center; background:rgba(255,255,255,0.05); border-radius:12px; padding:8px; word-break:break-all;">
-          <span style="flex:1; font-size:14px; color:#c8b0e0;">${referralLink}</span>
+          <span style="flex:1; font-size:14px; color:#B9A99A;">${referralLink}</span>
           <button onclick="copyReferralLink('${referralLink}')" class="btn btn-primary" style="padding:6px 14px; font-size:13px;">Копировать</button>
         </div>
-        <p style="margin-top:8px; color:#a080b8; font-size:14px;">Приглашено: <strong>${currentUser.referralCount || 0}</strong> человек</p>
+        <p style="margin-top:8px; color:#9D887A; font-size:14px;">Приглашено: <strong>${currentUser.referralCount || 0}</strong> человек</p>
       `;
     }
 
-    // ---- Заказы ----
     const ordersDiv = document.getElementById('profileOrders');
     if (currentUser.orders && currentUser.orders.length > 0) {
       let html = '';
@@ -118,27 +164,101 @@ function updateProfileUI() {
             </div>
             <div class="order-date">${date}</div>
             <span class="order-status ${status}">${statusLabel}</span>
-            ${order.tickets ? `&nbsp;<span style="color:#f7c948; font-size:13px;">🎟️ ${order.tickets} бил.</span>` : ''}
+            ${order.tickets ? `&nbsp;<span style="color:#E7A04A; font-size:13px;">🎟️ ${order.tickets} бил.</span>` : ''}
           </div>
         `;
       });
       ordersDiv.innerHTML = html;
     } else {
-      ordersDiv.innerHTML = '<p style="color:#a080b8;">Заказов пока нет.</p>';
+      ordersDiv.innerHTML = '<p style="color:#9D887A;">Заказов пока нет.</p>';
     }
   } else {
     userBtn.innerHTML = '👤 Войти';
     document.getElementById('profileName').textContent = 'Пользователь';
     document.getElementById('profileTickets').textContent = '0';
     document.getElementById('profileOrdersCount').textContent = '0';
-    document.getElementById('profileAvatar').textContent = '👤';
-    document.getElementById('profileOrders').innerHTML = '<p style="color:#a080b8;">Войдите, чтобы увидеть историю.</p>';
+    applyAvatar(document.getElementById('profileAvatar'), null, null);
+    document.getElementById('profileOrders').innerHTML = '<p style="color:#9D887A;">Войдите, чтобы увидеть историю.</p>';
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) referralDiv.innerHTML = '';
   }
 }
 
-// ---- КОПИРОВАНИЕ РЕФЕРАЛЬНОЙ ССЫЛКИ ----
+// =============================================
+// ===== ЛОГИКА ВЫБОРА АВАТАРКИ =====
+// =============================================
+function openAvatarModal() {
+  pendingAvatarId = currentUser ? currentUser.avatar : null;
+  renderAvatarGrid();
+  document.getElementById('avatarModal').classList.add('open');
+}
+
+function closeAvatarModal() {
+  document.getElementById('avatarModal').classList.remove('open');
+  pendingAvatarId = null;
+}
+
+function renderAvatarGrid() {
+  const grid = document.getElementById('avatarGrid');
+  grid.innerHTML = AVATARS.map(a => `
+    <div class="avatar-option ${pendingAvatarId === a.id ? 'selected' : ''}"
+         data-avatar-id="${a.id}"
+         title="Аватарка ${a.id}">
+      <img src="${a.image}" alt="Аватарка ${a.id}" loading="lazy">
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.avatar-option').forEach(el => {
+    el.addEventListener('click', () => {
+      pendingAvatarId = parseInt(el.dataset.avatarId);
+      grid.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+    });
+  });
+}
+
+async function saveAvatar() {
+  if (!currentUser || !currentUser.telegram) {
+    showToast('⚠️ Войдите в профиль', 'error');
+    return;
+  }
+  if (!pendingAvatarId) {
+    showToast('⚠️ Выберите аватарку', 'error');
+    return;
+  }
+
+  const saveBtn = document.getElementById('avatarSaveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Сохранение...';
+
+  try {
+    const response = await fetch(WORKER_URL + 'update-avatar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        telegram: currentUser.telegram,
+        avatar: pendingAvatarId
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Ошибка сохранения');
+
+    currentUser.avatar = pendingAvatarId;
+    updateProfileUI();
+    closeAvatarModal();
+    showToast('✅ Аватарка обновлена!', 'success');
+  } catch (err) {
+    showToast(`❌ ${err.message}`, 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Сохранить';
+  }
+}
+
+// =============================================
+// ===== КОПИРОВАНИЕ РЕФЕРАЛЬНОЙ ССЫЛКИ =====
+// =============================================
 window.copyReferralLink = function(link) {
   navigator.clipboard.writeText(link).then(() => {
     showToast('🔗 Реферальная ссылка скопирована!', 'success');
@@ -153,7 +273,9 @@ window.copyReferralLink = function(link) {
   });
 };
 
-// ---- ВХОД ----
+// =============================================
+// ===== ВХОД / РЕГИСТРАЦИЯ =====
+// =============================================
 async function login() {
   const input = document.getElementById('loginInput');
   const passwordInput = document.getElementById('loginPassword');
@@ -170,9 +292,8 @@ async function login() {
       body: JSON.stringify({ telegram: username, password })
     });
     const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.error || 'Ошибка входа');
-    }
+    if (!response.ok) throw new Error(data.error || 'Ошибка входа');
+
     localStorage.setItem('user_telegram', username);
     currentUser = data;
     updateProfileUI();
@@ -183,7 +304,6 @@ async function login() {
   }
 }
 
-// ---- РЕГИСТРАЦИЯ (с реферальным кодом) ----
 async function register() {
   const input = document.getElementById('loginInput');
   const passwordInput = document.getElementById('loginPassword');
@@ -208,9 +328,8 @@ async function register() {
       })
     });
     const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.error || 'Ошибка регистрации');
-    }
+    if (!response.ok) throw new Error(data.error || 'Ошибка регистрации');
+
     showToast('✅ Регистрация успешна! Теперь войдите.', 'success');
     localStorage.removeItem('referralCode');
     await login();
@@ -219,17 +338,16 @@ async function register() {
   }
 }
 
-// ---- ИНИЦИАЛИЗАЦИЯ ПРОФИЛЯ ----
 function initProfile() {
   const saved = localStorage.getItem('user_telegram');
   if (saved) {
-    loadUserProfile(saved).then(() => {
-      updateProfileUI();
-    });
+    loadUserProfile(saved).then(() => updateProfileUI());
   }
 }
 
-// ---- ОБРАБОТЧИКИ ДЛЯ МОДАЛОК ----
+// =============================================
+// ===== ОБРАБОТЧИКИ МОДАЛОК =====
+// =============================================
 document.getElementById('userBtn').addEventListener('click', () => {
   if (currentUser && currentUser.telegram) {
     document.getElementById('profileModal').classList.add('open');
@@ -247,13 +365,8 @@ document.getElementById('loginModalClose').addEventListener('click', () => {
 
 document.getElementById('loginSubmit').addEventListener('click', login);
 document.getElementById('registerSubmit').addEventListener('click', register);
-
-document.getElementById('loginPassword').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') login();
-});
-document.getElementById('loginInput').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') login();
-});
+document.getElementById('loginPassword').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
+document.getElementById('loginInput').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
 
 document.getElementById('profileModalClose').addEventListener('click', () => {
   document.getElementById('profileModal').classList.remove('open');
@@ -267,10 +380,17 @@ document.getElementById('profileLogout').addEventListener('click', () => {
   showToast('👋 Вы вышли из профиля', 'info');
 });
 
-// ---- ЗАКРЫТИЕ МОДАЛОК ПО OVERLAY ----
+// ---- Аватарка ----
+document.getElementById('avatarEditBtn').addEventListener('click', openAvatarModal);
+document.getElementById('avatarModalClose').addEventListener('click', closeAvatarModal);
+document.getElementById('avatarCancelBtn').addEventListener('click', closeAvatarModal);
+document.getElementById('avatarSaveBtn').addEventListener('click', saveAvatar);
+
+// Закрытие по overlay
 document.getElementById('overlay').addEventListener('click', () => {
   document.getElementById('loginModal').classList.remove('open');
   document.getElementById('profileModal').classList.remove('open');
+  document.getElementById('avatarModal').classList.remove('open');
 });
 
 // =============================================
@@ -285,13 +405,9 @@ const overlay = document.getElementById('overlay');
 function addToCart(productId) {
   const product = products.find(p => p.id === productId);
   if (!product) return;
-
   const existing = cart.find(item => item.id === productId);
-  if (existing) {
-    existing.quantity += 1;
-  } else {
-    cart.push({ ...product, quantity: 1 });
-  }
+  if (existing) existing.quantity += 1;
+  else cart.push({ ...product, quantity: 1 });
   updateCartUI();
   showToast(`✅ ${product.name} добавлен в корзину`, 'success');
 }
@@ -303,9 +419,7 @@ function removeFromCart(productId) {
 
 function getCartTotal() {
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  if (discountPercent > 0) {
-    return subtotal * (1 - discountPercent / 100);
-  }
+  if (discountPercent > 0) return subtotal * (1 - discountPercent / 100);
   return subtotal;
 }
 
@@ -333,14 +447,10 @@ function updateCartUI() {
   `).join('');
 
   document.querySelectorAll('.cart-item__remove').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = parseInt(btn.dataset.id);
-      removeFromCart(id);
-    });
+    btn.addEventListener('click', () => removeFromCart(parseInt(btn.dataset.id)));
   });
 
-  const total = getCartTotal();
-  cartTotal.textContent = Math.round(total);
+  cartTotal.textContent = Math.round(getCartTotal());
 }
 
 function openCart() {
@@ -366,12 +476,8 @@ function showToast(message, type = 'success') {
   const toast = document.createElement('div');
   toast.className = 'toast';
   const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
-  toast.innerHTML = `
-    <span class="toast-icon">${icon}</span>
-    <span class="toast-message">${message}</span>
-  `;
+  toast.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-message">${message}</span>`;
   toastContainer.appendChild(toast);
-
   setTimeout(() => {
     toast.classList.add('hide');
     setTimeout(() => toast.remove(), 300);
@@ -387,19 +493,16 @@ const promoMessage = document.getElementById('promoMessage');
 
 function applyPromo() {
   const code = promoInput.value.trim().toUpperCase();
-  
   if (!code) {
     promoMessage.textContent = '⚠️ Введите промокод';
     promoMessage.style.color = '#ff7777';
     return;
   }
-
   if (appliedPromo === code) {
     promoMessage.textContent = 'ℹ️ Этот промокод уже применён';
-    promoMessage.style.color = '#c8b0e0';
+    promoMessage.style.color = '#B9A99A';
     return;
   }
-
   const promo = promocodes.find(p => p.code === code);
   if (promo) {
     discountPercent = promo.discount;
@@ -417,11 +520,7 @@ function applyPromo() {
 }
 
 applyPromoBtn.addEventListener('click', applyPromo);
-promoInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    applyPromo();
-  }
-});
+promoInput.addEventListener('keypress', e => { if (e.key === 'Enter') applyPromo(); });
 
 // =============================================
 // ===== ФИЛЬТРЫ =====
@@ -462,9 +561,7 @@ function renderProducts(category, filter = 'Все') {
   if (!grid) return;
 
   let filtered = products.filter(p => p.category === category);
-  if (filter !== 'Все') {
-    filtered = filtered.filter(p => p.brand === filter);
-  }
+  if (filter !== 'Все') filtered = filtered.filter(p => p.brand === filter);
 
   if (filtered.length === 0) {
     grid.innerHTML = `<div class="placeholder"><p>🛠 В этой категории пока нет товаров</p></div>`;
@@ -494,8 +591,7 @@ function renderProducts(category, filter = 'Все') {
   document.querySelectorAll('.product-card__btn').forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
-      const id = parseInt(this.dataset.id);
-      addToCart(id);
+      addToCart(parseInt(this.dataset.id));
     });
   });
 }
@@ -521,17 +617,12 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
   orderMessage.textContent = '';
 });
 
-orderModalClose.addEventListener('click', () => {
-  orderModal.classList.remove('open');
-});
-
-overlay.addEventListener('click', () => {
-  orderModal.classList.remove('open');
-});
+orderModalClose.addEventListener('click', () => orderModal.classList.remove('open'));
+overlay.addEventListener('click', () => orderModal.classList.remove('open'));
 
 orderForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  
+
   const name = document.getElementById('orderName').value.trim();
   const telegram = document.getElementById('orderTelegram').value.trim();
   const address = document.getElementById('orderAddress').value.trim();
@@ -543,7 +634,6 @@ orderForm.addEventListener('submit', async (e) => {
     orderMessage.style.color = '#ff7777';
     return;
   }
-
   if (!telegram.startsWith('@')) {
     orderMessage.style.display = 'block';
     orderMessage.textContent = '⚠️ Укажите Telegram username, начиная с @';
@@ -552,10 +642,7 @@ orderForm.addEventListener('submit', async (e) => {
   }
 
   const orderData = {
-    name,
-    telegram,
-    address,
-    comment,
+    name, telegram, address, comment,
     items: cart,
     subtotal: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
     total: getCartTotal(),
@@ -575,19 +662,14 @@ orderForm.addEventListener('submit', async (e) => {
   message += `\n💰 Сумма: ${orderData.subtotal} BYN`;
   if (orderData.discount > 0) {
     message += `\n🎉 Скидка: ${orderData.discount}%`;
-    message += `\n💰 Итого: ${Math.round(orderData.total)} BYN`;
-  } else {
-    message += `\n💰 Итого: ${Math.round(orderData.total)} BYN`;
   }
+  message += `\n💰 Итого: ${Math.round(orderData.total)} BYN`;
 
   try {
     const response = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: message,
-        order: orderData
-      })
+      body: JSON.stringify({ message, order: orderData })
     });
 
     if (!response.ok) {
@@ -613,9 +695,7 @@ orderForm.addEventListener('submit', async (e) => {
       applyPromoBtn.disabled = false;
       promoMessage.textContent = '';
       showToast('✅ Заказ оформлен! Спасибо!', 'success');
-      if (currentUser && currentUser.telegram) {
-        loadUserProfile(currentUser.telegram);
-      }
+      if (currentUser && currentUser.telegram) loadUserProfile(currentUser.telegram);
     }, 2000);
 
   } catch (error) {
@@ -634,46 +714,34 @@ const categoryBtnsMobile = document.querySelectorAll('.category-btn-mobile');
 const categoryContent = document.getElementById('categoryContent');
 
 function switchCategory(category) {
-  categoryBtns.forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.category === category);
-  });
-  categoryBtnsMobile.forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.category === category);
-  });
+  categoryBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.category === category));
+  categoryBtnsMobile.forEach(btn => btn.classList.toggle('active', btn.dataset.category === category));
 
   if (category === 'liquids' || category === 'snus') {
     categoryContent.innerHTML = `
       <div class="category-content active">
         <div class="catalog__filters" id="filterContainer"></div>
         <div class="catalog__grid" id="productGrid"></div>
-      </div>
-    `;
+      </div>`;
     initFilters(category);
   } else if (category === 'coils' || category === 'disposables') {
     categoryContent.innerHTML = `
       <div class="category-content active">
         <div class="catalog__grid" id="productGrid"></div>
-      </div>
-    `;
+      </div>`;
     renderProducts(category, 'Все');
   } else {
     categoryContent.innerHTML = `
       <div class="category-content active">
         <div class="placeholder">
           <h3>Скоро появится!</h3>
-          <p style="font-size: 14px; margin-top: 8px; color: #8888aa;">Следите за обновлениями</p>
+          <p style="font-size: 14px; margin-top: 8px; color: #9D887A;">Следите за обновлениями</p>
         </div>
-      </div>
-    `;
+      </div>`;
   }
 }
 
-categoryBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    switchCategory(btn.dataset.category);
-  });
-});
-
+categoryBtns.forEach(btn => btn.addEventListener('click', () => switchCategory(btn.dataset.category)));
 categoryBtnsMobile.forEach(btn => {
   btn.addEventListener('click', () => {
     switchCategory(btn.dataset.category);
@@ -693,7 +761,7 @@ burger.addEventListener('click', () => {
   mobileMenu.classList.toggle('open');
 });
 
-document.addEventListener('click', (e) => {
+document.addEventListener('click', e => {
   if (!e.target.closest('.header__inner')) {
     burger.classList.remove('active');
     mobileMenu.classList.remove('open');
@@ -719,15 +787,10 @@ document.addEventListener('DOMContentLoaded', function() {
   if (!logo) return;
 
   const phrases = [
-    'Заказывай жижу :3',
-    'Какой сегодня вкус хочешь?',
-    'Время выбрать свой вкус!',
-    'Хочешь сладкого или мятного?',
-    'Новый день — новый вкус!',
-    'Что-то вкусненькое уже ждёт!',
-    'Лови свой идеальный вкус!',
-    'Сделай выбор — закажи сейчас!',
-    'Клубника, мята, апельсин — всё здесь!',
+    'Заказывай жижу :3', 'Какой сегодня вкус хочешь?', 'Время выбрать свой вкус!',
+    'Хочешь сладкого или мятного?', 'Новый день — новый вкус!',
+    'Что-то вкусненькое уже ждёт!', 'Лови свой идеальный вкус!',
+    'Сделай выбор — закажи сейчас!', 'Клубника, мята, апельсин — всё здесь!',
     'Найди свой любимый вкус!'
   ];
 
@@ -735,33 +798,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
   logo.addEventListener('click', function(e) {
     e.preventDefault();
-
     const oldTooltip = document.querySelector('.logo-tooltip');
     if (oldTooltip) oldTooltip.remove();
     if (tooltipTimeout) clearTimeout(tooltipTimeout);
 
-    const randomIndex = Math.floor(Math.random() * phrases.length);
-    const phrase = phrases[randomIndex];
-
+    const phrase = phrases[Math.floor(Math.random() * phrases.length)];
     const tooltip = document.createElement('div');
     tooltip.className = 'logo-tooltip';
     tooltip.textContent = phrase;
 
     const rect = this.getBoundingClientRect();
-    const top = rect.top - 10;
-    const left = rect.left + rect.width / 2;
-
     tooltip.style.position = 'fixed';
-    tooltip.style.top = top + 'px';
-    tooltip.style.left = left + 'px';
+    tooltip.style.top = (rect.top - 10) + 'px';
+    tooltip.style.left = (rect.left + rect.width / 2) + 'px';
     tooltip.style.transform = 'translateX(-50%) translateY(-100%)';
     tooltip.style.zIndex = '1000';
-
     document.body.appendChild(tooltip);
 
-    requestAnimationFrame(() => {
-      tooltip.classList.add('show');
-    });
+    requestAnimationFrame(() => tooltip.classList.add('show'));
 
     tooltipTimeout = setTimeout(() => {
       tooltip.classList.remove('show');
