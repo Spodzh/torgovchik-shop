@@ -175,13 +175,14 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ПРОФИЛЯ -->
+    <!-- ===== МОДАЛКА ПРОФИЛЯ ===== -->
     <div class="profile-modal" id="profileModal">
         <div class="profile-modal__content">
             <button class="profile-modal__close" id="profileModalClose">✕</button>
             <h2>👤 Мой профиль</h2>
 
-            <div class="profile-header">
+            <div class="profile-header" id="profileHeader">
+                <button class="banner-edit-btn" id="bannerEditBtn" title="Сменить шапку">✏️</button>
                 <div class="profile-avatar-wrap">
                     <div class="profile-avatar" id="profileAvatar">👤</div>
                     <button class="avatar-edit-btn" id="avatarEditBtn" title="Сменить аватарку">✏️</button>
@@ -210,7 +211,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ВЫБОРА АВАТАРКИ -->
+    <!-- ===== МОДАЛКА ВЫБОРА АВАТАРКИ ===== -->
     <div class="avatar-modal" id="avatarModal">
         <div class="avatar-modal__content">
             <button class="avatar-modal__close" id="avatarModalClose">✕</button>
@@ -224,7 +225,21 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА -->
+    <!-- ===== МОДАЛКА ВЫБОРА ШАПКИ ПРОФИЛЯ ===== -->
+    <div class="banner-modal" id="bannerModal">
+        <div class="banner-modal__content">
+            <button class="banner-modal__close" id="bannerModalClose">✕</button>
+            <h2>🎨 Шапка профиля</h2>
+            <p class="banner-modal__hint">Выберите фон для профиля или уберите шапку</p>
+            <div class="banner-grid" id="bannerGrid"></div>
+            <div class="banner-modal__buttons">
+                <button class="btn btn-secondary" id="bannerRemoveBtn">Убрать шапку</button>
+                <button class="btn btn-primary" id="bannerSaveBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА ===== -->
     <div class="order-modal" id="orderModal">
         <div class="order-modal__content">
             <button class="order-modal__close" id="orderModalClose">✕</button>
