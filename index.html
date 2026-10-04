@@ -134,18 +134,44 @@
     <div class="overlay" id="overlay"></div>
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- МОДАЛКА ВХОДА -->
+    <!-- ===== МОДАЛКА ВХОДА / РЕГИСТРАЦИИ ===== -->
     <div class="login-modal" id="loginModal">
         <div class="login-modal__content">
             <button class="login-modal__close" id="loginModalClose">✕</button>
-            <h2>Вход в профиль</h2>
-            <p>Введите ваш Telegram username и пароль:</p>
-            <input type="text" id="loginInput" placeholder="username (без @)">
-            <input type="password" id="loginPassword" placeholder="Пароль">
-            <div class="login-modal__buttons">
-                <button class="btn btn-primary" id="loginSubmit">Войти</button>
-                <button class="btn btn-secondary" id="registerSubmit">Регистрация</button>
+            <span class="login-modal__leaf">🍁</span>
+
+            <div class="login-modal__brand">TORGOVCHIK</div>
+            <h2 class="login-modal__title" id="authTitle">С возвращением</h2>
+            <p class="login-modal__subtitle" id="authSubtitle">Войдите, чтобы продолжить покупки</p>
+
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab active" data-tab="login">Вход</button>
+                <button type="button" class="auth-tab" data-tab="register">Регистрация</button>
             </div>
+
+            <form id="authForm" novalidate>
+                <div class="auth-field">
+                    <span class="auth-field__icon">👤</span>
+                    <input type="text" id="loginInput" placeholder="Username без @" autocomplete="username">
+                </div>
+                <div class="auth-error" id="usernameError"></div>
+
+                <div class="auth-field">
+                    <span class="auth-field__icon">🔒</span>
+                    <input type="password" id="loginPassword" placeholder="Пароль" autocomplete="current-password">
+                    <button type="button" class="auth-field__eye" id="togglePassword" aria-label="Показать пароль">👁</button>
+                </div>
+                <div class="auth-error" id="passwordError"></div>
+
+                <div class="auth-forgot" id="authForgot">
+                    <a href="#" id="forgotPasswordLink">Забыли пароль?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary auth-submit" id="authSubmitBtn">
+                    <span id="authSubmitText">Войти</span>
+                    <span class="auth-submit__arrow">→</span>
+                </button>
+            </form>
         </div>
     </div>
 
