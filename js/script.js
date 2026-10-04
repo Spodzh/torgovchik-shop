@@ -1094,25 +1094,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
   logo.addEventListener('click', function(e) {
     e.preventDefault();
-    const oldTooltip = document.querySelector('.logo-tooltip');
+
+    // Удаляем старый тултип, если есть
+    const oldTooltip = logo.querySelector('.logo-tooltip');
     if (oldTooltip) oldTooltip.remove();
     if (tooltipTimeout) clearTimeout(tooltipTimeout);
 
+    // Случайная фраза
     const phrase = LOGO_PHRASES[Math.floor(Math.random() * LOGO_PHRASES.length)];
     const tooltip = document.createElement('div');
     tooltip.className = 'logo-tooltip';
     tooltip.textContent = phrase;
 
-    const rect = this.getBoundingClientRect();
-    tooltip.style.position = 'fixed';
-    tooltip.style.top = (rect.top - 10) + 'px';
-    tooltip.style.left = (rect.left + rect.width / 2) + 'px';
-    tooltip.style.transform = 'translateX(-50%) translateY(-100%)';
-    tooltip.style.zIndex = '1000';
-    document.body.appendChild(tooltip);
+    // Вставляем внутрь логотипа (там position: relative)
+    logo.appendChild(tooltip);
 
+    // Анимированное появление
     requestAnimationFrame(() => tooltip.classList.add('show'));
 
+    // Автоскрытие через 2.5 сек
     tooltipTimeout = setTimeout(() => {
       tooltip.classList.remove('show');
       setTimeout(() => tooltip.remove(), 300);
