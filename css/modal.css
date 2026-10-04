@@ -2,7 +2,8 @@
 .order-modal,
 .login-modal,
 .profile-modal,
-.avatar-modal {
+.avatar-modal,
+.banner-modal {
     display: none;
     position: fixed;
     top: 0;
@@ -20,11 +21,13 @@
 .order-modal.open,
 .login-modal.open,
 .profile-modal.open,
-.avatar-modal.open { display: flex; }
+.avatar-modal.open,
+.banner-modal.open { display: flex; }
 
 .order-modal__content,
 .profile-modal__content,
-.avatar-modal__content {
+.avatar-modal__content,
+.banner-modal__content {
     background: var(--bg-modal);
     border-radius: 22px;
     padding: 32px 28px;
@@ -39,10 +42,12 @@
 
 .profile-modal__content { max-width: 600px; }
 .avatar-modal__content { max-width: 580px; }
+.banner-modal__content { max-width: 620px; }
 
 .order-modal__close,
 .profile-modal__close,
-.avatar-modal__close {
+.avatar-modal__close,
+.banner-modal__close {
     position: absolute;
     top: 16px;
     right: 20px;
@@ -57,11 +62,13 @@
 
 .order-modal__close:hover,
 .profile-modal__close:hover,
-.avatar-modal__close:hover { color: var(--accent); }
+.avatar-modal__close:hover,
+.banner-modal__close:hover { color: var(--accent); }
 
 .order-modal__content h2,
 .profile-modal__content h2,
-.avatar-modal__content h2 {
+.avatar-modal__content h2,
+.banner-modal__content h2 {
     font-family: 'Bitter', serif;
     font-size: 26px;
     font-weight: 700;
@@ -163,7 +170,6 @@
     line-height: 1.5;
 }
 
-/* ===== ВКЛАДКИ ===== */
 .auth-tabs {
     display: flex;
     position: relative;
@@ -201,7 +207,6 @@
     transition: all 0.3s ease;
 }
 
-/* ===== ПОЛЯ ===== */
 .auth-field {
     position: relative;
     display: flex;
@@ -267,7 +272,6 @@
 
 .auth-field__eye:hover { opacity: 1; }
 
-/* ===== ОШИБКИ ПОД ПОЛЯМИ ===== */
 .auth-error {
     font-family: 'Manrope', sans-serif;
     font-size: 12.5px;
@@ -283,7 +287,6 @@
     padding: 6px 6px 8px;
 }
 
-/* ===== ЗАБЫЛИ ПАРОЛЬ ===== */
 .auth-forgot {
     text-align: right;
     margin-bottom: 20px;
@@ -302,7 +305,6 @@
 
 .auth-forgot.hidden { display: none; }
 
-/* ===== ОСНОВНАЯ КНОПКА ===== */
 .auth-submit {
     width: 100%;
     padding: 16px 24px;
@@ -373,6 +375,7 @@
 
 /* ===== ПРОФИЛЬ ===== */
 .profile-header {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -381,6 +384,55 @@
     border: 1px solid var(--border-soft);
     border-radius: 16px;
     padding: 16px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    transition: background-image 0.3s ease;
+}
+
+.profile-header.has-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 0;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.profile-header > * {
+    position: relative;
+    z-index: 1;
+}
+
+.banner-edit-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(28, 23, 21, 0.85);
+    backdrop-filter: blur(6px);
+    color: var(--accent);
+    border: 1px solid rgba(216, 137, 50, 0.5);
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    line-height: 1;
+    z-index: 5;
+}
+
+.banner-edit-btn:hover {
+    background: var(--accent);
+    color: #1C1715;
+    transform: scale(1.12);
+    box-shadow: 0 0 12px rgba(216, 137, 50, 0.55);
 }
 
 .profile-avatar-wrap { position: relative; flex-shrink: 0; }
@@ -579,52 +631,104 @@
 
 .avatar-modal__buttons .btn { flex: 1; text-align: center; }
 
+/* ===== МОДАЛКА ШАПКИ ===== */
+.banner-modal__hint {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.banner-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.banner-option {
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.banner-option:hover {
+    transform: scale(1.04);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.banner-option.selected {
+    border-color: var(--accent);
+    box-shadow:
+        0 0 0 3px rgba(216, 137, 50, 0.3),
+        0 6px 24px rgba(216, 137, 50, 0.45);
+    transform: scale(1.02);
+}
+
+.banner-option::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    transition: background 0.2s;
+}
+
+.banner-option:hover::after {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.banner-option.selected::after {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.banner-modal__buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.banner-modal__buttons .btn { flex: 1; text-align: center; }
+
 /* ===== АДАПТИВ ===== */
 @media (max-width: 768px) {
     .order-modal__content,
     .profile-modal__content,
     .avatar-modal__content,
-    .login-modal__content { padding: 24px 20px; }
+    .login-modal__content,
+    .banner-modal__content { padding: 24px 20px; }
 
-    .avatar-grid {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 10px;
-    }
+    .avatar-grid { grid-template-columns: repeat(5, 1fr); gap: 10px; }
 }
 
 @media (max-width: 600px) {
     .order-modal__content,
     .profile-modal__content,
-    .avatar-modal__content { padding: 20px 16px; }
+    .avatar-modal__content,
+    .banner-modal__content { padding: 20px 16px; }
 
-    .login-modal__content {
-        padding: 32px 22px 28px;
-        border-radius: 20px;
-    }
-
+    .login-modal__content { padding: 32px 22px 28px; border-radius: 20px; }
     .login-modal__title { font-size: 24px; }
     .login-modal__subtitle { font-size: 13px; margin-bottom: 22px; }
-
     .auth-field { padding: 0 14px; }
     .auth-field input { padding: 14px 0; font-size: 15px; }
-
     .auth-submit { padding: 15px 24px; font-size: 15px; }
 
     .profile-header { flex-direction: column; text-align: center; }
     .profile-stats { justify-content: center; }
 
-    .avatar-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-    }
+    .avatar-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+    .banner-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .banner-modal__content h2 { font-size: 20px; }
 }
 
 @media (max-width: 400px) {
-    .avatar-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-    }
-
+    .avatar-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .login-modal__title { font-size: 22px; }
     .auth-tab { font-size: 14px; }
     .login-modal__leaf { font-size: 36px; right: 60px; }
