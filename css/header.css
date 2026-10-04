@@ -183,7 +183,7 @@
     font-family: 'Manrope', sans-serif;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     white-space: nowrap;
 }
 
@@ -193,6 +193,48 @@
 }
 
 .user-btn.logged-in { color: var(--text-primary); }
+
+/* ===== АВАТАРКА В КНОПКЕ ПРОФИЛЯ ===== */
+.user-btn__avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--grad-accent);
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1C1715;
+    border: 1.5px solid rgba(216, 137, 50, 0.5);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.user-btn__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+
+.user-btn__name {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.user-btn__tickets {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.user-btn:hover .user-btn__avatar {
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(216, 137, 50, 0.55);
+}
 
 /* ===== ПОДСКАЗКА ПРИ КЛИКЕ НА ЛОГОТИП ===== */
 .logo-tooltip {
@@ -235,7 +277,19 @@
 @media (max-width: 600px) {
     .header { padding: 4px 0; }
     .logo__image { height: 38px; }
-    .user-btn { font-size: 13px; padding: 4px 10px; }
+
+    .user-btn {
+        gap: 5px;
+        padding: 4px 10px;
+    }
+    .user-btn__avatar {
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
+    }
+    .user-btn__name { font-size: 13px; }
+    .user-btn__tickets { font-size: 12px; }
+
     .logo-tooltip {
         font-size: 15px;
         padding: 8px 16px;
