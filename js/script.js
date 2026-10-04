@@ -29,7 +29,6 @@ const AVATARS = [
     { id: 20, image: 'https://i.ibb.co/Nz2SQ4w/image.png' }
 ];
 
-// ID аватарки по умолчанию (для тех, кто ещё не выбрал)
 const DEFAULT_AVATAR_ID = 6;
 
 // =============================================
@@ -43,6 +42,7 @@ let discountPercent = 0;
 let currentUser = null;
 let referralCode = null;
 let pendingAvatarId = null;
+let currentAuthTab = 'login';
 
 // =============================================
 // ===== ЗАГРУЗКА ТОВАРОВ И ПРОМОКОДОВ =====
@@ -107,7 +107,6 @@ async function loadUserProfile(telegram) {
   }
 }
 
-// ---- Применяет аватарку к элементу ----
 function applyAvatar(el, avatarId, fallbackText) {
   if (!el) return;
   el.innerHTML = '';
@@ -128,7 +127,6 @@ function updateProfileUI() {
   const userBtn = document.getElementById('userBtn');
   if (currentUser && currentUser.telegram) {
     const tickets = currentUser.totalTickets || 0;
-    // Если пользователь не выбрал аватарку — используем #6 по умолчанию
     const avatarId = currentUser.avatar || DEFAULT_AVATAR_ID;
 
     userBtn.innerHTML = `
@@ -142,14 +140,8 @@ function updateProfileUI() {
     document.getElementById('profileTickets').textContent = tickets;
     document.getElementById('profileOrdersCount').textContent = (currentUser.orders || []).length;
 
-    // В профиле тоже показываем #6, если аватарка не выбрана
-    applyAvatar(
-      document.getElementById('profileAvatar'),
-      avatarId,
-      currentUser.telegram
-    );
+    applyAvatar(document.getElementById('profileAvatar'), avatarId, currentUser.telegram);
 
-    // Реферальная ссылка
     const referralLink = `${window.location.origin}${window.location.pathname}?ref=${currentUser.telegram}`;
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) {
@@ -163,7 +155,6 @@ function updateProfileUI() {
       `;
     }
 
-    // Заказы
     const ordersDiv = document.getElementById('profileOrders');
     if (currentUser.orders && currentUser.orders.length > 0) {
       let html = '';
@@ -290,17 +281,87 @@ window.copyReferralLink = function(link) {
 };
 
 // =============================================
+// ===== ВКЛАДКИ ВХОД / РЕГИСТРАЦИЯ =====
+// =============================================
+function switchAuthTab(tab) {
+  currentAuthTab = tab;
+  document.querySelectorAll('.auth-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.tab === tab)
+  );
+
+  const title = document.getElementById('authTitle');
+  const subtitle = document.getElementById('authSubtitle');
+  const submitText = document.getElementById('authSubmitText');
+  const forgot = document.getElementById('authForgot');
+  const passwordInput = document.getElementById('loginPassword');
+
+  if (tab === 'register') {
+    title.textContent = 'Создать аккаунт';
+    subtitle.textContent = 'Зарегистрируйтесь, чтобы получать билетики';
+    submitText.textContent = 'Зарегистрироваться';
+    forgot.classList.add('hidden');
+    passwordInput.setAttribute('autocomplete', 'new-password');
+  } else {
+    title.textContent = 'С возвращением';
+    subtitle.textContent = 'Войдите, чтобы продолжить покупки';
+    submitText.textContent = 'Войти';
+    forgot.classList.remove('hidden');
+    passwordInput.setAttribute('autocomplete', 'current-password');
+  }
+
+  clearAuthErrors();
+}
+
+function clearAuthErrors() {
+  document.querySelectorAll('.auth-error').forEach(el => {
+    el.textContent = '';
+    el.classList.remove('visible');
+  });
+  document.querySelectorAll('.auth-field').forEach(el => el.classList.remove('error'));
+}
+
+function showFieldError(fieldId, errorId, message) {
+  const field = document.getElementById(fieldId);
+  const error = document.getElementById(errorId);
+  if (field) field.closest('.auth-field').classList.add('error');
+  if (error) {
+    error.textContent = message;
+    error.classList.add('visible');
+  }
+}
+
+function resetAuthForm() {
+  document.getElementById('loginInput').value = '';
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginPassword').type = 'password';
+  document.getElementById('togglePassword').textContent = '👁';
+  clearAuthErrors();
+  switchAuthTab('login');
+}
+
+// =============================================
 // ===== ВХОД / РЕГИСТРАЦИЯ =====
 // =============================================
 async function login() {
+  clearAuthErrors();
+
   const input = document.getElementById('loginInput');
   const passwordInput = document.getElementById('loginPassword');
   const username = input.value.trim();
   const password = passwordInput.value.trim();
-  if (!username || !password) {
-    showToast('⚠️ Заполните все поля', 'error');
+
+  if (!username) {
+    showFieldError('loginInput', 'usernameError', 'Введите username');
     return;
   }
+  if (!password) {
+    showFieldError('loginPassword', 'passwordError', 'Введите пароль');
+    return;
+  }
+
+  const submitBtn = document.getElementById('authSubmitBtn');
+  submitBtn.disabled = true;
+
   try {
     const response = await fetch(WORKER_URL + 'login', {
       method: 'POST',
@@ -308,31 +369,57 @@ async function login() {
       body: JSON.stringify({ telegram: username, password })
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Ошибка входа');
+
+    if (!response.ok) {
+      const errMsg = data.error || 'Ошибка входа';
+      const lower = errMsg.toLowerCase();
+      if (lower.includes('не найден')) {
+        showFieldError('loginInput', 'usernameError', 'Пользователь не найден');
+      } else if (lower.includes('пароль')) {
+        showFieldError('loginPassword', 'passwordError', 'Неверный пароль');
+      } else {
+        showFieldError('loginPassword', 'passwordError', errMsg);
+      }
+      return;
+    }
 
     localStorage.setItem('user_telegram', username);
     currentUser = data;
     updateProfileUI();
     document.getElementById('loginModal').classList.remove('open');
     showToast(`✅ Добро пожаловать, ${username}!`, 'success');
+    resetAuthForm();
   } catch (err) {
-    showToast(`❌ ${err.message}`, 'error');
+    showFieldError('loginPassword', 'passwordError', err.message || 'Ошибка сети');
+  } finally {
+    submitBtn.disabled = false;
   }
 }
 
 async function register() {
+  clearAuthErrors();
+
   const input = document.getElementById('loginInput');
   const passwordInput = document.getElementById('loginPassword');
   const username = input.value.trim();
   const password = passwordInput.value.trim();
-  if (!username || !password) {
-    showToast('⚠️ Заполните все поля', 'error');
+
+  if (!username) {
+    showFieldError('loginInput', 'usernameError', 'Введите username');
+    return;
+  }
+  if (!password) {
+    showFieldError('loginPassword', 'passwordError', 'Введите пароль');
     return;
   }
   if (password.length < 4) {
-    showToast('⚠️ Пароль должен быть не менее 4 символов', 'error');
+    showFieldError('loginPassword', 'passwordError', 'Пароль должен содержать минимум 4 символа');
     return;
   }
+
+  const submitBtn = document.getElementById('authSubmitBtn');
+  submitBtn.disabled = true;
+
   try {
     const response = await fetch(WORKER_URL + 'register', {
       method: 'POST',
@@ -344,13 +431,24 @@ async function register() {
       })
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Ошибка регистрации');
+
+    if (!response.ok) {
+      const errMsg = data.error || 'Ошибка регистрации';
+      if (errMsg.toLowerCase().includes('существует')) {
+        showFieldError('loginInput', 'usernameError', 'Такой пользователь уже существует');
+      } else {
+        showFieldError('loginPassword', 'passwordError', errMsg);
+      }
+      return;
+    }
 
     showToast('✅ Регистрация успешна! Теперь войдите.', 'success');
     localStorage.removeItem('referralCode');
     await login();
   } catch (err) {
-    showToast(`❌ ${err.message}`, 'error');
+    showFieldError('loginPassword', 'passwordError', err.message || 'Ошибка сети');
+  } finally {
+    submitBtn.disabled = false;
   }
 }
 
@@ -369,9 +467,8 @@ document.getElementById('userBtn').addEventListener('click', () => {
     document.getElementById('profileModal').classList.add('open');
     updateProfileUI();
   } else {
+    resetAuthForm();
     document.getElementById('loginModal').classList.add('open');
-    document.getElementById('loginInput').value = '';
-    document.getElementById('loginPassword').value = '';
   }
 });
 
@@ -379,11 +476,40 @@ document.getElementById('loginModalClose').addEventListener('click', () => {
   document.getElementById('loginModal').classList.remove('open');
 });
 
-document.getElementById('loginSubmit').addEventListener('click', login);
-document.getElementById('registerSubmit').addEventListener('click', register);
-document.getElementById('loginPassword').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
-document.getElementById('loginInput').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
+document.querySelectorAll('.auth-tab').forEach(tab => {
+  tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab));
+});
 
+document.getElementById('authForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (currentAuthTab === 'register') register();
+  else login();
+});
+
+// Показ пароля
+document.getElementById('togglePassword').addEventListener('click', function() {
+  const input = document.getElementById('loginPassword');
+  const isPassword = input.type === 'password';
+  input.type = isPassword ? 'text' : 'password';
+  this.textContent = isPassword ? '🙈' : '👁';
+});
+
+// Focus-состояния полей
+document.querySelectorAll('.auth-field input').forEach(input => {
+  input.addEventListener('focus', () => input.closest('.auth-field').classList.add('focused'));
+  input.addEventListener('blur', () => input.closest('.auth-field').classList.remove('focused'));
+  input.addEventListener('input', () => {
+    input.closest('.auth-field').classList.remove('error');
+  });
+});
+
+// Забыли пароль
+document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  showToast('📩 Напишите в наш Telegram — поможем восстановить пароль', 'info');
+});
+
+// Профиль
 document.getElementById('profileModalClose').addEventListener('click', () => {
   document.getElementById('profileModal').classList.remove('open');
 });
@@ -396,7 +522,7 @@ document.getElementById('profileLogout').addEventListener('click', () => {
   showToast('👋 Вы вышли из профиля', 'info');
 });
 
-// ---- Аватарка ----
+// Аватарка
 document.getElementById('avatarEditBtn').addEventListener('click', openAvatarModal);
 document.getElementById('avatarModalClose').addEventListener('click', closeAvatarModal);
 document.getElementById('avatarCancelBtn').addEventListener('click', closeAvatarModal);
@@ -676,9 +802,7 @@ orderForm.addEventListener('submit', async (e) => {
     message += `  • ${item.brand} | ${item.name} × ${item.quantity} = ${item.price * item.quantity} BYN\n`;
   });
   message += `\n💰 Сумма: ${orderData.subtotal} BYN`;
-  if (orderData.discount > 0) {
-    message += `\n🎉 Скидка: ${orderData.discount}%`;
-  }
+  if (orderData.discount > 0) message += `\n🎉 Скидка: ${orderData.discount}%`;
   message += `\n💰 Итого: ${Math.round(orderData.total)} BYN`;
 
   try {
