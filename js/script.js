@@ -117,7 +117,7 @@ function checkReferral() {
 }
 
 // =============================================
-// ===== ОБЪЯВЛЕНИЕ (ВСПЛЫВАЮЩЕЕ ОКНО С САЙТА) =====
+// ===== ОБЪЯВЛЕНИЕ (ВСПЛЫВАЮЩЕЕ ОКНО) =====
 // =============================================
 async function checkAnnouncement() {
   try {
@@ -125,16 +125,13 @@ async function checkAnnouncement() {
     if (!response.ok) return;
     const data = await response.json();
 
-    // Показываем только если включено и есть хоть что-то
     if (!data || !data.enabled) return;
-    if (!data.text && !data.image) return;
+    if (!data.title && !data.text && !data.image) return;
 
-    // Ключ показа завязан на updatedAt — если админ обновит объявление, покажется снова
     const version = data.updatedAt || 'default';
     const seenKey = 'announcement_seen_' + version;
     if (localStorage.getItem(seenKey)) return;
 
-    // Показ через 2 секунды после загрузки
     setTimeout(() => showAnnouncement(data, seenKey), 2000);
   } catch (error) {
     console.error('Announcement error:', error);
@@ -143,10 +140,21 @@ async function checkAnnouncement() {
 
 function showAnnouncement(data, seenKey) {
   const modal = document.getElementById('announcementModal');
+  const titleEl = document.getElementById('announcementTitle');
   const img = document.getElementById('announcementImage');
   const text = document.getElementById('announcementText');
   if (!modal) return;
 
+  // Заголовок
+  if (data.title) {
+    titleEl.textContent = data.title;
+    titleEl.style.display = 'block';
+  } else {
+    titleEl.textContent = '';
+    titleEl.style.display = 'none';
+  }
+
+  // Картинка
   if (data.image) {
     img.src = data.image;
     img.style.display = 'block';
@@ -155,6 +163,7 @@ function showAnnouncement(data, seenKey) {
     img.style.display = 'none';
   }
 
+  // Текст
   if (data.text) {
     text.textContent = data.text;
     text.style.display = 'block';
@@ -166,7 +175,6 @@ function showAnnouncement(data, seenKey) {
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
 
-  // Помечаем как увиденное — повторно не всплывёт даже после F5
   localStorage.setItem(seenKey, '1');
 
   const close = () => {
@@ -178,7 +186,6 @@ function showAnnouncement(data, seenKey) {
   document.getElementById('announcementOk').onclick = close;
   modal.onclick = (e) => { if (e.target === modal) close(); };
 
-  // Esc тоже закрывает
   const escHandler = (e) => {
     if (e.key === 'Escape') {
       close();
@@ -241,7 +248,6 @@ function updateProfileUI() {
 
     applyAvatar(document.getElementById('profileAvatar'), avatarId, currentUser.telegram);
 
-    // Шапка профиля
     const profileBanner = document.getElementById('profileHeader');
     if (profileBanner) {
       const banner = BANNERS.find(b => b.id === currentUser.banner);
@@ -252,7 +258,6 @@ function updateProfileUI() {
       }
     }
 
-    // Реферальная карточка
     const referralLink = `${window.location.origin}${window.location.pathname}?ref=${currentUser.telegram}`;
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) {
@@ -295,7 +300,6 @@ function updateProfileUI() {
       }
     }
 
-    // История заказов
     const ordersDiv = document.getElementById('profileOrders');
     if (currentUser.orders && currentUser.orders.length > 0) {
       let html = '';
@@ -352,7 +356,7 @@ function updateProfileUI() {
 }
 
 // =============================================
-// ===== ЛОГИКА ВЫБОРА АВАТАРКИ =====
+// ===== АВАТАРКА =====
 // =============================================
 function openAvatarModal() {
   pendingAvatarId = (currentUser && currentUser.avatar) ? currentUser.avatar : DEFAULT_AVATAR_ID;
@@ -424,7 +428,7 @@ async function saveAvatar() {
 }
 
 // =============================================
-// ===== ЛОГИКА ВЫБОРА ШАПКИ ПРОФИЛЯ =====
+// ===== ШАПКА ПРОФИЛЯ =====
 // =============================================
 function openBannerModal() {
   pendingBannerId = (currentUser && currentUser.banner) ? currentUser.banner : null;
@@ -514,7 +518,7 @@ window.copyReferralLink = function(link) {
 };
 
 // =============================================
-// ===== ВКЛАДКИ ВХОД / РЕГИСТРАЦИЯ =====
+// ===== ВХОД / РЕГИСТРАЦИЯ =====
 // =============================================
 function switchAuthTab(tab) {
   currentAuthTab = tab;
@@ -572,9 +576,6 @@ function resetAuthForm() {
   switchAuthTab('login');
 }
 
-// =============================================
-// ===== ВХОД / РЕГИСТРАЦИЯ =====
-// =============================================
 async function login() {
   clearAuthErrors();
 
@@ -751,19 +752,16 @@ document.getElementById('profileLogout').addEventListener('click', () => {
   showToast('👋 Вы вышли из профиля', 'info');
 });
 
-// Аватарка
 document.getElementById('avatarEditBtn').addEventListener('click', openAvatarModal);
 document.getElementById('avatarModalClose').addEventListener('click', closeAvatarModal);
 document.getElementById('avatarCancelBtn').addEventListener('click', closeAvatarModal);
 document.getElementById('avatarSaveBtn').addEventListener('click', saveAvatar);
 
-// Шапка профиля
 document.getElementById('bannerEditBtn').addEventListener('click', openBannerModal);
 document.getElementById('bannerModalClose').addEventListener('click', closeBannerModal);
 document.getElementById('bannerRemoveBtn').addEventListener('click', removeBanner);
 document.getElementById('bannerSaveBtn').addEventListener('click', saveBanner);
 
-// Закрытие по overlay
 document.getElementById('overlay').addEventListener('click', () => {
   document.getElementById('loginModal').classList.remove('open');
   document.getElementById('profileModal').classList.remove('open');
@@ -1156,7 +1154,7 @@ document.querySelectorAll('.faq__question').forEach(question => {
 });
 
 // =============================================
-// ===== ПОДСКАЗКА НА ЛОГОТИПЕ (ПАСХАЛКА) =====
+// ===== ПОДСКАЗКА НА ЛОГОТИПЕ =====
 // =============================================
 document.addEventListener('DOMContentLoaded', function() {
   const logo = document.querySelector('.logo');
