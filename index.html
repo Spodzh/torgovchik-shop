@@ -142,6 +142,7 @@
                 <span class="announcement-modal__badge-dot"></span>
                 Новость
             </div>
+            <h2 class="announcement-modal__title" id="announcementTitle"></h2>
             <img class="announcement-modal__image" id="announcementImage" alt="">
             <p class="announcement-modal__text" id="announcementText"></p>
             <button class="btn btn-primary announcement-modal__ok" id="announcementOk">Понятно</button>
@@ -183,11 +184,10 @@
         </div>
     </div>
 
-    <!-- ===== МОДАЛКА ПРОФИЛЯ (новый дизайн) ===== -->
+    <!-- ===== МОДАЛКА ПРОФИЛЯ ===== -->
     <div class="profile-modal" id="profileModal">
         <div class="profile-modal__content">
 
-            <!-- Шапка модалки -->
             <div class="profile-modal__top">
                 <div class="profile-modal__heading">
                     <svg class="profile-modal__heading-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -199,7 +199,6 @@
                 <button class="profile-modal__close" id="profileModalClose">✕</button>
             </div>
 
-            <!-- Баннер с аватаркой -->
             <div class="profile-banner-wrap">
                 <div class="profile-banner" id="profileHeader">
                     <button class="banner-edit-btn" id="bannerEditBtn" title="Сменить шапку">
@@ -223,7 +222,6 @@
                 </div>
             </div>
 
-            <!-- Статистика -->
             <div class="profile-stats-panel">
                 <div class="profile-stats-block">
                     <div class="profile-stats-block__icon">
@@ -249,10 +247,8 @@
                 </div>
             </div>
 
-            <!-- Реферальная ссылка -->
             <div class="referral-card" id="profileReferral"></div>
 
-            <!-- История заказов -->
             <div class="orders-section">
                 <h3 class="orders-section__title">
                     <span class="orders-section__icon">
@@ -267,7 +263,6 @@
                 <div class="profile-orders" id="profileOrders"></div>
             </div>
 
-            <!-- Выйти -->
             <button class="btn-logout" id="profileLogout">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
