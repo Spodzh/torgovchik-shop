@@ -71,9 +71,7 @@
     margin-bottom: 20px;
 }
 
-/* =============================================
-   ===== МОДАЛКА ВХОДА / РЕГИСТРАЦИИ =====
-   ============================================= */
+/* ===== МОДАЛКА ВХОДА / РЕГИСТРАЦИИ ===== */
 .login-modal__content {
     background: linear-gradient(180deg, #2A201D 0%, #211815 100%);
     border-radius: 22px;
@@ -305,9 +303,7 @@
 
 .auth-submit:hover .auth-submit__arrow { transform: translateX(4px); }
 
-/* =============================================
-   ===== ПРОФИЛЬ — НОВЫЙ ДИЗАЙН =====
-   ============================================= */
+/* ===== ПРОФИЛЬ ===== */
 .profile-modal__content {
     background: linear-gradient(180deg, #2A201D 0%, #1F1814 100%);
     border-radius: 22px;
@@ -321,7 +317,6 @@
     position: relative;
 }
 
-/* Шапка модалки */
 .profile-modal__top {
     display: flex;
     justify-content: space-between;
@@ -372,7 +367,6 @@
     background: rgba(216, 137, 50, 0.1);
 }
 
-/* ===== БАННЕР ===== */
 .profile-banner-wrap {
     position: relative;
     margin-bottom: 48px;
@@ -450,7 +444,6 @@
     box-shadow: 0 0 14px rgba(216, 137, 50, 0.6);
 }
 
-/* Аватарка */
 .profile-avatar-wrap {
     position: absolute;
     bottom: -34px;
@@ -472,9 +465,7 @@
     color: #1C1715;
     overflow: hidden;
     border: 3px solid rgba(216, 137, 50, 0.55);
-    box-shadow:
-        0 8px 28px rgba(0, 0, 0, 0.55),
-        0 0 24px rgba(216, 137, 50, 0.2);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55), 0 0 24px rgba(216, 137, 50, 0.2);
 }
 
 .profile-avatar img {
@@ -510,7 +501,6 @@
     box-shadow: 0 0 14px rgba(216, 137, 50, 0.6);
 }
 
-/* ===== СТАТИСТИКА ===== */
 .profile-stats-panel {
     display: flex;
     align-items: stretch;
@@ -571,7 +561,6 @@
     margin: 8px 0;
 }
 
-/* ===== РЕФЕРАЛЬНАЯ КАРТОЧКА ===== */
 .referral-card {
     background: rgba(255, 255, 255, 0.025);
     border: 1px solid rgba(184, 92, 50, 0.18);
@@ -667,14 +656,6 @@
     font-weight: 600;
 }
 
-.referral-card__footer-icon {
-    color: var(--accent);
-    opacity: 0.7;
-    display: flex;
-    align-items: center;
-}
-
-/* ===== ИСТОРИЯ ЗАКАЗОВ ===== */
 .orders-section { margin-bottom: 20px; }
 
 .orders-section__title {
@@ -741,7 +722,6 @@
 .order-card .order-status.rejected { color: #E39070; background: rgba(184, 92, 50, 0.25); }
 .order-card .order-status.pending { color: var(--accent); background: rgba(216, 137, 50, 0.2); }
 
-/* Пустое состояние — история заказов */
 .orders-empty {
     position: relative;
     background: rgba(48, 35, 31, 0.35);
@@ -754,7 +734,6 @@
         0 0 30px rgba(216, 137, 50, 0.06);
 }
 
-/* Внутренняя декоративная пунктирная рамка */
 .orders-empty::before {
     content: '';
     position: absolute;
@@ -784,7 +763,6 @@
     z-index: 1;
 }
 
-/* ===== КНОПКА ВЫЙТИ ===== */
 .btn-logout {
     display: inline-flex;
     align-items: center;
@@ -807,9 +785,7 @@
     color: #E39070;
 }
 
-/* =============================================
-   ===== МОДАЛКА АВАТАРКИ =====
-   ============================================= */
+/* ===== МОДАЛКА АВАТАРКИ ===== */
 .avatar-modal__hint {
     color: var(--text-secondary);
     font-size: 14px;
@@ -912,7 +888,7 @@
 .banner-modal__buttons { display: flex; gap: 10px; }
 .banner-modal__buttons .btn { flex: 1; text-align: center; }
 
-/* ===== ФОРМА ЗАКАЗА (общее) ===== */
+/* ===== ФОРМА ЗАКАЗА ===== */
 .form-group { margin-bottom: 18px; }
 
 .form-group label {
@@ -952,7 +928,7 @@
 #applyPromoBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* =============================================
-   ===== МОДАЛКА ОБЪЯВЛЕНИЯ (УПРАВЛЯЕТСЯ ИЗ БОТА) =====
+   ===== МОДАЛКА ОБЪЯВЛЕНИЯ =====
    ============================================= */
 .announcement-modal {
     display: none;
@@ -1001,7 +977,6 @@
     opacity: 1;
 }
 
-/* Крестик закрытия */
 .announcement-modal__close {
     position: absolute;
     top: 14px;
@@ -1063,6 +1038,27 @@
     50%      { opacity: 0.5; transform: scale(0.75); }
 }
 
+/* ===== ЗАГОЛОВОК ОБЪЯВЛЕНИЯ (КРУПНЫЙ) ===== */
+.announcement-modal__title {
+    font-family: 'Bitter', serif;
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.12;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #E8A54A;
+    text-align: center;
+    margin: 0 0 18px;
+    padding: 0 6px;
+    text-shadow:
+        0 0 32px rgba(216, 137, 50, 0.55),
+        0 2px 12px rgba(0, 0, 0, 0.75),
+        0 1px 0 rgba(216, 137, 50, 0.35);
+    word-wrap: break-word;
+}
+
+.announcement-modal__title:empty { display: none; }
+
 /* Картинка объявления */
 .announcement-modal__image {
     display: block;
@@ -1095,7 +1091,6 @@
 
 .announcement-modal__text:empty { display: none; }
 
-/* Кнопка "Понятно" */
 .announcement-modal__ok {
     width: 100%;
     padding: 14px 24px;
@@ -1112,6 +1107,11 @@
         padding: 22px 18px 18px;
         border-radius: 20px;
         max-height: 90vh;
+    }
+    .announcement-modal__title {
+        font-size: 22px;
+        margin-bottom: 14px;
+        letter-spacing: 0.3px;
     }
     .announcement-modal__image {
         max-height: 240px;
@@ -1204,4 +1204,6 @@
     .profile-avatar { width: 62px; height: 62px; font-size: 24px; }
     .profile-avatar-wrap { bottom: -24px; left: 14px; }
     .profile-stats-block__value { font-size: 22px; }
+
+    .announcement-modal__title { font-size: 20px; }
 }
