@@ -39,6 +39,7 @@
     <link rel="stylesheet" href="css/cart.css" />
     <link rel="stylesheet" href="css/modal.css" />
     <link rel="stylesheet" href="css/toast.css" />
+    <link rel="stylesheet" href="css/extras.css" />
     <link rel="stylesheet" href="css/responsive.css" />
 
     <script type="application/ld+json">
@@ -57,6 +58,32 @@
     </script>
 </head>
 <body>
+
+    <!-- 18+ ВРАТА -->
+    <div class="age-gate-modal" id="ageGateModal" role="dialog" aria-modal="true" aria-labelledby="ageGateTitle">
+        <div class="age-gate-modal__content">
+            <div id="ageGateQuestion">
+                <span class="age-gate-modal__icon">🔞</span>
+                <span class="age-gate-modal__badge">18+</span>
+                <h2 class="age-gate-modal__title" id="ageGateTitle">Вам есть 18 лет?</h2>
+                <p class="age-gate-modal__text">
+                    Сайт содержит информацию о товарах, предназначенных<br>для <strong>совершеннолетних</strong>. Подтвердите свой возраст.
+                </p>
+                <div class="age-gate-modal__buttons">
+                    <button class="age-gate-modal__btn age-gate-modal__btn--yes" id="ageGateYes">Мне есть 18 лет</button>
+                    <button class="age-gate-modal__btn age-gate-modal__btn--no" id="ageGateNo">Мне меньше 18</button>
+                </div>
+            </div>
+            <div class="age-gate-modal__deny" id="ageGateDeny">
+                <span class="age-gate-modal__deny-icon">🚫</span>
+                <div class="age-gate-modal__deny-title">Доступ запрещён</div>
+                <p class="age-gate-modal__deny-text">
+                    К сожалению, сайт доступен только пользователям старше 18 лет.<br>
+                    Спасибо за понимание.
+                </p>
+            </div>
+        </div>
+    </div>
 
     <header class="header">
         <div class="container header__inner">
@@ -88,6 +115,11 @@
                 <button class="user-btn" id="userBtn" aria-label="Войти в профиль">👤 Войти</button>
             </div>
 
+            <button class="favorites-btn" id="favoritesToggle" aria-label="Открыть избранное">
+                <span class="favorites-icon" aria-hidden="true">♡</span>
+                <span class="favorites-badge" id="favoritesCount" aria-live="polite">0</span>
+            </button>
+
             <button class="cart-btn" id="cartToggle" aria-label="Открыть корзину">
                 <span class="cart-icon" aria-hidden="true">🛒</span>
                 <span class="cart-badge" id="cartCount" aria-live="polite">0</span>
@@ -114,6 +146,13 @@
 
         <section class="catalog" id="catalog">
             <div class="container"><div id="categoryContent"></div></div>
+        </section>
+
+        <section class="recently-viewed" id="recentlyViewedSection" style="display: none;">
+            <div class="container">
+                <h2 class="section-title">Недавно просмотренные</h2>
+                <div class="recently-viewed__grid" id="recentlyViewedGrid"></div>
+            </div>
         </section>
 
         <section class="about" id="about">
@@ -172,7 +211,22 @@
         </div>
     </footer>
 
-    <!-- Корзина -->
+    <!-- Кнопка "Наверх" -->
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Наверх" type="button">↑</button>
+
+    <!-- Confirm-модалка -->
+    <div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+        <div class="confirm-modal__content">
+            <div class="confirm-modal__icon" id="confirmIcon">⚠️</div>
+            <h2 class="confirm-modal__title" id="confirmTitle">Подтвердите действие</h2>
+            <p class="confirm-modal__text" id="confirmText"></p>
+            <div class="confirm-modal__buttons">
+                <button class="confirm-modal__btn confirm-modal__btn--cancel" id="confirmCancelBtn">Отмена</button>
+                <button class="confirm-modal__btn confirm-modal__btn--danger" id="confirmOkBtn">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+
     <aside class="cart-panel" id="cartPanel" aria-hidden="true" aria-label="Корзина">
         <div class="cart-panel__header">
             <h3>Корзина</h3>
@@ -184,13 +238,21 @@
         <div class="cart-panel__footer">
             <p><strong>Итого: <span id="cartTotal">0</span> BYN</strong></p>
             <button class="btn btn-primary" id="checkoutBtn">Оформить заказ</button>
+            <button class="btn-clear-cart" id="clearCartBtn" type="button">Очистить корзину</button>
         </div>
     </aside>
 
     <div class="overlay" id="overlay" aria-hidden="true"></div>
     <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
 
-    <!-- Модалка объявления -->
+    <div class="favorites-modal" id="favoritesModal" role="dialog" aria-modal="true" aria-labelledby="favoritesModalTitle" aria-hidden="true">
+        <div class="favorites-modal__content">
+            <button class="favorites-modal__close" id="favoritesModalClose" aria-label="Закрыть избранное">✕</button>
+            <h2 id="favoritesModalTitle">❤️ Избранное</h2>
+            <div class="favorites-grid" id="favoritesGrid"></div>
+        </div>
+    </div>
+
     <div class="announcement-modal" id="announcementModal" role="dialog" aria-modal="true" aria-labelledby="announcementTitle" aria-hidden="true">
         <div class="announcement-modal__content">
             <button class="announcement-modal__close" id="announcementClose" aria-label="Закрыть объявление">✕</button>
@@ -205,7 +267,6 @@
         </div>
     </div>
 
-    <!-- Модалка входа -->
     <div class="login-modal" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-hidden="true">
         <div class="login-modal__content">
             <button class="login-modal__close" id="loginModalClose" aria-label="Закрыть окно входа">✕</button>
@@ -240,7 +301,6 @@
         </div>
     </div>
 
-    <!-- Модалка профиля -->
     <div class="profile-modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle" aria-hidden="true">
         <div class="profile-modal__content">
             <div class="profile-modal__top">
@@ -329,7 +389,6 @@
         </div>
     </div>
 
-    <!-- Модалка аватарки -->
     <div class="avatar-modal" id="avatarModal" role="dialog" aria-modal="true" aria-labelledby="avatarModalTitle" aria-hidden="true">
         <div class="avatar-modal__content">
             <button class="avatar-modal__close" id="avatarModalClose" aria-label="Закрыть выбор аватарки">✕</button>
@@ -343,7 +402,6 @@
         </div>
     </div>
 
-    <!-- Модалка шапки -->
     <div class="banner-modal" id="bannerModal" role="dialog" aria-modal="true" aria-labelledby="bannerModalTitle" aria-hidden="true">
         <div class="banner-modal__content">
             <button class="banner-modal__close" id="bannerModalClose" aria-label="Закрыть выбор шапки">✕</button>
@@ -357,7 +415,6 @@
         </div>
     </div>
 
-    <!-- Модалка заказа -->
     <div class="order-modal" id="orderModal" role="dialog" aria-modal="true" aria-labelledby="orderModalTitle" aria-hidden="true">
         <div class="order-modal__content">
             <button class="order-modal__close" id="orderModalClose" aria-label="Закрыть оформление заказа">✕</button>
@@ -394,6 +451,7 @@
         </div>
     </div>
 
+    <script src="js/utils.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>

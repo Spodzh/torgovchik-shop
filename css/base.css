@@ -51,6 +51,14 @@
     --z-toast: 300;
     --z-announcement: 500;
     --z-tooltip: 1000;
+
+    /* Высота липкой шапки — для якорей */
+    --header-height: 62px;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-height) + 16px);
 }
 
 body {
@@ -71,6 +79,11 @@ body {
 
 button:focus:not(:focus-visible) {
     outline: none;
+}
+
+/* Якоря — чтобы не прятались под sticky-шапкой */
+[id] {
+    scroll-margin-top: calc(var(--header-height) + 16px);
 }
 
 .container {
@@ -144,6 +157,15 @@ button:focus:not(:focus-visible) {
     transform: translateY(-50%) rotate(-20deg);
     font-size: 20px;
     opacity: 0.55;
+}
+
+/* Центрирование заголовков внутри секций */
+.about .section-title,
+.faq .section-title,
+.contacts .section-title {
+    display: block;
+    width: max-content;
+    max-width: 100%;
 }
 
 /* ===== ГЕРОЙ ===== */
@@ -286,6 +308,7 @@ button:focus:not(:focus-visible) {
     border-top: 1px solid var(--border-soft);
     border-bottom: 1px solid var(--border-soft);
     position: relative;
+    text-align: center;
 }
 
 .about__grid {
@@ -340,6 +363,7 @@ button:focus:not(:focus-visible) {
 .faq {
     padding: 60px 0;
     background: var(--bg-main);
+    text-align: center;
 }
 
 .faq__list {
@@ -348,6 +372,7 @@ button:focus:not(:focus-visible) {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    text-align: left;
 }
 
 .faq__item {
@@ -408,6 +433,7 @@ button:focus:not(:focus-visible) {
     padding: 60px 0;
     background: var(--bg-section);
     border-top: 1px solid var(--border-soft);
+    text-align: center;
 }
 
 .contacts__simple {
@@ -478,7 +504,7 @@ button:focus:not(:focus-visible) {
     color: var(--accent-hover);
 }
 
-/* ===== ОБЩИЙ АДАПТИВ ===== */
+/* ===== АДАПТИВ ===== */
 @media (max-width: 900px) {
     .hero__box {
         min-height: 420px;
@@ -541,6 +567,10 @@ button:focus:not(:focus-visible) {
 }
 
 @media (max-width: 600px) {
+    :root {
+        --header-height: 54px;
+    }
+
     .container { padding: 0 16px; }
     .hero__content h1 { font-size: 28px; }
     .hero__content p { font-size: 14px; }
@@ -559,6 +589,10 @@ button:focus:not(:focus-visible) {
 }
 
 @media (max-width: 375px) {
+    :root {
+        --header-height: 50px;
+    }
+
     .container { padding: 0 12px; }
     .hero__box { padding: 22px 16px 220px; }
     .hero__content h1 { font-size: 24px; }
@@ -568,12 +602,15 @@ button:focus:not(:focus-visible) {
 
 /* ===== A11Y: уважаем предпочтения к анимациям ===== */
 @media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
     *,
     *::before,
     *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
     }
 }

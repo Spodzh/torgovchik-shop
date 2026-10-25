@@ -50,7 +50,7 @@
     border-radius: 50%;
 }
 
-.cart-panel__close:hover { color: var(--accent); }
+.cart-panel__close:hover { color: var(--accent); background: rgba(216, 137, 50, 0.1); }
 
 .cart-panel__body {
     flex: 1;
@@ -170,7 +170,34 @@
     color: var(--price);
 }
 
-.cart-panel__footer .btn { width: 100%; text-align: center; }
+.cart-panel__footer .btn {
+    width: 100%;
+    text-align: center;
+    margin-top: 8px;
+}
+
+/* Кнопка очистки корзины */
+.btn-clear-cart {
+    display: none;
+    width: 100%;
+    margin-top: 10px;
+    background: transparent;
+    border: 1px solid rgba(184, 92, 50, 0.35);
+    color: #C8A090;
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-clear-cart:hover {
+    background: rgba(184, 92, 50, 0.15);
+    border-color: rgba(184, 92, 50, 0.6);
+    color: #E39070;
+}
 
 .overlay {
     position: fixed;

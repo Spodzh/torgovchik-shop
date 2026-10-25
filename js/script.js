@@ -2,9 +2,11 @@
 // ===== КОНФИГУРАЦИЯ =====
 // =============================================
 const WORKER_URL = 'https://torgovchik-bot.ernest-chanel.workers.dev/';
+const RECENTLY_VIEWED_KEY = 'torgovchik_recently_viewed';
+const RECENTLY_VIEWED_MAX = 12;
 
 // =============================================
-// ===== ДОСТУПНЫЕ АВАТАРКИ (20 шт.) =====
+// ===== ДОСТУПНЫЕ АВАТАРКИ =====
 // =============================================
 const AVATARS = [
     { id: 1,  image: 'https://i.ibb.co/vvmQyYqG/image.png' },
@@ -32,7 +34,7 @@ const AVATARS = [
 const DEFAULT_AVATAR_ID = 6;
 
 // =============================================
-// ===== ШАПКИ ПРОФИЛЯ (4 шт.) =====
+// ===== ШАПКИ ПРОФИЛЯ =====
 // =============================================
 const BANNERS = [
     { id: 1, image: 'https://i.ibb.co/FbQzf5tN/image.png' },
@@ -45,24 +47,20 @@ const BANNERS = [
 // ===== ФРАЗЫ НА ЛОГОТИПЕ =====
 // =============================================
 const LOGO_PHRASES = [
-    'Купил жижу? 😏',
-    'Заправиться не хочешь?',
-    'Есть вкусненькое 😉',
-    'Скучал по нам?',
-    'Как насчёт новой вкусняшки?',
-    'Жижа сама себя не купит!',
-    'Пара затяжек — и день ярче 🌿',
-    'Твой Pod скучает по новой жиже 👀',
-    'Вкусный день сегодня, да?',
-    'Псс, есть кое-что новенькое...'
+    'Купил жижу? 😏', 'Заправиться не хочешь?', 'Есть вкусненькое 😉',
+    'Скучал по нам?', 'Как насчёт новой вкусняшки?', 'Жижа сама себя не купит!',
+    'Пара затяжек — и день ярче 🌿', 'Твой Pod скучает по новой жиже 👀',
+    'Вкусный день сегодня, да?', 'Псс, есть кое-что новенькое...'
 ];
 
 // =============================================
 // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
 // =============================================
 let products = [];
+let productStats = {}; // { productId: count }
 let promocodes = [];
 let cart = [];
+let favorites = [];
 let appliedPromo = null;
 let discountPercent = 0;
 let currentUser = null;
@@ -73,45 +71,110 @@ let currentAuthTab = 'login';
 let currentCategory = 'liquids';
 let orderIdempotencyKey = null;
 
+// Для auto-retry
+let retryTimer = null;
+let retryCountdown = 0;
+
 // =============================================
-// ===== УТИЛИТЫ =====
+// ===== 18+ ВРАТА =====
 // =============================================
-function generateUUID() {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    return crypto.randomUUID();
+function initAgeGate() {
+  const isVerified = localStorage.getItem('torgovchik_age_verified') === 'true';
+  const modal = document.getElementById('ageGateModal');
+  if (!modal) return;
+
+  if (isVerified) {
+    modal.classList.remove('open');
+    return;
   }
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
+
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  const question = document.getElementById('ageGateQuestion');
+  const deny = document.getElementById('ageGateDeny');
+
+  document.getElementById('ageGateYes').addEventListener('click', () => {
+    localStorage.setItem('torgovchik_age_verified', 'true');
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+
+  document.getElementById('ageGateNo').addEventListener('click', () => {
+    question.style.display = 'none';
+    deny.classList.add('open');
   });
 }
 
-function validateTelegramUsername(raw) {
-  if (!raw || typeof raw !== 'string') return 'Введите Telegram username';
-  const clean = raw.trim().startsWith('@') ? raw.trim().slice(1) : raw.trim();
-  if (clean.length === 0) return 'Введите Telegram username';
-  if (clean.length < 5) return 'Username должен быть минимум 5 символов';
-  if (clean.length > 32) return 'Username должен быть максимум 32 символа';
-  if (!/^[a-zA-Z]/.test(clean)) return 'Username должен начинаться с буквы';
-  if (!/^[a-zA-Z0-9_]+$/.test(clean)) return 'Только латиница, цифры и _';
-  if (clean.endsWith('_')) return 'Username не может заканчиваться на _';
-  if (clean.includes('__')) return 'Нельзя использовать __ подряд';
-  return null;
-}
+// =============================================
+// ===== КНОПКА "НАВЕРХ" =====
+// =============================================
+function initScrollToTop() {
+  const btn = document.getElementById('scrollToTop');
+  if (!btn) return;
 
-function normalizeTelegramUsername(raw) {
-  if (!raw) return '';
-  const trimmed = raw.trim();
-  return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  }, { passive: true });
+
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 }
 
 // =============================================
-// ===== УТИЛИТЫ МОДАЛОК (a11y) =====
+// ===== CONFIRM-МОДАЛКА =====
+// =============================================
+function showConfirm(options) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('confirmModal');
+    const iconEl = document.getElementById('confirmIcon');
+    const titleEl = document.getElementById('confirmTitle');
+    const textEl = document.getElementById('confirmText');
+    const okBtn = document.getElementById('confirmOkBtn');
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+
+    iconEl.textContent = options.icon || '⚠️';
+    titleEl.textContent = options.title || 'Подтвердите действие';
+    textEl.textContent = options.text || '';
+    okBtn.textContent = options.okText || 'Подтвердить';
+    cancelBtn.textContent = options.cancelText || 'Отмена';
+    
+    // Сброс класса опасности
+    okBtn.className = 'confirm-modal__btn ' + (options.danger ? 'confirm-modal__btn--danger' : 'confirm-modal__btn--primary');
+
+    modal.classList.add('open');
+
+    const closeAndResolve = (result) => {
+      modal.classList.remove('open');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      modal.removeEventListener('click', onOverlay);
+      resolve(result);
+    };
+
+    const onOk = () => closeAndResolve(true);
+    const onCancel = () => closeAndResolve(false);
+    const onOverlay = (e) => {
+      if (e.target === modal) closeAndResolve(false);
+    };
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    modal.addEventListener('click', onOverlay);
+  });
+}
+
+// =============================================
+// ===== УТИЛИТЫ МОДАЛОК =====
 // =============================================
 function updateBodyOverflow() {
   const anyOpen = document.querySelector(
-    '.login-modal.open, .profile-modal.open, .avatar-modal.open, .banner-modal.open, .order-modal.open, .announcement-modal.open'
+    '.login-modal.open, .profile-modal.open, .avatar-modal.open, .banner-modal.open, .order-modal.open, .announcement-modal.open, .favorites-modal.open, .confirm-modal.open'
   );
   document.body.style.overflow = anyOpen ? 'hidden' : '';
 }
@@ -136,39 +199,23 @@ function setupModal(modalId, onClose) {
 
   modal.addEventListener('keydown', (e) => {
     if (!modal.classList.contains('open')) return;
-
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      closeFn();
-      return;
-    }
+    if (e.key === 'Escape') { e.preventDefault(); closeFn(); return; }
 
     if (e.key === 'Tab') {
       const focusable = Array.from(getFocusable()).filter(el => el.offsetParent !== null);
-      if (focusable.length === 0) {
-        e.preventDefault();
-        return;
-      }
+      if (focusable.length === 0) { e.preventDefault(); return; }
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
 
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     }
   });
 
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeFn();
-  });
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeFn(); });
 
   const observer = new MutationObserver(() => {
     const isOpen = modal.classList.contains('open');
-
     if (isOpen && !wasOpen) {
       lastFocused = document.activeElement;
       updateBodyOverflow();
@@ -182,7 +229,6 @@ function setupModal(modalId, onClose) {
         try { lastFocused.focus(); } catch (e) {}
       }
     }
-
     wasOpen = isOpen;
   });
   observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
@@ -191,24 +237,161 @@ function setupModal(modalId, onClose) {
 }
 
 // =============================================
+// ===== ТОСТЫ =====
+// =============================================
+const toastContainer = document.getElementById('toastContainer');
+
+function showToast(message, type, action) {
+  type = type || 'success';
+  const toast = document.createElement('div');
+  toast.className = 'toast' + (action ? ' toast--action' : '');
+  toast.setAttribute('role', 'status');
+  
+  const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+  
+  let html = `
+    <div class="toast__body">
+      <span class="toast-icon">${icon}</span>
+      <span class="toast-message">${message}</span>
+    </div>
+  `;
+  
+  toast.innerHTML = html;
+
+  if (action) {
+    const btn = document.createElement('button');
+    btn.className = 'toast__action';
+    btn.textContent = action.text;
+    btn.addEventListener('click', () => {
+      action.onClick();
+      toast.classList.add('hide');
+      setTimeout(() => toast.remove(), 300);
+    });
+    toast.appendChild(btn);
+  }
+
+  toastContainer.appendChild(toast);
+  
+  const timeout = setTimeout(() => {
+    toast.classList.add('hide');
+    setTimeout(() => toast.remove(), 300);
+  }, action ? 5000 : 3000);
+
+  // При клике на кнопку таймаут сбрасывается
+  if (action) {
+    toast.addEventListener('mouseenter', () => clearTimeout(timeout), { once: true });
+  }
+}
+
+// =============================================
 // ===== ЗАГРУЗКА ТОВАРОВ И ПРОМОКОДОВ =====
 // =============================================
+function renderSkeletonCatalog() {
+  const content = document.getElementById('categoryContent');
+  if (!content) return;
+  const skeletonCards = Array(6).fill(0).map(() => `
+    <div class="product-card product-card--skeleton">
+      <div class="skeleton skeleton-image"></div>
+      <div class="skeleton skeleton-line skeleton-line--short"></div>
+      <div class="skeleton skeleton-line skeleton-line--tiny"></div>
+      <div class="skeleton skeleton-line skeleton-line--price"></div>
+    </div>
+  `).join('');
+  content.innerHTML = `
+    <div class="category-content active">
+      <div class="catalog__grid">${skeletonCards}</div>
+    </div>
+  `;
+}
+
+function renderCatalogError() {
+  const content = document.getElementById('categoryContent');
+  if (!content) return;
+  content.innerHTML = `
+    <div class="placeholder">
+      <h3>Не удалось загрузить каталог</h3>
+      <p>Проверьте интернет-соединение</p>
+      <button class="btn btn-primary" onclick="manualRetry()" style="margin-top:20px;">Повторить</button>
+      <p class="catalog-retry-notice" id="retryNotice" style="display:none;">
+        Следующая попытка через <span class="catalog-retry-notice__count" id="retryCountdown">5</span> сек...
+      </p>
+    </div>`;
+}
+
+function manualRetry() {
+  clearTimeout(retryTimer);
+  retryTimer = null;
+  loadProducts();
+}
+
+function startAutoRetry() {
+  if (retryTimer) clearTimeout(retryTimer);
+  retryCountdown = 5;
+  
+  const notice = document.getElementById('retryNotice');
+  const counter = document.getElementById('retryCountdown');
+  if (notice) notice.style.display = 'block';
+
+  const tick = () => {
+    retryCountdown--;
+    if (counter) counter.textContent = retryCountdown;
+    
+    if (retryCountdown <= 0) {
+      clearInterval(interval);
+      loadProducts();
+    }
+  };
+
+  if (counter) counter.textContent = retryCountdown;
+  const interval = setInterval(tick, 1000);
+  
+  // Таймаут дублирует интервал на случай если DOM пропал
+  retryTimer = setTimeout(() => {
+    clearInterval(interval);
+    loadProducts();
+  }, 5000);
+}
+
+async function loadProductStats() {
+  try {
+    const response = await fetch(WORKER_URL + 'product-stats');
+    if (response.ok) {
+      productStats = await response.json();
+    }
+  } catch (e) {
+    // Игнорируем ошибку, это не критично
+    productStats = {};
+  }
+}
+
 async function loadProducts() {
+  if (retryTimer) {
+    clearTimeout(retryTimer);
+    retryTimer = null;
+  }
+  
+  renderSkeletonCatalog();
+  
   try {
     const response = await fetch(WORKER_URL + 'products');
     if (!response.ok) throw new Error('Ошибка загрузки товаров');
+    
     products = await response.json();
-    await loadPromocodes();
+    
+    // Параллельно грузим промокоды и статистику
+    await Promise.all([loadPromocodes(), loadProductStats()]);
+    
     switchCategory(currentCategory);
+    renderRecentlyViewedOnIndex();
+    
+    // Восстанавливаем корзину с учётом актуальных цен
+    loadCartFromStorage();
+    
   } catch (error) {
     console.error('Ошибка загрузки товаров:', error);
     products = [];
-    document.getElementById('categoryContent').innerHTML = `
-      <div class="placeholder">
-        <h3>Не удалось загрузить каталог</h3>
-        <p>Проверьте интернет-соединение</p>
-        <button class="btn btn-primary" onclick="loadProducts()" style="margin-top:20px;">Повторить</button>
-      </div>`;
+    renderCatalogError();
+    startAutoRetry();
   }
 }
 
@@ -232,6 +415,171 @@ function checkReferral() {
     localStorage.setItem('referralCode', ref);
   }
   referralCode = localStorage.getItem('referralCode') || null;
+}
+
+// =============================================
+// ===== НЕДАВНО ПРОСМОТРЕННЫЕ =====
+// =============================================
+function loadRecentlyViewed() {
+  try {
+    const saved = localStorage.getItem(RECENTLY_VIEWED_KEY);
+    if (saved) {
+      const arr = JSON.parse(saved);
+      return Array.isArray(arr) ? arr : [];
+    }
+  } catch (e) {}
+  return [];
+}
+
+function renderRecentlyViewedOnIndex() {
+  const section = document.getElementById('recentlyViewedSection');
+  const grid = document.getElementById('recentlyViewedGrid');
+  if (!section || !grid) return;
+
+  const ids = loadRecentlyViewed();
+  const items = ids
+    .map(id => products.find(p => p.id === id))
+    .filter(Boolean)
+    .slice(0, RECENTLY_VIEWED_MAX);
+
+  if (items.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+  grid.innerHTML = items.map(p => `
+    <a href="product.html?id=${p.id}" class="recently-viewed__card">
+      <img src="${p.image}" alt="${p.name}" class="recently-viewed__image" loading="lazy" onerror="this.src='https://i.ibb.co/VWRmsGHt/logo.png'">
+      <div class="recently-viewed__name">${p.name}</div>
+      <div class="recently-viewed__brand">${p.brand}</div>
+      <div class="recently-viewed__price">${p.price} BYN</div>
+    </a>
+  `).join('');
+}
+
+// =============================================
+// ===== ИЗБРАННОЕ =====
+// =============================================
+function loadFavoritesFromStorage() {
+  try {
+    const saved = localStorage.getItem('torgovchik_favorites');
+    if (saved) {
+      favorites = JSON.parse(saved);
+      if (!Array.isArray(favorites)) favorites = [];
+    }
+  } catch (e) {
+    console.error('Ошибка загрузки избранного:', e);
+    favorites = [];
+  }
+  updateFavoritesUI();
+}
+
+function saveFavoritesToStorage() {
+  localStorage.setItem('torgovchik_favorites', JSON.stringify(favorites));
+}
+
+function toggleFavorite(productId) {
+  const product = products.find(p => p.id === productId);
+  const result = Utils.toggleFavoriteInList(favorites, productId);
+  favorites = result.list;
+  saveFavoritesToStorage();
+  updateFavoritesUI();
+  refreshFavoriteIcons();
+
+  if (result.added) {
+    showToast(`❤️ ${product ? product.name : 'Товар'} добавлен в избранное`, 'success');
+  } else {
+    showToast(`💔 ${product ? product.name : 'Товар'} убран из избранного`, 'info');
+  }
+}
+
+function updateFavoritesUI() {
+  const countEl = document.getElementById('favoritesCount');
+  if (countEl) countEl.textContent = favorites.length;
+
+  const toggleBtn = document.getElementById('favoritesToggle');
+  if (toggleBtn) {
+    const icon = toggleBtn.querySelector('.favorites-icon');
+    if (icon) icon.textContent = favorites.length > 0 ? '❤' : '♡';
+  }
+
+  const grid = document.getElementById('favoritesGrid');
+  if (grid) renderFavoritesModal();
+}
+
+function refreshFavoriteIcons() {
+  document.querySelectorAll('.product-card').forEach(card => {
+    const id = parseInt(card.dataset.id);
+    const heart = card.querySelector('.product-card__fav');
+    if (heart) {
+      const active = Utils.isFavorite(favorites, id);
+      heart.classList.toggle('active', active);
+      heart.textContent = active ? '❤' : '♡';
+      heart.setAttribute('aria-label', active ? 'Убрать из избранного' : 'Добавить в избранное');
+      heart.setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
+  });
+}
+
+function renderFavoritesModal() {
+  const grid = document.getElementById('favoritesGrid');
+  if (!grid) return;
+
+  const favProducts = favorites
+    .map(id => products.find(p => p.id === id))
+    .filter(Boolean);
+
+  if (favProducts.length === 0) {
+    grid.innerHTML = `
+      <div class="favorites-empty">
+        <div class="favorites-empty__icon">💔</div>
+        <div class="favorites-empty__title">Пока ничего нет</div>
+        <div class="favorites-empty__text">Добавляйте товары сердечком — они появятся здесь</div>
+        <button class="btn btn-primary favorites-empty__btn" id="favoritesGoCatalog">В каталог</button>
+      </div>
+    `;
+    const goBtn = document.getElementById('favoritesGoCatalog');
+    if (goBtn) {
+      goBtn.addEventListener('click', () => {
+        favoritesModalCtrl.closeFn();
+        document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+    return;
+  }
+
+  grid.innerHTML = favProducts.map(p => `
+    <div class="favorites-card" data-id="${p.id}">
+      <button class="favorites-card__fav" data-id="${p.id}" aria-label="Убрать из избранного" aria-pressed="true">❤</button>
+      <a href="product.html?id=${p.id}" class="favorites-card__link" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1;">
+        <img src="${p.image}" alt="${p.name}" class="favorites-card__image" loading="lazy" onerror="this.src='https://i.ibb.co/VWRmsGHt/logo.png'">
+        <div class="favorites-card__name">${p.name}</div>
+        <div class="favorites-card__brand">${p.brand}</div>
+        <div class="favorites-card__price">${p.price} BYN</div>
+      </a>
+      <button class="favorites-card__btn" data-id="${p.id}">В корзину</button>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.favorites-card__fav').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleFavorite(parseInt(btn.dataset.id));
+    });
+  });
+
+  grid.querySelectorAll('.favorites-card__btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      addToCart(parseInt(btn.dataset.id));
+    });
+  });
+}
+
+function openFavoritesModal() {
+  renderFavoritesModal();
+  document.getElementById('favoritesModal').classList.add('open');
 }
 
 // =============================================
@@ -263,29 +611,14 @@ function showAnnouncement(data, seenKey) {
   const text = document.getElementById('announcementText');
   if (!modal) return;
 
-  if (data.title) {
-    titleEl.textContent = data.title;
-    titleEl.style.display = 'block';
-  } else {
-    titleEl.textContent = '';
-    titleEl.style.display = 'none';
-  }
+  if (data.title) { titleEl.textContent = data.title; titleEl.style.display = 'block'; }
+  else { titleEl.textContent = ''; titleEl.style.display = 'none'; }
 
-  if (data.image) {
-    img.src = data.image;
-    img.style.display = 'block';
-  } else {
-    img.removeAttribute('src');
-    img.style.display = 'none';
-  }
+  if (data.image) { img.src = data.image; img.style.display = 'block'; }
+  else { img.removeAttribute('src'); img.style.display = 'none'; }
 
-  if (data.text) {
-    text.textContent = data.text;
-    text.style.display = 'block';
-  } else {
-    text.textContent = '';
-    text.style.display = 'none';
-  }
+  if (data.text) { text.textContent = data.text; text.style.display = 'block'; }
+  else { text.textContent = ''; text.style.display = 'none'; }
 
   modal.classList.add('open');
   localStorage.setItem(seenKey, '1');
@@ -347,11 +680,8 @@ function updateProfileUI() {
     const profileBanner = document.getElementById('profileHeader');
     if (profileBanner) {
       const banner = BANNERS.find(b => b.id === currentUser.banner);
-      if (banner) {
-        profileBanner.style.backgroundImage = `url('${banner.image}')`;
-      } else {
-        profileBanner.style.backgroundImage = '';
-      }
+      if (banner) profileBanner.style.backgroundImage = `url('${banner.image}')`;
+      else profileBanner.style.backgroundImage = '';
     }
 
     const referralLink = `${window.location.origin}${window.location.pathname}?ref=${currentUser.telegram}`;
@@ -389,9 +719,7 @@ function updateProfileUI() {
               this.textContent = 'Копировать';
               this.classList.remove('copied');
             }, 2000);
-          }).catch(() => {
-            showToast('⚠️ Не удалось скопировать', 'error');
-          });
+          }).catch(() => showToast('⚠️ Не удалось скопировать', 'error'));
         });
       }
     }
@@ -418,12 +746,7 @@ function updateProfileUI() {
       });
       ordersDiv.innerHTML = html;
     } else {
-      ordersDiv.innerHTML = `
-        <div class="orders-empty">
-          <div class="orders-empty__icon">📦</div>
-          <div class="orders-empty__title">Пока здесь пусто</div>
-        </div>
-      `;
+      ordersDiv.innerHTML = `<div class="orders-empty"><div class="orders-empty__icon">📦</div><div class="orders-empty__title">Пока здесь пусто</div></div>`;
     }
   } else {
     userBtn.innerHTML = '👤 Войти';
@@ -431,19 +754,10 @@ function updateProfileUI() {
     document.getElementById('profileTickets').textContent = '0';
     document.getElementById('profileOrdersCount').textContent = '0';
     applyAvatar(document.getElementById('profileAvatar'), null, null);
-
     const profileBanner = document.getElementById('profileHeader');
     if (profileBanner) profileBanner.style.backgroundImage = '';
-
     const ordersDiv = document.getElementById('profileOrders');
-    if (ordersDiv) {
-      ordersDiv.innerHTML = `
-        <div class="orders-empty">
-          <div class="orders-empty__icon">📦</div>
-          <div class="orders-empty__title">Пока здесь пусто</div>
-        </div>
-      `;
-    }
+    if (ordersDiv) ordersDiv.innerHTML = `<div class="orders-empty"><div class="orders-empty__icon">📦</div><div class="orders-empty__title">Пока здесь пусто</div></div>`;
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) referralDiv.innerHTML = '';
   }
@@ -461,13 +775,7 @@ function openAvatarModal() {
 function renderAvatarGrid() {
   const grid = document.getElementById('avatarGrid');
   grid.innerHTML = AVATARS.map(a => `
-    <div class="avatar-option ${pendingAvatarId === a.id ? 'selected' : ''}"
-         data-avatar-id="${a.id}"
-         title="Аватарка ${a.id}"
-         role="button"
-         tabindex="0"
-         aria-label="Аватарка ${a.id}"
-         aria-pressed="${pendingAvatarId === a.id ? 'true' : 'false'}">
+    <div class="avatar-option ${pendingAvatarId === a.id ? 'selected' : ''}" data-avatar-id="${a.id}" title="Аватарка ${a.id}" role="button" tabindex="0" aria-label="Аватарка ${a.id}" aria-pressed="${pendingAvatarId === a.id ? 'true' : 'false'}">
       <img src="${a.image}" alt="Аватарка ${a.id}" loading="lazy">
     </div>
   `).join('');
@@ -475,56 +783,34 @@ function renderAvatarGrid() {
   grid.querySelectorAll('.avatar-option').forEach(el => {
     const select = () => {
       pendingAvatarId = parseInt(el.dataset.avatarId);
-      grid.querySelectorAll('.avatar-option').forEach(o => {
-        o.classList.remove('selected');
-        o.setAttribute('aria-pressed', 'false');
-      });
+      grid.querySelectorAll('.avatar-option').forEach(o => { o.classList.remove('selected'); o.setAttribute('aria-pressed', 'false'); });
       el.classList.add('selected');
       el.setAttribute('aria-pressed', 'true');
     };
     el.addEventListener('click', select);
-    el.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        select();
-      }
-    });
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(); } });
   });
 }
 
 async function saveAvatar() {
-  if (!currentUser || !currentUser.telegram) {
-    showToast('⚠️ Войдите в профиль', 'error');
-    return;
-  }
-  if (!pendingAvatarId) {
-    showToast('⚠️ Выберите аватарку', 'error');
-    return;
-  }
-
+  if (!currentUser || !currentUser.telegram) return showToast('⚠️ Войдите в профиль', 'error');
+  if (!pendingAvatarId) return showToast('⚠️ Выберите аватарку', 'error');
   const saveBtn = document.getElementById('avatarSaveBtn');
-  saveBtn.disabled = true;
-  saveBtn.textContent = 'Сохранение...';
-
+  saveBtn.disabled = true; saveBtn.textContent = 'Сохранение...';
   try {
     const response = await fetch(WORKER_URL + 'update-avatar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ telegram: currentUser.telegram, avatar: pendingAvatarId })
     });
-
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Ошибка сохранения');
-
     currentUser.avatar = pendingAvatarId;
-    updateProfileUI();
-    avatarModalCtrl.closeFn();
+    updateProfileUI(); avatarModalCtrl.closeFn();
     showToast('✅ Аватарка обновлена!', 'success');
   } catch (err) {
     showToast(`❌ ${err.message}`, 'error');
   } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = 'Сохранить';
+    saveBtn.disabled = false; saveBtn.textContent = 'Сохранить';
   }
 }
 
@@ -540,75 +826,44 @@ function openBannerModal() {
 function renderBannerGrid() {
   const grid = document.getElementById('bannerGrid');
   grid.innerHTML = BANNERS.map(b => `
-    <div class="banner-option ${pendingBannerId === b.id ? 'selected' : ''}"
-         data-banner-id="${b.id}"
-         style="background-image: url('${b.image}');"
-         title="Шапка ${b.id}"
-         role="button"
-         tabindex="0"
-         aria-label="Шапка ${b.id}"
-         aria-pressed="${pendingBannerId === b.id ? 'true' : 'false'}"></div>
+    <div class="banner-option ${pendingBannerId === b.id ? 'selected' : ''}" data-banner-id="${b.id}" style="background-image: url('${b.image}');" title="Шапка ${b.id}" role="button" tabindex="0" aria-label="Шапка ${b.id}" aria-pressed="${pendingBannerId === b.id ? 'true' : 'false'}"></div>
   `).join('');
 
   grid.querySelectorAll('.banner-option').forEach(el => {
     const select = () => {
       pendingBannerId = parseInt(el.dataset.bannerId);
-      grid.querySelectorAll('.banner-option').forEach(o => {
-        o.classList.remove('selected');
-        o.setAttribute('aria-pressed', 'false');
-      });
-      el.classList.add('selected');
-      el.setAttribute('aria-pressed', 'true');
+      grid.querySelectorAll('.banner-option').forEach(o => { o.classList.remove('selected'); o.setAttribute('aria-pressed', 'false'); });
+      el.classList.add('selected'); el.setAttribute('aria-pressed', 'true');
     };
     el.addEventListener('click', select);
-    el.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        select();
-      }
-    });
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(); } });
   });
 }
 
 async function saveBanner() {
-  if (!currentUser || !currentUser.telegram) {
-    showToast('⚠️ Войдите в профиль', 'error');
-    return;
-  }
-
+  if (!currentUser || !currentUser.telegram) return showToast('⚠️ Войдите в профиль', 'error');
   const saveBtn = document.getElementById('bannerSaveBtn');
-  saveBtn.disabled = true;
-  saveBtn.textContent = 'Сохранение...';
-
+  saveBtn.disabled = true; saveBtn.textContent = 'Сохранение...';
   try {
     const response = await fetch(WORKER_URL + 'update-banner', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ telegram: currentUser.telegram, banner: pendingBannerId })
     });
-
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Ошибка сохранения');
-
     currentUser.banner = pendingBannerId;
-    updateProfileUI();
-    bannerModalCtrl.closeFn();
+    updateProfileUI(); bannerModalCtrl.closeFn();
     showToast(pendingBannerId ? '✅ Шапка обновлена!' : '✅ Шапка убрана', 'success');
   } catch (err) {
     showToast(`❌ ${err.message}`, 'error');
   } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = 'Сохранить';
+    saveBtn.disabled = false; saveBtn.textContent = 'Сохранить';
   }
 }
 
 function removeBanner() {
   pendingBannerId = null;
-  const grid = document.getElementById('bannerGrid');
-  grid.querySelectorAll('.banner-option').forEach(o => {
-    o.classList.remove('selected');
-    o.setAttribute('aria-pressed', 'false');
-  });
+  document.querySelectorAll('.banner-option').forEach(o => { o.classList.remove('selected'); o.setAttribute('aria-pressed', 'false'); });
 }
 
 // =============================================
@@ -616,11 +871,7 @@ function removeBanner() {
 // =============================================
 function switchAuthTab(tab) {
   currentAuthTab = tab;
-  document.querySelectorAll('.auth-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.tab === tab);
-    t.setAttribute('aria-selected', t.dataset.tab === tab ? 'true' : 'false');
-  });
-
+  document.querySelectorAll('.auth-tab').forEach(t => { t.classList.toggle('active', t.dataset.tab === tab); t.setAttribute('aria-selected', t.dataset.tab === tab ? 'true' : 'false'); });
   const title = document.getElementById('authTitle');
   const subtitle = document.getElementById('authSubtitle');
   const submitText = document.getElementById('authSubmitText');
@@ -628,42 +879,25 @@ function switchAuthTab(tab) {
   const passwordInput = document.getElementById('loginPassword');
 
   if (tab === 'register') {
-    title.textContent = 'Создать аккаунт';
-    subtitle.textContent = 'Зарегистрируйтесь, чтобы получать билетики';
-    submitText.textContent = 'Зарегистрироваться';
-    forgot.classList.add('hidden');
-    passwordInput.setAttribute('autocomplete', 'new-password');
+    title.textContent = 'Создать аккаунт'; subtitle.textContent = 'Зарегистрируйтесь, чтобы получать билетики';
+    submitText.textContent = 'Зарегистрироваться'; forgot.classList.add('hidden'); passwordInput.setAttribute('autocomplete', 'new-password');
   } else {
-    title.textContent = 'С возвращением';
-    subtitle.textContent = 'Войдите, чтобы продолжить покупки';
-    submitText.textContent = 'Войти';
-    forgot.classList.remove('hidden');
-    passwordInput.setAttribute('autocomplete', 'current-password');
+    title.textContent = 'С возвращением'; subtitle.textContent = 'Войдите, чтобы продолжить покупки';
+    submitText.textContent = 'Войти'; forgot.classList.remove('hidden'); passwordInput.setAttribute('autocomplete', 'current-password');
   }
-
   clearAuthErrors();
 }
 
 function clearAuthErrors() {
-  document.querySelectorAll('.auth-error').forEach(el => {
-    el.textContent = '';
-    el.classList.remove('visible');
-  });
+  document.querySelectorAll('.auth-error').forEach(el => { el.textContent = ''; el.classList.remove('visible'); });
   document.querySelectorAll('.auth-field').forEach(el => el.classList.remove('error'));
 }
 
 function showFieldError(fieldId, errorId, message) {
   const field = document.getElementById(fieldId);
   const error = document.getElementById(errorId);
-  if (field) {
-    field.closest('.auth-field').classList.add('error');
-    field.setAttribute('aria-invalid', 'true');
-    field.setAttribute('aria-describedby', errorId);
-  }
-  if (error) {
-    error.textContent = message;
-    error.classList.add('visible');
-  }
+  if (field) { field.closest('.auth-field').classList.add('error'); field.setAttribute('aria-invalid', 'true'); field.setAttribute('aria-describedby', errorId); }
+  if (error) { error.textContent = message; error.classList.add('visible'); }
 }
 
 function resetAuthForm() {
@@ -671,55 +905,38 @@ function resetAuthForm() {
   document.getElementById('loginPassword').value = '';
   document.getElementById('loginPassword').type = 'password';
   document.getElementById('togglePassword').textContent = '👁';
-  clearAuthErrors();
-  switchAuthTab('login');
+  clearAuthErrors(); switchAuthTab('login');
 }
 
 async function login() {
   clearAuthErrors();
-
-  const input = document.getElementById('loginInput');
-  const passwordInput = document.getElementById('loginPassword');
-  const username = normalizeTelegramUsername(input.value);
-  const password = passwordInput.value.trim();
-
-  const userErr = validateTelegramUsername(username);
-  if (userErr) {
-    showFieldError('loginInput', 'usernameError', userErr);
-    return;
-  }
-  if (!password) {
-    showFieldError('loginPassword', 'passwordError', 'Введите пароль');
-    return;
-  }
+  const username = Utils.normalizeTelegramUsername(document.getElementById('loginInput').value);
+  const password = document.getElementById('loginPassword').value.trim();
+  const userErr = Utils.validateTelegramUsername(username);
+  
+  if (userErr) return showFieldError('loginInput', 'usernameError', userErr);
+  if (!password) return showFieldError('loginPassword', 'passwordError', 'Введите пароль');
 
   const submitBtn = document.getElementById('authSubmitBtn');
   submitBtn.disabled = true;
 
   try {
     const response = await fetch(WORKER_URL + 'login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ telegram: username, password })
     });
     const data = await response.json();
 
     if (!response.ok) {
       const errMsg = data.error || 'Ошибка входа';
-      const lower = errMsg.toLowerCase();
-      if (lower.includes('не найден')) {
-        showFieldError('loginInput', 'usernameError', 'Пользователь не найден');
-      } else if (lower.includes('пароль')) {
-        showFieldError('loginPassword', 'passwordError', 'Неверный пароль');
-      } else {
-        showFieldError('loginPassword', 'passwordError', errMsg);
-      }
+      if (errMsg.toLowerCase().includes('не найден')) showFieldError('loginInput', 'usernameError', 'Пользователь не найден');
+      else if (errMsg.toLowerCase().includes('пароль')) showFieldError('loginPassword', 'passwordError', 'Неверный пароль');
+      else showFieldError('loginPassword', 'passwordError', errMsg);
       return;
     }
 
     localStorage.setItem('user_telegram', username);
-    currentUser = data;
-    updateProfileUI();
+    currentUser = data; updateProfileUI();
     loginModalCtrl.closeFn();
     showToast(`✅ Добро пожаловать, ${username}!`, 'success');
     resetAuthForm();
@@ -732,44 +949,28 @@ async function login() {
 
 async function register() {
   clearAuthErrors();
+  const username = Utils.normalizeTelegramUsername(document.getElementById('loginInput').value);
+  const password = document.getElementById('loginPassword').value.trim();
+  const userErr = Utils.validateTelegramUsername(username);
 
-  const input = document.getElementById('loginInput');
-  const passwordInput = document.getElementById('loginPassword');
-  const username = normalizeTelegramUsername(input.value);
-  const password = passwordInput.value.trim();
-
-  const userErr = validateTelegramUsername(username);
-  if (userErr) {
-    showFieldError('loginInput', 'usernameError', userErr);
-    return;
-  }
-  if (!password) {
-    showFieldError('loginPassword', 'passwordError', 'Введите пароль');
-    return;
-  }
-  if (password.length < 4) {
-    showFieldError('loginPassword', 'passwordError', 'Пароль должен содержать минимум 4 символа');
-    return;
-  }
+  if (userErr) return showFieldError('loginInput', 'usernameError', userErr);
+  if (!password) return showFieldError('loginPassword', 'passwordError', 'Введите пароль');
+  if (password.length < 4) return showFieldError('loginPassword', 'passwordError', 'Пароль должен содержать минимум 4 символа');
 
   const submitBtn = document.getElementById('authSubmitBtn');
   submitBtn.disabled = true;
 
   try {
     const response = await fetch(WORKER_URL + 'register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ telegram: username, password, ref: referralCode || null })
     });
     const data = await response.json();
 
     if (!response.ok) {
       const errMsg = data.error || 'Ошибка регистрации';
-      if (errMsg.toLowerCase().includes('существует')) {
-        showFieldError('loginInput', 'usernameError', 'Такой пользователь уже существует');
-      } else {
-        showFieldError('loginInput', 'usernameError', errMsg);
-      }
+      if (errMsg.toLowerCase().includes('существует')) showFieldError('loginInput', 'usernameError', 'Такой пользователь уже существует');
+      else showFieldError('loginInput', 'usernameError', errMsg);
       return;
     }
 
@@ -785,9 +986,7 @@ async function register() {
 
 function initProfile() {
   const saved = localStorage.getItem('user_telegram');
-  if (saved) {
-    loadUserProfile(saved).then(() => updateProfileUI());
-  }
+  if (saved) loadUserProfile(saved).then(() => updateProfileUI());
 }
 
 // =============================================
@@ -820,50 +1019,117 @@ function saveCartToStorage() {
   localStorage.setItem('torgovchik_cart', JSON.stringify(cart));
 }
 
-function addToCart(productId) {
+function flyToCart(sourceEl, imageSrc) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!sourceEl) return;
+
+  const cartBtn = document.getElementById('cartToggle');
+  if (!cartBtn) return;
+
+  const startRect = sourceEl.getBoundingClientRect();
+  const endRect = cartBtn.getBoundingClientRect();
+
+  const img = document.createElement('img');
+  img.src = imageSrc;
+  img.className = 'fly-to-cart';
+  img.style.left = startRect.left + 'px';
+  img.style.top = startRect.top + 'px';
+  img.style.width = startRect.width + 'px';
+  img.style.height = startRect.height + 'px';
+  document.body.appendChild(img);
+
+  // Форсируем reflow
+  img.getBoundingClientRect();
+
+  requestAnimationFrame(() => {
+    img.style.left = (endRect.left + endRect.width / 2 - 20) + 'px';
+    img.style.top = (endRect.top + endRect.height / 2 - 20) + 'px';
+    img.style.width = '40px';
+    img.style.height = '40px';
+    img.style.opacity = '0';
+    img.style.transform = 'rotate(360deg)';
+  });
+
+  setTimeout(() => {
+    img.remove();
+    cartBtn.classList.add('cart-btn--bump');
+    setTimeout(() => cartBtn.classList.remove('cart-btn--bump'), 400);
+  }, 700);
+}
+
+function addToCart(productId, event) {
   const product = products.find(p => p.id === productId);
   if (!product) return;
 
   const existing = cart.find(item => item.id === productId);
-  if (existing) {
-    existing.quantity += 1;
-  } else {
-    cart.push({ ...product, quantity: 1 });
-  }
+  if (existing) existing.quantity += 1;
+  else cart.push({ ...product, quantity: 1 });
+  
   saveCartToStorage();
   updateCartUI();
-  showToast(`✅ ${product.name} добавлен в корзину`, 'success');
+  
+  // Анимация полета
+  if (event) {
+    const btn = event.currentTarget || event.target;
+    flyToCart(btn, product.image);
+  }
+
+  // Показываем тост с кнопкой перехода
+  showToast(`${product.name} добавлен`, 'success', {
+    text: 'Открыть корзину',
+    onClick: () => {
+      openCart();
+      // Закрываем тост принудительно
+      document.querySelectorAll('.toast').forEach(t => t.classList.add('hide'));
+    }
+  });
 }
 
 function changeQuantity(productId, delta) {
   const item = cart.find(i => i.id === productId);
   if (!item) return;
-
   item.quantity += delta;
-  if (item.quantity <= 0) {
-    cart = cart.filter(i => i.id !== productId);
-  }
-  saveCartToStorage();
-  updateCartUI();
+  if (item.quantity <= 0) cart = cart.filter(i => i.id !== productId);
+  saveCartToStorage(); updateCartUI();
 }
 
 function removeFromCart(productId) {
   cart = cart.filter(item => item.id !== productId);
+  saveCartToStorage(); updateCartUI();
+}
+
+async function clearCart() {
+  if (cart.length === 0) return;
+  
+  const confirmed = await showConfirm({
+    icon: '🧹',
+    title: 'Очистить корзину?',
+    text: 'Все товары будут удалены. Это действие нельзя отменить.',
+    okText: 'Очистить',
+    cancelText: 'Отмена',
+    danger: true
+  });
+
+  if (!confirmed) return;
+
+  cart = [];
+  appliedPromo = null;
+  discountPercent = 0;
   saveCartToStorage();
   updateCartUI();
+  showToast('🧹 Корзина очищена', 'info');
 }
 
 function getCartTotal() {
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  if (discountPercent > 0) {
-    return parseFloat((subtotal * (1 - discountPercent / 100)).toFixed(2));
-  }
-  return parseFloat(subtotal.toFixed(2));
+  return Utils.calculateCartTotal(cart, discountPercent);
 }
 
 function updateCartUI() {
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItems = Utils.countCartItems(cart);
   cartCount.textContent = totalItems;
+
+  const clearBtn = document.getElementById('clearCartBtn');
+  if (clearBtn) clearBtn.style.display = cart.length > 0 ? 'inline-block' : 'none';
 
   if (cart.length === 0) {
     cartItems.innerHTML = '<p class="cart-empty">Корзина пуста</p>';
@@ -902,24 +1168,6 @@ function closeCart() {
 }
 
 // =============================================
-// ===== ТОСТЫ =====
-// =============================================
-const toastContainer = document.getElementById('toastContainer');
-
-function showToast(message, type = 'success') {
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.setAttribute('role', 'status');
-  const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
-  toast.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-message">${message}</span>`;
-  toastContainer.appendChild(toast);
-  setTimeout(() => {
-    toast.classList.add('hide');
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
-}
-
-// =============================================
 // ===== ПРОМОКОДЫ =====
 // =============================================
 const promoInput = document.getElementById('promoCode');
@@ -928,26 +1176,16 @@ const promoMessage = document.getElementById('promoMessage');
 
 function applyPromo() {
   const code = promoInput.value.trim().toUpperCase();
-  if (!code) {
-    promoMessage.textContent = '⚠️ Введите промокод';
-    promoMessage.style.color = '#ff7777';
-    return;
-  }
-  if (appliedPromo === code) {
-    promoMessage.textContent = 'ℹ️ Этот промокод уже применён';
-    promoMessage.style.color = '#B9A99A';
-    return;
-  }
+  if (!code) { promoMessage.textContent = '⚠️ Введите промокод'; promoMessage.style.color = '#ff7777'; return; }
+  if (appliedPromo === code) { promoMessage.textContent = 'ℹ️ Этот промокод уже применён'; promoMessage.style.color = '#B9A99A'; return; }
   const promo = promocodes.find(p => p.code === code);
   if (promo) {
     discountPercent = promo.discount;
     appliedPromo = code;
     promoMessage.textContent = `✅ Промокод "${code}" применён! Скидка ${discountPercent}%`;
     promoMessage.style.color = '#8aff8a';
-    promoInput.disabled = true;
-    applyPromoBtn.disabled = true;
-    updateCartUI();
-    showToast(`✅ Промокод "${code}" применён!`, 'success');
+    promoInput.disabled = true; applyPromoBtn.disabled = true;
+    updateCartUI(); showToast(`✅ Промокод "${code}" применён!`, 'success');
   } else {
     promoMessage.textContent = `❌ Промокод "${code}" не найден`;
     promoMessage.style.color = '#ff7777';
@@ -960,18 +1198,14 @@ function applyPromo() {
 function initFilters(category) {
   const container = document.getElementById('filterContainer');
   if (!container) return;
-
   const catProducts = products.filter(p => p.category === category);
   const brands = [...new Set(catProducts.map(p => p.brand))];
 
-  container.innerHTML = brands.map(b => `
-    <button class="filter-btn" data-filter="${b}">${b}</button>
-  `).join('');
+  container.innerHTML = brands.map(b => `<button class="filter-btn" data-filter="${b}">${b}</button>`).join('');
 
   const firstBtn = container.querySelector('.filter-btn');
   if (firstBtn) {
-    firstBtn.classList.add('active');
-    firstBtn.setAttribute('aria-pressed', 'true');
+    firstBtn.classList.add('active'); firstBtn.setAttribute('aria-pressed', 'true');
     renderProducts(category, firstBtn.dataset.filter);
   } else {
     renderProducts(category, 'Все');
@@ -979,12 +1213,8 @@ function initFilters(category) {
 
   container.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      container.querySelectorAll('.filter-btn').forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-pressed', 'false');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
+      container.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+      btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true');
       renderProducts(category, btn.dataset.filter);
     });
   });
@@ -1005,15 +1235,32 @@ function renderProducts(category, filter = 'Все') {
     return;
   }
 
-  grid.innerHTML = filtered.map(p => `
-    <div class="product-card" data-id="${p.id}">
-      <img src="${p.image}" alt="${p.name}" class="product-card__image" loading="lazy" onerror="this.src='https://i.ibb.co/VWRmsGHt/logo.png'">
-      <div class="product-card__name">${p.name}</div>
-      <div class="product-card__brand">${p.brand}</div>
-      <div class="product-card__price">${p.price} BYN</div>
-      <button class="product-card__btn" onclick="addToCart(${p.id})" aria-label="Добавить ${p.name} в корзину">В корзину</button>
-    </div>
-  `).join('');
+  grid.innerHTML = filtered.map(p => {
+    const fav = Utils.isFavorite(favorites, p.id);
+    const count = productStats[p.id] || 0;
+    const popularity = count > 0 ? `<div class="product-card__popularity">Купили ${count} раз</div>` : '';
+    
+    return `
+      <div class="product-card" data-id="${p.id}">
+        <button class="product-card__fav ${fav ? 'active' : ''}" data-id="${p.id}" aria-label="${fav ? 'Убрать из избранного' : 'Добавить в избранное'}" aria-pressed="${fav ? 'true' : 'false'}">${fav ? '❤' : '♡'}</button>
+        <a href="product.html?id=${p.id}" class="product-card__link" aria-label="Открыть ${p.name}">
+          <img src="${p.image}" alt="${p.name}" class="product-card__image" loading="lazy" onerror="this.src='https://i.ibb.co/VWRmsGHt/logo.png'">
+          ${popularity}
+          <div class="product-card__name">${p.name}</div>
+          <div class="product-card__brand">${p.brand}</div>
+          <div class="product-card__price">${p.price} BYN</div>
+        </a>
+        <button class="product-card__btn" onclick="addToCart(${p.id}, event)" aria-label="Добавить ${p.name} в корзину">В корзину</button>
+      </div>
+    `;
+  }).join('');
+
+  grid.querySelectorAll('.product-card__fav').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation(); e.preventDefault();
+      toggleFavorite(parseInt(btn.dataset.id));
+    });
+  });
 }
 
 // =============================================
@@ -1025,31 +1272,17 @@ const categoryContent = document.getElementById('categoryContent');
 
 function switchCategory(category) {
   currentCategory = category;
-
   categoryBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.category === category));
   categoryBtnsMobile.forEach(btn => btn.classList.toggle('active', btn.dataset.category === category));
 
   if (category === 'liquids' || category === 'snus') {
-    categoryContent.innerHTML = `
-      <div class="category-content active">
-        <div class="catalog__filters" id="filterContainer"></div>
-        <div class="catalog__grid" id="productGrid"></div>
-      </div>`;
+    categoryContent.innerHTML = `<div class="category-content active"><div class="catalog__filters" id="filterContainer"></div><div class="catalog__grid" id="productGrid"></div></div>`;
     initFilters(category);
   } else if (category === 'coils' || category === 'disposables') {
-    categoryContent.innerHTML = `
-      <div class="category-content active">
-        <div class="catalog__grid" id="productGrid"></div>
-      </div>`;
+    categoryContent.innerHTML = `<div class="category-content active"><div class="catalog__grid" id="productGrid"></div></div>`;
     renderProducts(category, 'Все');
   } else {
-    categoryContent.innerHTML = `
-      <div class="category-content active">
-        <div class="placeholder">
-          <h3>Скоро появится!</h3>
-          <p style="font-size: 14px; margin-top: 8px; color: #9D887A;">Следите за обновлениями</p>
-        </div>
-      </div>`;
+    categoryContent.innerHTML = `<div class="category-content active"><div class="placeholder"><h3>Скоро появится!</h3></div></div>`;
   }
 }
 
@@ -1062,6 +1295,7 @@ const avatarModalCtrl = setupModal('avatarModal', () => { pendingAvatarId = null
 const bannerModalCtrl = setupModal('bannerModal', () => { pendingBannerId = null; });
 const orderModalCtrl = setupModal('orderModal');
 const announcementCtrl = setupModal('announcementModal');
+const favoritesModalCtrl = setupModal('favoritesModal');
 
 document.getElementById('loginModalClose').addEventListener('click', () => loginModalCtrl.closeFn());
 document.getElementById('profileModalClose').addEventListener('click', () => profileModalCtrl.closeFn());
@@ -1071,26 +1305,18 @@ document.getElementById('bannerModalClose').addEventListener('click', () => bann
 document.getElementById('orderModalClose').addEventListener('click', () => orderModalCtrl.closeFn());
 document.getElementById('announcementClose').addEventListener('click', () => announcementCtrl.closeFn());
 document.getElementById('announcementOk').addEventListener('click', () => announcementCtrl.closeFn());
+document.getElementById('favoritesModalClose').addEventListener('click', () => favoritesModalCtrl.closeFn());
 
 document.getElementById('userBtn').addEventListener('click', () => {
   if (currentUser && currentUser.telegram) {
-    document.getElementById('profileModal').classList.add('open');
-    updateProfileUI();
+    document.getElementById('profileModal').classList.add('open'); updateProfileUI();
   } else {
-    resetAuthForm();
-    document.getElementById('loginModal').classList.add('open');
+    resetAuthForm(); document.getElementById('loginModal').classList.add('open');
   }
 });
 
-document.querySelectorAll('.auth-tab').forEach(tab => {
-  tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab));
-});
-
-document.getElementById('authForm').addEventListener('submit', (e) => {
-  e.preventDefault();
-  if (currentAuthTab === 'register') register();
-  else login();
-});
+document.querySelectorAll('.auth-tab').forEach(tab => tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab)));
+document.getElementById('authForm').addEventListener('submit', (e) => { e.preventDefault(); if (currentAuthTab === 'register') register(); else login(); });
 
 document.getElementById('togglePassword').addEventListener('click', function() {
   const input = document.getElementById('loginPassword');
@@ -1103,28 +1329,18 @@ document.getElementById('togglePassword').addEventListener('click', function() {
 document.querySelectorAll('.auth-field input').forEach(input => {
   input.addEventListener('focus', () => input.closest('.auth-field').classList.add('focused'));
   input.addEventListener('blur', () => input.closest('.auth-field').classList.remove('focused'));
-  input.addEventListener('input', () => {
-    input.closest('.auth-field').classList.remove('error');
-    input.removeAttribute('aria-invalid');
-  });
+  input.addEventListener('input', () => { input.closest('.auth-field').classList.remove('error'); input.removeAttribute('aria-invalid'); });
 });
 
-document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  showToast('📩 Напишите в наш Telegram — поможем восстановить пароль', 'info');
-});
+document.getElementById('forgotPasswordLink').addEventListener('click', (e) => { e.preventDefault(); showToast('📩 Напишите в наш Telegram — поможем восстановить пароль', 'info'); });
 
 document.getElementById('profileLogout').addEventListener('click', () => {
-  localStorage.removeItem('user_telegram');
-  currentUser = null;
-  updateProfileUI();
-  profileModalCtrl.closeFn();
-  showToast('👋 Вы вышли из профиля', 'info');
+  localStorage.removeItem('user_telegram'); currentUser = null; updateProfileUI();
+  profileModalCtrl.closeFn(); showToast('👋 Вы вышли из профиля', 'info');
 });
 
 document.getElementById('avatarEditBtn').addEventListener('click', openAvatarModal);
 document.getElementById('avatarSaveBtn').addEventListener('click', saveAvatar);
-
 document.getElementById('bannerEditBtn').addEventListener('click', openBannerModal);
 document.getElementById('bannerRemoveBtn').addEventListener('click', removeBanner);
 document.getElementById('bannerSaveBtn').addEventListener('click', saveBanner);
@@ -1132,6 +1348,8 @@ document.getElementById('bannerSaveBtn').addEventListener('click', saveBanner);
 document.getElementById('cartToggle').addEventListener('click', openCart);
 document.getElementById('cartClose').addEventListener('click', closeCart);
 overlay.addEventListener('click', closeCart);
+document.getElementById('favoritesToggle').addEventListener('click', openFavoritesModal);
+document.getElementById('clearCartBtn').addEventListener('click', clearCart);
 
 // =============================================
 // ===== ФОРМА ЗАКАЗА =====
@@ -1140,126 +1358,61 @@ const orderForm = document.getElementById('orderForm');
 const orderMessage = document.getElementById('orderMessage');
 
 document.getElementById('checkoutBtn').addEventListener('click', () => {
-  if (cart.length === 0) {
-    showToast('Корзина пуста. Добавьте товары.', 'error');
-    return;
-  }
-  if (currentUser && currentUser.telegram) {
-    document.getElementById('orderTelegram').value = '@' + currentUser.telegram;
-  }
+  if (cart.length === 0) return showToast('Корзина пуста. Добавьте товары.', 'error');
+  if (currentUser && currentUser.telegram) document.getElementById('orderTelegram').value = '@' + currentUser.telegram;
   orderIdempotencyKey = null;
   document.getElementById('orderModal').classList.add('open');
-  orderMessage.style.display = 'none';
-  orderMessage.textContent = '';
+  orderMessage.style.display = 'none'; orderMessage.textContent = '';
 });
 
 orderForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-
   const name = document.getElementById('orderName').value.trim();
   const telegramRaw = document.getElementById('orderTelegram').value.trim();
   const address = document.getElementById('orderAddress').value.trim();
   const comment = document.getElementById('orderComment').value.trim();
 
-  if (!name) {
-    orderMessage.style.display = 'block';
-    orderMessage.textContent = '⚠️ Пожалуйста, укажите имя.';
-    orderMessage.style.color = '#ff7777';
-    return;
-  }
-
-  const telegramClean = normalizeTelegramUsername(telegramRaw);
-  const telegramErr = validateTelegramUsername(telegramClean);
-  if (telegramErr) {
-    orderMessage.style.display = 'block';
-    orderMessage.textContent = '⚠️ ' + telegramErr;
-    orderMessage.style.color = '#ff7777';
-    return;
-  }
+  if (!name) { orderMessage.style.display = 'block'; orderMessage.textContent = '⚠️ Пожалуйста, укажите имя.'; orderMessage.style.color = '#ff7777'; return; }
+  
+  const telegramClean = Utils.normalizeTelegramUsername(telegramRaw);
+  const telegramErr = Utils.validateTelegramUsername(telegramClean);
+  if (telegramErr) { orderMessage.style.display = 'block'; orderMessage.textContent = '⚠️ ' + telegramErr; orderMessage.style.color = '#ff7777'; return; }
+  
   const telegramForServer = '@' + telegramClean;
-
   const submitBtn = document.getElementById('orderSubmit');
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Отправка...';
+  submitBtn.disabled = true; submitBtn.textContent = 'Отправка...';
 
-  if (!orderIdempotencyKey) {
-    orderIdempotencyKey = generateUUID();
-  }
+  if (!orderIdempotencyKey) orderIdempotencyKey = Utils.generateUUID();
 
   const orderData = {
-    name,
-    telegram: telegramForServer,
-    address,
-    comment,
-    items: cart,
+    name, telegram: telegramForServer, address, comment, items: cart,
     subtotal: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-    total: getCartTotal(),
-    promo: appliedPromo,
-    discount: discountPercent,
-    idempotencyKey: orderIdempotencyKey
+    total: getCartTotal(), promo: appliedPromo, discount: discountPercent, idempotencyKey: orderIdempotencyKey
   };
 
   try {
-    const response = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ order: orderData })
-    });
+    const response = await fetch(WORKER_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order: orderData }) });
+    if (!response.ok) { const errData = await response.json(); throw new Error(errData.error || 'Ошибка отправки заказа'); }
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Ошибка отправки заказа');
-    }
-
-    orderMessage.style.display = 'block';
-    orderMessage.textContent = '✅ Заказ успешно отправлен! Мы свяжемся с вами в Telegram.';
-    orderMessage.style.color = '#8aff8a';
+    orderMessage.style.display = 'block'; orderMessage.textContent = '✅ Заказ успешно отправлен! Мы свяжемся с вами в Telegram.'; orderMessage.style.color = '#8aff8a';
 
     setTimeout(() => {
-      cart = [];
-      appliedPromo = null;
-      discountPercent = 0;
-      orderIdempotencyKey = null;
-      saveCartToStorage();
-      updateCartUI();
-      closeCart();
-      orderModalCtrl.closeFn();
-      orderForm.reset();
-      orderMessage.style.display = 'none';
-      promoInput.value = '';
-      promoInput.disabled = false;
-      applyPromoBtn.disabled = false;
-      promoMessage.textContent = '';
+      cart = []; appliedPromo = null; discountPercent = 0; orderIdempotencyKey = null;
+      saveCartToStorage(); updateCartUI(); closeCart(); orderModalCtrl.closeFn(); orderForm.reset();
+      orderMessage.style.display = 'none'; promoInput.value = ''; promoInput.disabled = false;
+      applyPromoBtn.disabled = false; promoMessage.textContent = '';
       showToast('✅ Заказ оформлен! Спасибо!', 'success');
       if (currentUser && currentUser.telegram) loadUserProfile(currentUser.telegram);
     }, 2000);
-
   } catch (error) {
-    console.error('Ошибка отправки:', error);
-    orderMessage.style.display = 'block';
-    orderMessage.textContent = `⚠️ Ошибка: ${error.message || 'Неизвестная ошибка'}. Попробуйте позже.`;
-    orderMessage.style.color = '#ff7777';
+    orderMessage.style.display = 'block'; orderMessage.textContent = `⚠️ Ошибка: ${error.message || 'Неизвестная ошибка'}. Попробуйте позже.`; orderMessage.style.color = '#ff7777';
   } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Отправить заказ';
+    submitBtn.disabled = false; submitBtn.textContent = 'Отправить заказ';
   }
 });
 
 applyPromoBtn.addEventListener('click', applyPromo);
 promoInput.addEventListener('keypress', e => { if (e.key === 'Enter') applyPromo(); });
-
-// =============================================
-// ===== ПЕРЕКЛЮЧЕНИЕ КАТЕГОРИЙ =====
-// =============================================
-categoryBtns.forEach(btn => btn.addEventListener('click', () => switchCategory(btn.dataset.category)));
-categoryBtnsMobile.forEach(btn => {
-  btn.addEventListener('click', () => {
-    switchCategory(btn.dataset.category);
-    burger.classList.remove('active');
-    mobileMenu.classList.remove('open');
-    burger.setAttribute('aria-expanded', 'false');
-  });
-});
 
 // =============================================
 // ===== БУРГЕР =====
@@ -1268,7 +1421,6 @@ const burger = document.getElementById('burgerBtn');
 const mobileMenu = document.getElementById('mobileMenu');
 
 burger.setAttribute('aria-expanded', 'false');
-
 burger.addEventListener('click', () => {
   const isOpen = burger.classList.toggle('active');
   mobileMenu.classList.toggle('open');
@@ -1277,74 +1429,56 @@ burger.addEventListener('click', () => {
 
 document.addEventListener('click', e => {
   if (!e.target.closest('.header__inner')) {
-    burger.classList.remove('active');
-    mobileMenu.classList.remove('open');
-    burger.setAttribute('aria-expanded', 'false');
+    burger.classList.remove('active'); mobileMenu.classList.remove('open'); burger.setAttribute('aria-expanded', 'false');
   }
+});
+
+categoryBtns.forEach(btn => btn.addEventListener('click', () => switchCategory(btn.dataset.category)));
+categoryBtnsMobile.forEach(btn => {
+  btn.addEventListener('click', () => {
+    switchCategory(btn.dataset.category); burger.classList.remove('active'); mobileMenu.classList.remove('open'); burger.setAttribute('aria-expanded', 'false');
+  });
 });
 
 // =============================================
 // ===== FAQ =====
 // =============================================
 document.querySelectorAll('.faq__question').forEach(question => {
-  question.setAttribute('role', 'button');
-  question.setAttribute('tabindex', '0');
-  question.setAttribute('aria-expanded', 'false');
-
+  question.setAttribute('role', 'button'); question.setAttribute('tabindex', '0'); question.setAttribute('aria-expanded', 'false');
   const toggle = () => {
-    const parent = question.closest('.faq__item');
-    if (!parent) return;
+    const parent = question.closest('.faq__item'); if (!parent) return;
     const isOpen = parent.classList.toggle('open');
     question.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   };
-
   question.addEventListener('click', toggle);
-  question.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      toggle();
-    }
-  });
+  question.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
 });
 
 // =============================================
 // ===== ПАСХАЛКА НА ЛОГОТИПЕ =====
 // =============================================
 document.addEventListener('DOMContentLoaded', function() {
-  const logo = document.querySelector('.logo');
-  if (!logo) return;
-
+  const logo = document.querySelector('.logo'); if (!logo) return;
   let tooltipTimeout = null;
-
   logo.addEventListener('click', function(e) {
     e.preventDefault();
-
-    const oldTooltip = logo.querySelector('.logo-tooltip');
-    if (oldTooltip) oldTooltip.remove();
+    const oldTooltip = logo.querySelector('.logo-tooltip'); if (oldTooltip) oldTooltip.remove();
     if (tooltipTimeout) clearTimeout(tooltipTimeout);
-
     const phrase = LOGO_PHRASES[Math.floor(Math.random() * LOGO_PHRASES.length)];
-    const tooltip = document.createElement('div');
-    tooltip.className = 'logo-tooltip';
-    tooltip.textContent = phrase;
-    tooltip.setAttribute('role', 'status');
-
-    logo.appendChild(tooltip);
-    requestAnimationFrame(() => tooltip.classList.add('show'));
-
-    tooltipTimeout = setTimeout(() => {
-      tooltip.classList.remove('show');
-      setTimeout(() => tooltip.remove(), 300);
-    }, 2500);
+    const tooltip = document.createElement('div'); tooltip.className = 'logo-tooltip'; tooltip.textContent = phrase; tooltip.setAttribute('role', 'status');
+    logo.appendChild(tooltip); requestAnimationFrame(() => tooltip.classList.add('show'));
+    tooltipTimeout = setTimeout(() => { tooltip.classList.remove('show'); setTimeout(() => tooltip.remove(), 300); }, 2500);
   });
 });
 
 // =============================================
 // ===== ЗАПУСК =====
 // =============================================
+initAgeGate();
+initScrollToTop();
 checkReferral();
+loadFavoritesFromStorage();
 loadProducts().then(() => {
-  loadCartFromStorage();
   initProfile();
   checkAnnouncement();
 });

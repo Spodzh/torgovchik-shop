@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Товар — Torgovchik</title>
+    <meta name="description" content="Подробная карточка товара в магазине Torgovchik." />
+    <meta name="theme-color" content="#1C1715" />
+    <meta name="robots" content="index, follow" />
+
+    <link rel="icon" type="image/png" href="https://i.ibb.co/VWRmsGHt/logo.png" />
+    <link rel="apple-touch-icon" href="https://i.ibb.co/VWRmsGHt/logo.png" />
+
+    <meta property="og:type" content="product" />
+    <meta property="og:site_name" content="Torgovchik" />
+    <meta property="og:title" id="ogTitle" content="Товар — Torgovchik" />
+    <meta property="og:description" id="ogDescription" content="Подробная карточка товара в магазине Torgovchik." />
+    <meta property="og:image" id="ogImage" content="https://i.ibb.co/VWRmsGHt/logo.png" />
+    <meta property="og:locale" content="ru_RU" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://i.ibb.co" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/header.css" />
+    <link rel="stylesheet" href="css/catalog.css" />
+    <link rel="stylesheet" href="css/cart.css" />
+    <link rel="stylesheet" href="css/modal.css" />
+    <link rel="stylesheet" href="css/toast.css" />
+    <link rel="stylesheet" href="css/extras.css" />
+    <link rel="stylesheet" href="css/product.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+
+    <!-- 18+ ВРАТА -->
+    <div class="age-gate-modal" id="ageGateModal" role="dialog" aria-modal="true" aria-labelledby="ageGateTitle">
+        <div class="age-gate-modal__content">
+            <div id="ageGateQuestion">
+                <span class="age-gate-modal__icon">🔞</span>
+                <span class="age-gate-modal__badge">18+</span>
+                <h2 class="age-gate-modal__title" id="ageGateTitle">Вам есть 18 лет?</h2>
+                <p class="age-gate-modal__text">
+                    Сайт содержит информацию о товарах, предназначенных<br>для <strong>совершеннолетних</strong>. Подтвердите свой возраст.
+                </p>
+                <div class="age-gate-modal__buttons">
+                    <button class="age-gate-modal__btn age-gate-modal__btn--yes" id="ageGateYes">Мне есть 18 лет</button>
+                    <button class="age-gate-modal__btn age-gate-modal__btn--no" id="ageGateNo">Мне меньше 18</button>
+                </div>
+            </div>
+            <div class="age-gate-modal__deny" id="ageGateDeny">
+                <span class="age-gate-modal__deny-icon">🚫</span>
+                <div class="age-gate-modal__deny-title">Доступ запрещён</div>
+                <p class="age-gate-modal__deny-text">
+                    К сожалению, сайт доступен только пользователям старше 18 лет.<br>
+                    Спасибо за понимание.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container header__inner">
+            <a href="index.html" class="logo" aria-label="Torgovchik — на главную">
+                <img src="https://i.ibb.co/VWRmsGHt/logo.png" alt="Torgovchik" class="logo__image">
+            </a>
+
+            <nav class="nav nav--desktop" aria-label="Категории товаров">
+                <a href="index.html" class="category-btn">Каталог</a>
+                <a href="index.html#about" class="category-btn">О нас</a>
+                <a href="index.html#contacts" class="category-btn">Контакты</a>
+            </nav>
+
+            <div class="header__user">
+                <a href="index.html" class="user-btn" aria-label="На главную">
+                    <span aria-hidden="true">🏠</span>
+                    <span>На главную</span>
+                </a>
+            </div>
+
+            <a href="index.html" class="favorites-btn" aria-label="Избранное на главной">
+                <span class="favorites-icon" aria-hidden="true">♡</span>
+                <span class="favorites-badge" id="favoritesCount">0</span>
+            </a>
+
+            <a href="index.html" class="cart-btn" aria-label="Корзина на главной">
+                <span class="cart-icon" aria-hidden="true">🛒</span>
+                <span class="cart-badge" id="cartCount">0</span>
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <section class="product-page" id="productPage">
+            <div class="container">
+                <div class="product-breadcrumbs">
+                    <a href="index.html" class="product-breadcrumbs__link">← Назад в каталог</a>
+                </div>
+
+                <div id="productContent">
+                    <div class="product-skeleton">
+                        <div class="product-skeleton__image skeleton"></div>
+                        <div class="product-skeleton__info">
+                            <div class="skeleton skeleton-line skeleton-line--short"></div>
+                            <div class="skeleton skeleton-line skeleton-line--tiny"></div>
+                            <div class="skeleton skeleton-line skeleton-line--price"></div>
+                            <div class="skeleton skeleton-line"></div>
+                            <div class="skeleton skeleton-line"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="recently-viewed" id="recentlyViewedSection" style="display: none;">
+            <div class="container">
+                <h2 class="section-title">Недавно просмотренные</h2>
+                <div class="recently-viewed__grid" id="recentlyViewedGrid"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 Torgovchik. Все права защищены.</p>
+            <p style="margin-top: 8px; font-size: 14px; opacity: 0.8;">
+                <a href="terms.html">Пользовательское соглашение</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Кнопка "Наверх" -->
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Наверх" type="button">↑</button>
+
+    <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/product.js"></script>
+</body>
+</html>

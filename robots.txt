@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Disallow: /tests.html
+
+Sitemap: https://spodzh.github.io/torgovchik-shop/sitemap.xml

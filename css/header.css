@@ -168,6 +168,52 @@
     text-align: center;
 }
 
+/* ===== КНОПКА ИЗБРАННОГО ===== */
+.favorites-btn {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-medium);
+    border-radius: 40px;
+    padding: 8px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.favorites-btn:hover {
+    border-color: #E5737A;
+    background: var(--bg-card-hover);
+    box-shadow: 0 0 20px rgba(229, 115, 122, 0.25);
+}
+
+.favorites-icon {
+    font-size: 16px;
+    line-height: 1;
+    transition: color 0.2s, transform 0.2s;
+    display: inline-block;
+    color: #E5737A;
+}
+
+.favorites-btn:hover .favorites-icon {
+    transform: scale(1.15);
+}
+
+.favorites-badge {
+    background: #E5737A;
+    color: #1C1715;
+    border-radius: 30px;
+    padding: 0 8px;
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 22px;
+    min-width: 22px;
+    text-align: center;
+}
+
 /* ===== КНОПКА ПРОФИЛЯ ===== */
 .header__user { display: flex; align-items: center; }
 
@@ -302,6 +348,7 @@
     .user-btn__tickets { font-size: 12px; }
 
     .cart-btn { font-size: 13px; padding: 6px 12px; }
+    .favorites-btn { font-size: 13px; padding: 6px 10px; }
 
     .logo-tooltip {
         font-size: 14px;
@@ -318,4 +365,6 @@
     .user-btn { padding: 4px 8px; gap: 4px; }
     .cart-btn { padding: 5px 10px; font-size: 12px; }
     .cart-badge { font-size: 11px; line-height: 18px; padding: 0 6px; min-width: 18px; }
+    .favorites-btn { padding: 5px 8px; }
+    .favorites-badge { font-size: 11px; line-height: 18px; padding: 0 6px; min-width: 18px; }
 }
