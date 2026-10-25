@@ -13,14 +13,16 @@ let productStats = {};
 let cart = [];
 let favorites = [];
 let currentProduct = null;
+let renderFinished = false;
 
 // =============================================
 // ===== ТОСТЫ =====
 // =============================================
-const toastContainer = document.getElementById('toastContainer');
-
 function showToast(message, type, action) {
   type = type || 'success';
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+
   const toast = document.createElement('div');
   toast.className = 'toast' + (action ? ' toast--action' : '');
   toast.setAttribute('role', 'status');
@@ -45,7 +47,7 @@ function showToast(message, type, action) {
     toast.appendChild(btn);
   }
 
-  toastContainer.appendChild(toast);
+  container.appendChild(toast);
 
   const timeout = setTimeout(() => {
     toast.classList.add('hide');
@@ -58,15 +60,16 @@ function showToast(message, type, action) {
 }
 
 // =============================================
-// ===== 18+ ВРАТА =====
+// ===== 18+ ВРАТА (защищённая инициализация) =====
 // =============================================
 function initAgeGate() {
-  const isVerified = localStorage.getItem('torgovchik_age_verified') === 'true';
   const modal = document.getElementById('ageGateModal');
   if (!modal) return;
 
+  const isVerified = localStorage.getItem('torgovchik_age_verified') === 'true';
   if (isVerified) {
     modal.classList.remove('open');
+    document.body.style.overflow = '';
     return;
   }
 
@@ -75,21 +78,27 @@ function initAgeGate() {
 
   const question = document.getElementById('ageGateQuestion');
   const deny = document.getElementById('ageGateDeny');
+  const yesBtn = document.getElementById('ageGateYes');
+  const noBtn = document.getElementById('ageGateNo');
 
-  document.getElementById('ageGateYes').addEventListener('click', () => {
-    localStorage.setItem('torgovchik_age_verified', 'true');
-    modal.classList.remove('open');
-    document.body.style.overflow = '';
-  });
+  if (yesBtn) {
+    yesBtn.addEventListener('click', () => {
+      localStorage.setItem('torgovchik_age_verified', 'true');
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  }
 
-  document.getElementById('ageGateNo').addEventListener('click', () => {
-    question.style.display = 'none';
-    deny.classList.add('open');
-  });
+  if (noBtn && question && deny) {
+    noBtn.addEventListener('click', () => {
+      question.style.display = 'none';
+      deny.classList.add('open');
+    });
+  }
 }
 
 // =============================================
-// ===== КНОПКА "НАВЕРХ" =====
+// ===== КНОПКА "НАВЕРХ" (защищённая) =====
 // =============================================
 function initScrollToTop() {
   const btn = document.getElementById('scrollToTop');
@@ -128,15 +137,19 @@ function saveCartToStorage() {
 function updateCartBadge() {
   const badge = document.getElementById('cartCount');
   if (!badge) return;
-  const total = Utils.countCartItems(cart);
+  let total = 0;
+  if (typeof Utils !== 'undefined' && Utils.countCartItems) {
+    total = Utils.countCartItems(cart);
+  } else {
+    total = cart.reduce((s, i) => s + (parseInt(i.quantity) || 0), 0);
+  }
   badge.textContent = total;
 }
 
 function flyToCart(sourceEl, imageSrc) {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!sourceEl) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  // На странице товара корзина — это ссылка <a class="cart-btn">
   const cartBtn = document.querySelector('.cart-btn');
   if (!cartBtn) return;
 
@@ -227,7 +240,17 @@ function updateFavoritesBadge() {
 
 function toggleFavorite(productId) {
   if (!currentProduct) return;
-  const result = Utils.toggleFavoriteInList(favorites, productId);
+
+  let result;
+  if (typeof Utils !== 'undefined' && Utils.toggleFavoriteInList) {
+    result = Utils.toggleFavoriteInList(favorites, productId);
+  } else {
+    const arr = favorites.slice();
+    const idx = arr.indexOf(productId);
+    if (idx >= 0) { arr.splice(idx, 1); result = { list: arr, added: false }; }
+    else { arr.push(productId); result = { list: arr, added: true }; }
+  }
+
   favorites = result.list;
   saveFavoritesToStorage();
   updateFavoritesBadge();
@@ -301,14 +324,16 @@ function getIdFromUrl() {
   return isNaN(id) ? null : id;
 }
 
-function renderNotFound() {
+function renderNotFound(message) {
   const content = document.getElementById('productContent');
+  if (!content) return;
+  renderFinished = true;
   content.innerHTML = `
     <div class="product-not-found">
       <div class="product-not-found__icon">🍂</div>
       <h2 class="product-not-found__title">Товар не найден</h2>
       <p class="product-not-found__text">
-        Возможно, он уже распродан или вы перешли по устаревшей ссылке.<br>
+        ${message || 'Возможно, он уже распродан или вы перешли по устаревшей ссылке.'}<br>
         Загляните в каталог — там много вкусного.
       </p>
       <a href="index.html" class="btn btn-primary">← В каталог</a>
@@ -328,7 +353,13 @@ function setMeta(property, content) {
 
 function renderProduct(p) {
   const content = document.getElementById('productContent');
-  const fav = Utils.isFavorite(favorites, p.id);
+  if (!content) return;
+
+  renderFinished = true;
+
+  const isFav = typeof Utils !== 'undefined' && Utils.isFavorite
+    ? Utils.isFavorite(favorites, p.id)
+    : favorites.indexOf(p.id) !== -1;
   const inCart = isInCart(p.id);
   const boughtCount = productStats[p.id] || 0;
 
@@ -347,10 +378,10 @@ function renderProduct(p) {
   content.innerHTML = `
     <div class="product-detail">
       <div class="product-detail__image-wrap">
-        <button class="product-detail__fav ${fav ? 'active' : ''}"
+        <button class="product-detail__fav ${isFav ? 'active' : ''}"
                 id="productFavBtn"
-                aria-label="${fav ? 'Убрать из избранного' : 'Добавить в избранное'}"
-                aria-pressed="${fav ? 'true' : 'false'}">${fav ? '❤' : '♡'}</button>
+                aria-label="${isFav ? 'Убрать из избранного' : 'Добавить в избранное'}"
+                aria-pressed="${isFav ? 'true' : 'false'}">${isFav ? '❤' : '♡'}</button>
         <img src="${p.image}"
              alt="${p.name}"
              class="product-detail__image"
@@ -393,80 +424,84 @@ function renderProduct(p) {
     </div>
   `;
 
-  document.getElementById('productFavBtn').addEventListener('click', () => {
-    toggleFavorite(p.id);
-  });
+  const favBtn = document.getElementById('productFavBtn');
+  if (favBtn) {
+    favBtn.addEventListener('click', () => toggleFavorite(p.id));
+  }
 
   const addBtn = document.getElementById('productAddBtn');
   if (addBtn && !inCart) {
-    addBtn.addEventListener('click', (e) => {
-      addToCart(p.id, e);
-    });
+    addBtn.addEventListener('click', (e) => addToCart(p.id, e));
   }
 
-  // ===== SEO: обновляем мета-теги =====
-  const pageTitle = p.name + ' — ' + p.brand + ' — Torgovchik';
-  document.title = pageTitle;
+  // SEO
+  try {
+    const pageTitle = p.name + ' — ' + p.brand + ' — Torgovchik';
+    document.title = pageTitle;
 
-  const metaDesc = 'Купить ' + p.name + ' от ' + p.brand + ' в магазине Torgovchik. Цена ' + p.price + ' BYN.';
+    const metaDesc = 'Купить ' + p.name + ' от ' + p.brand + ' в магазине Torgovchik. Цена ' + p.price + ' BYN.';
 
-  const descEl = document.querySelector('meta[name="description"]');
-  if (descEl) descEl.setAttribute('content', metaDesc);
+    const descEl = document.querySelector('meta[name="description"]');
+    if (descEl) descEl.setAttribute('content', metaDesc);
 
-  const canonical = document.querySelector('link[rel="canonical"]');
-  if (canonical) {
-    canonical.setAttribute('href', window.location.origin + window.location.pathname + '?id=' + p.id);
-  }
-
-  const ogTitle = document.getElementById('ogTitle');
-  if (ogTitle) ogTitle.setAttribute('content', pageTitle);
-
-  const ogDesc = document.getElementById('ogDescription');
-  if (ogDesc) ogDesc.setAttribute('content', metaDesc);
-
-  const ogImage = document.getElementById('ogImage');
-  if (ogImage) ogImage.setAttribute('content', p.image);
-
-  // Стандарт Open Graph for Products
-  setMeta('product:price:amount', String(p.price));
-  setMeta('product:price:currency', 'BYN');
-  setMeta('product:availability', 'in stock');
-  setMeta('og:price:amount', String(p.price));
-  setMeta('og:price:currency', 'BYN');
-
-  // JSON-LD Product
-  const ldScript = document.createElement('script');
-  ldScript.type = 'application/ld+json';
-  ldScript.textContent = JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    'name': p.name,
-    'brand': { '@type': 'Brand', 'name': p.brand },
-    'image': p.image,
-    'category': categoryLabel,
-    'sku': '#' + String(p.id).padStart(4, '0'),
-    'offers': {
-      '@type': 'Offer',
-      'price': p.price,
-      'priceCurrency': 'BYN',
-      'availability': 'https://schema.org/InStock',
-      'seller': { '@type': 'Organization', 'name': 'Torgovchik' }
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) {
+      canonical.setAttribute('href', window.location.origin + window.location.pathname + '?id=' + p.id);
     }
-  });
-  document.head.appendChild(ldScript);
+
+    const ogTitle = document.getElementById('ogTitle');
+    if (ogTitle) ogTitle.setAttribute('content', pageTitle);
+
+    const ogDesc = document.getElementById('ogDescription');
+    if (ogDesc) ogDesc.setAttribute('content', metaDesc);
+
+    const ogImage = document.getElementById('ogImage');
+    if (ogImage) ogImage.setAttribute('content', p.image);
+
+    setMeta('product:price:amount', String(p.price));
+    setMeta('product:price:currency', 'BYN');
+    setMeta('product:availability', 'in stock');
+    setMeta('og:price:amount', String(p.price));
+    setMeta('og:price:currency', 'BYN');
+
+    const ldScript = document.createElement('script');
+    ldScript.type = 'application/ld+json';
+    ldScript.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      'name': p.name,
+      'brand': { '@type': 'Brand', 'name': p.brand },
+      'image': p.image,
+      'category': categoryLabel,
+      'sku': '#' + String(p.id).padStart(4, '0'),
+      'offers': {
+        '@type': 'Offer',
+        'price': p.price,
+        'priceCurrency': 'BYN',
+        'availability': 'https://schema.org/InStock',
+        'seller': { '@type': 'Organization', 'name': 'Torgovchik' }
+      }
+    });
+    document.head.appendChild(ldScript);
+  } catch (e) {
+    console.warn('SEO update failed:', e);
+  }
 }
 
 function updateProductActions() {
   if (!currentProduct) return;
-  const fav = Utils.isFavorite(favorites, currentProduct.id);
+
+  const isFav = typeof Utils !== 'undefined' && Utils.isFavorite
+    ? Utils.isFavorite(favorites, currentProduct.id)
+    : favorites.indexOf(currentProduct.id) !== -1;
   const inCart = isInCart(currentProduct.id);
 
   const favBtn = document.getElementById('productFavBtn');
   if (favBtn) {
-    favBtn.classList.toggle('active', fav);
-    favBtn.textContent = fav ? '❤' : '♡';
-    favBtn.setAttribute('aria-label', fav ? 'Убрать из избранного' : 'Добавить в избранное');
-    favBtn.setAttribute('aria-pressed', fav ? 'true' : 'false');
+    favBtn.classList.toggle('active', isFav);
+    favBtn.textContent = isFav ? '❤' : '♡';
+    favBtn.setAttribute('aria-label', isFav ? 'Убрать из избранного' : 'Добавить в избранное');
+    favBtn.setAttribute('aria-pressed', isFav ? 'true' : 'false');
   }
 
   const addBtn = document.getElementById('productAddBtn');
@@ -488,52 +523,78 @@ function updateProductActions() {
 async function loadProductStats() {
   try {
     const response = await fetch(WORKER_URL + 'product-stats');
-    if (response.ok) {
-      productStats = await response.json();
-    }
+    if (response.ok) productStats = await response.json();
   } catch (e) {
     productStats = {};
   }
 }
 
 async function loadData() {
+  // Защитный таймер: если через 8 секунд ничего не отрендерилось — показать ошибку
+  const safetyTimeout = setTimeout(() => {
+    if (!renderFinished) {
+      console.warn('Товар не отрендерился за 8 секунд');
+      renderNotFound('Страница загружается слишком долго. Проверьте интернет и попробуйте ещё раз.');
+    }
+  }, 8000);
+
   try {
-    const [productsResp] = await Promise.all([
-      fetch(WORKER_URL + 'products'),
-      loadProductStats()
-    ]);
+    const productsResp = await fetch(WORKER_URL + 'products');
+    if (!productsResp.ok) throw new Error('Ошибка загрузки каталога: HTTP ' + productsResp.status);
 
-    if (!productsResp.ok) throw new Error('Ошибка загрузки');
     products = await productsResp.json();
+    if (!Array.isArray(products)) throw new Error('Некорректный ответ сервера');
+
+    loadProductStats(); // без await — не критично, грузится параллельно
+
+    const productId = getIdFromUrl();
+    if (productId === null) {
+      clearTimeout(safetyTimeout);
+      renderNotFound('В ссылке не указан ID товара.');
+      return;
+    }
+
+    const product = products.find(p => p.id === productId);
+    if (!product) {
+      clearTimeout(safetyTimeout);
+      renderNotFound('Товар с таким ID не найден.');
+      return;
+    }
+
+    currentProduct = product;
+    clearTimeout(safetyTimeout);
+    renderProduct(product);
+    addToRecentlyViewed(productId);
+    renderRecentlyViewed(productId);
   } catch (e) {
-    console.error('Не удалось загрузить каталог:', e);
-    renderNotFound();
-    return;
+    clearTimeout(safetyTimeout);
+    console.error('Не удалось загрузить данные:', e);
+    renderNotFound('Ошибка загрузки: ' + (e.message || 'неизвестная ошибка') + '. Попробуйте обновить страницу.');
   }
-
-  const productId = getIdFromUrl();
-  if (productId === null) {
-    renderNotFound();
-    return;
-  }
-
-  const product = products.find(p => p.id === productId);
-  if (!product) {
-    renderNotFound();
-    return;
-  }
-
-  currentProduct = product;
-  renderProduct(product);
-  addToRecentlyViewed(productId);
-  renderRecentlyViewed(productId);
 }
 
 // =============================================
-// ===== ЗАПУСК =====
+// ===== ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК =====
 // =============================================
-initAgeGate();
-initScrollToTop();
-loadCartFromStorage();
-loadFavoritesFromStorage();
+window.addEventListener('error', function (e) {
+  console.error('JS Error:', e.message, 'at', e.filename + ':' + e.lineno);
+  if (!renderFinished) {
+    renderNotFound('Произошла ошибка при загрузке страницы. Попробуйте обновить.');
+  }
+});
+
+window.addEventListener('unhandledrejection', function (e) {
+  console.error('Unhandled Promise Rejection:', e.reason);
+  if (!renderFinished) {
+    renderNotFound('Произошла ошибка. Попробуйте обновить страницу.');
+  }
+});
+
+// =============================================
+// ===== ЗАПУСК (каждый шаг защищён) =====
+// =============================================
+try { initAgeGate(); } catch (e) { console.warn('initAgeGate failed:', e); }
+try { initScrollToTop(); } catch (e) { console.warn('initScrollToTop failed:', e); }
+try { loadCartFromStorage(); } catch (e) { console.warn('loadCartFromStorage failed:', e); }
+try { loadFavoritesFromStorage(); } catch (e) { console.warn('loadFavoritesFromStorage failed:', e); }
 loadData();
