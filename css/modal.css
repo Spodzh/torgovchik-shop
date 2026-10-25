@@ -12,10 +12,11 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.78);
     backdrop-filter: blur(10px);
-    z-index: 250;
+    z-index: var(--z-modal);
     align-items: center;
     justify-content: center;
     padding: 20px;
+    overflow-y: auto;
 }
 
 .order-modal.open,
@@ -55,11 +56,17 @@
     cursor: pointer;
     transition: color 0.2s;
     z-index: 2;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
 }
 
 .order-modal__close:hover,
 .avatar-modal__close:hover,
-.banner-modal__close:hover { color: var(--accent); }
+.banner-modal__close:hover { color: var(--accent); background: rgba(216, 137, 50, 0.1); }
 
 .order-modal__content h2,
 .avatar-modal__content h2,
@@ -71,7 +78,7 @@
     margin-bottom: 20px;
 }
 
-/* ===== МОДАЛКА ВХОДА / РЕГИСТРАЦИИ ===== */
+/* ===== ЛОГИН / РЕГИСТРАЦИЯ ===== */
 .login-modal__content {
     background: linear-gradient(180deg, #2A201D 0%, #211815 100%);
     border-radius: 22px;
@@ -246,6 +253,7 @@
     transition: opacity 0.2s;
     line-height: 1;
     flex-shrink: 0;
+    border-radius: 4px;
 }
 
 .auth-field__eye:hover { opacity: 1; }
@@ -465,7 +473,9 @@
     color: #1C1715;
     overflow: hidden;
     border: 3px solid rgba(216, 137, 50, 0.55);
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55), 0 0 24px rgba(216, 137, 50, 0.2);
+    box-shadow:
+        0 8px 28px rgba(0, 0, 0, 0.55),
+        0 0 24px rgba(216, 137, 50, 0.2);
 }
 
 .profile-avatar img {
@@ -699,6 +709,8 @@
     color: var(--text-primary);
     margin-bottom: 4px;
     font-size: 14px;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .order-card .order-date { font-size: 13px; color: var(--text-muted); }
@@ -707,6 +719,7 @@
     font-family: 'Bitter', serif;
     font-weight: 700;
     color: var(--price);
+    white-space: nowrap;
 }
 
 .order-card .order-status {
@@ -921,15 +934,22 @@
 
 .form-group textarea { resize: vertical; }
 
+.form-hint {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    line-height: 1.4;
+}
+
 #orderSubmit { width: 100%; margin-top: 8px; }
+#orderSubmit:disabled { opacity: 0.7; cursor: not-allowed; }
 #orderMessage { margin-top: 16px; font-size: 15px; }
 
 #promoCode:disabled { opacity: 0.6; cursor: not-allowed; }
 #applyPromoBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* =============================================
-   ===== МОДАЛКА ОБЪЯВЛЕНИЯ =====
-   ============================================= */
+/* ===== ОБЪЯВЛЕНИЕ ===== */
 .announcement-modal {
     display: none;
     position: fixed;
@@ -940,12 +960,13 @@
     background: rgba(10, 7, 5, 0.7);
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
-    z-index: 500;
+    z-index: var(--z-announcement);
     align-items: center;
     justify-content: center;
     padding: 20px;
     opacity: 0;
     transition: opacity 0.35s ease;
+    overflow-y: auto;
 }
 
 .announcement-modal.open {
@@ -1005,7 +1026,6 @@
     transform: rotate(90deg);
 }
 
-/* Бейдж "Новость" */
 .announcement-modal__badge {
     display: inline-flex;
     align-items: center;
@@ -1038,7 +1058,6 @@
     50%      { opacity: 0.5; transform: scale(0.75); }
 }
 
-/* ===== ЗАГОЛОВОК ОБЪЯВЛЕНИЯ (КРУПНЫЙ) ===== */
 .announcement-modal__title {
     font-family: 'Bitter', serif;
     font-size: 30px;
@@ -1059,7 +1078,6 @@
 
 .announcement-modal__title:empty { display: none; }
 
-/* Картинка объявления */
 .announcement-modal__image {
     display: block;
     width: 100%;
@@ -1077,7 +1095,6 @@
     display: none;
 }
 
-/* Текст объявления */
 .announcement-modal__text {
     font-family: 'Manrope', sans-serif;
     font-size: 16px;
@@ -1098,54 +1115,27 @@
     border-radius: 60px;
 }
 
-/* Адаптив */
-@media (max-width: 600px) {
-    .announcement-modal {
-        padding: 14px;
-    }
-    .announcement-modal__content {
-        padding: 22px 18px 18px;
-        border-radius: 20px;
-        max-height: 90vh;
-    }
-    .announcement-modal__title {
-        font-size: 22px;
-        margin-bottom: 14px;
-        letter-spacing: 0.3px;
-    }
-    .announcement-modal__image {
-        max-height: 240px;
-        border-radius: 14px;
-    }
-    .announcement-modal__text {
-        font-size: 15px;
-        line-height: 1.6;
-    }
-    .announcement-modal__badge {
-        font-size: 10px;
-        padding: 5px 12px;
-        letter-spacing: 2px;
-        margin-bottom: 14px;
-    }
-    .announcement-modal__ok {
-        padding: 13px 20px;
-        font-size: 14px;
-    }
-}
-
 /* ===== АДАПТИВ ===== */
 @media (max-width: 768px) {
     .order-modal__content,
     .avatar-modal__content,
     .banner-modal__content { padding: 24px 20px; }
-
     .avatar-grid { grid-template-columns: repeat(5, 1fr); gap: 10px; }
 }
 
 @media (max-width: 600px) {
+    .order-modal,
+    .login-modal,
+    .profile-modal,
+    .avatar-modal,
+    .banner-modal,
+    .announcement-modal {
+        padding: 12px;
+    }
+
     .order-modal__content,
     .avatar-modal__content,
-    .banner-modal__content { padding: 20px 16px; }
+    .banner-modal__content { padding: 20px 16px; border-radius: 18px; }
 
     .login-modal__content { padding: 32px 22px 28px; border-radius: 20px; }
     .login-modal__title { font-size: 24px; }
@@ -1153,23 +1143,14 @@
     .auth-field { padding: 0 14px; }
     .auth-field input { padding: 14px 0; font-size: 15px; }
     .auth-submit { padding: 15px 24px; font-size: 15px; }
+    .login-modal__leaf { font-size: 38px; right: 64px; }
 
     .profile-modal__content { padding: 22px 16px 18px; border-radius: 20px; }
     .profile-modal__heading h2 { font-size: 21px; }
 
-    .profile-banner {
-        min-height: 120px;
-        padding: 14px 16px 14px 100px;
-    }
-    .profile-avatar {
-        width: 70px;
-        height: 70px;
-        font-size: 28px;
-    }
-    .profile-avatar-wrap {
-        bottom: -28px;
-        left: 18px;
-    }
+    .profile-banner { min-height: 120px; padding: 14px 16px 14px 100px; }
+    .profile-avatar { width: 70px; height: 70px; font-size: 28px; }
+    .profile-avatar-wrap { bottom: -28px; left: 18px; }
     .profile-banner-wrap { margin-bottom: 42px; }
     .profile-banner__name { font-size: 16px; }
 
@@ -1188,22 +1169,30 @@
 
     .avatar-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
     .banner-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .banner-modal__content h2 { font-size: 20px; }
+
+    .announcement-modal__content {
+        padding: 22px 18px 18px;
+        border-radius: 20px;
+        max-height: 90vh;
+    }
+    .announcement-modal__title { font-size: 22px; margin-bottom: 14px; letter-spacing: 0.3px; }
+    .announcement-modal__image { max-height: 240px; border-radius: 14px; }
+    .announcement-modal__text { font-size: 15px; line-height: 1.6; }
+    .announcement-modal__badge { font-size: 10px; padding: 5px 12px; letter-spacing: 2px; margin-bottom: 14px; }
+    .announcement-modal__ok { padding: 13px 20px; font-size: 14px; }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 375px) {
     .avatar-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .login-modal__title { font-size: 22px; }
     .auth-tab { font-size: 14px; }
-    .login-modal__leaf { font-size: 36px; right: 60px; }
+    .login-modal__leaf { font-size: 32px; right: 56px; }
 
-    .profile-banner {
-        padding: 12px 14px 12px 92px;
-        min-height: 110px;
-    }
+    .profile-banner { padding: 12px 14px 12px 92px; min-height: 110px; }
     .profile-avatar { width: 62px; height: 62px; font-size: 24px; }
     .profile-avatar-wrap { bottom: -24px; left: 14px; }
     .profile-stats-block__value { font-size: 22px; }
 
     .announcement-modal__title { font-size: 20px; }
+    .announcement-modal__content { padding: 20px 14px 16px; }
 }

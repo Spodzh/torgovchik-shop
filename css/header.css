@@ -6,7 +6,7 @@
     padding: 6px 0;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: var(--z-header);
 }
 
 .header__inner {
@@ -78,7 +78,7 @@
     border: none;
     cursor: pointer;
     padding: 6px 0;
-    z-index: 110;
+    z-index: calc(var(--z-header) + 10);
 }
 
 .burger span {
@@ -105,7 +105,7 @@
     backdrop-filter: blur(12px);
     padding: 20px 24px;
     border-bottom: 1px solid var(--border-soft);
-    z-index: 90;
+    z-index: var(--z-mobile-menu);
     border-radius: 0 0 16px 16px;
 }
 
@@ -195,7 +195,6 @@
 
 .user-btn.logged-in { color: var(--text-primary); }
 
-/* ===== АВАТАРКА В КНОПКЕ ПРОФИЛЯ ===== */
 .user-btn__avatar {
     width: 26px;
     height: 26px;
@@ -259,7 +258,7 @@
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.25s ease, transform 0.25s ease;
-    z-index: 1000;
+    z-index: var(--z-tooltip);
 }
 
 .logo-tooltip.show {
@@ -267,7 +266,6 @@
     transform: translateX(-50%) translateY(0) scale(1);
 }
 
-/* Стрелка сверху, указывает на логотип */
 .logo-tooltip::before {
     content: '';
     position: absolute;
@@ -282,6 +280,11 @@
 }
 
 /* ===== АДАПТИВ ===== */
+@media (max-width: 768px) {
+    .nav--desktop { display: none; }
+    .burger { display: flex; }
+}
+
 @media (max-width: 600px) {
     .header { padding: 4px 0; }
     .logo__image { height: 38px; }
@@ -298,6 +301,8 @@
     .user-btn__name { font-size: 13px; }
     .user-btn__tickets { font-size: 12px; }
 
+    .cart-btn { font-size: 13px; padding: 6px 12px; }
+
     .logo-tooltip {
         font-size: 14px;
         padding: 8px 16px;
@@ -305,4 +310,12 @@
         max-width: 240px;
         text-align: center;
     }
+}
+
+@media (max-width: 375px) {
+    .logo__image { height: 34px; }
+    .user-btn__name { display: none; }
+    .user-btn { padding: 4px 8px; gap: 4px; }
+    .cart-btn { padding: 5px 10px; font-size: 12px; }
+    .cart-badge { font-size: 11px; line-height: 18px; padding: 0 6px; min-width: 18px; }
 }

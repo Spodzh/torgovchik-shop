@@ -3,10 +3,36 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Torgovchik — жидкости для POD</title>
+
+    <title>Torgovchik — жидкости для POD-систем в Гомеле</title>
+    <meta name="description" content="Torgovchik — жидкости для POD-систем. Ассортимент оригинальных вкусов, качественные бренды. Работаем в Гомеле." />
+    <meta name="theme-color" content="#1C1715" />
+    <meta name="author" content="Torgovchik" />
+    <meta name="robots" content="index, follow" />
+
+    <link rel="canonical" href="https://spodzh.github.io/torgovchik-shop/" />
+
+    <link rel="icon" type="image/png" href="https://i.ibb.co/VWRmsGHt/logo.png" />
+    <link rel="apple-touch-icon" href="https://i.ibb.co/VWRmsGHt/logo.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Torgovchik" />
+    <meta property="og:title" content="Torgovchik — жидкости для POD-систем" />
+    <meta property="og:description" content="Ассортимент оригинальных вкусов. Только качественные бренды. Работаем в Гомеле." />
+    <meta property="og:image" content="https://i.ibb.co/VWRmsGHt/logo.png" />
+    <meta property="og:url" content="https://spodzh.github.io/torgovchik-shop/" />
+    <meta property="og:locale" content="ru_RU" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Torgovchik — жидкости для POD-систем" />
+    <meta name="twitter:description" content="Ассортимент оригинальных вкусов. Только качественные бренды. Работаем в Гомеле." />
+    <meta name="twitter:image" content="https://i.ibb.co/VWRmsGHt/logo.png" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://i.ibb.co" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/header.css" />
     <link rel="stylesheet" href="css/catalog.css" />
@@ -14,104 +40,128 @@
     <link rel="stylesheet" href="css/modal.css" />
     <link rel="stylesheet" href="css/toast.css" />
     <link rel="stylesheet" href="css/responsive.css" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Torgovchik",
+      "url": "https://spodzh.github.io/torgovchik-shop/",
+      "logo": "https://i.ibb.co/VWRmsGHt/logo.png",
+      "description": "Магазин жидкостей для POD-систем. Работаем в Гомеле.",
+      "areaServed": {
+        "@type": "City",
+        "name": "Гомель"
+      }
+    }
+    </script>
 </head>
 <body>
 
     <header class="header">
         <div class="container header__inner">
-            <a href="#" class="logo">
+            <a href="#" class="logo" aria-label="Torgovchik — на главную">
                 <img src="https://i.ibb.co/VWRmsGHt/logo.png" alt="Torgovchik" class="logo__image">
             </a>
-            <nav class="nav nav--desktop" id="categoryNav">
+
+            <nav class="nav nav--desktop" aria-label="Категории товаров">
                 <button class="category-btn active" data-category="liquids">Жидкости</button>
                 <button class="category-btn" data-category="coils">Испарители/Картриджи</button>
                 <button class="category-btn" data-category="snus">Снюс</button>
                 <button class="category-btn" data-category="disposables">Одноразки/Pod-системы</button>
             </nav>
-            <button class="burger" id="burgerBtn" aria-label="Меню"><span></span><span></span><span></span></button>
+
+            <button class="burger" id="burgerBtn" aria-label="Меню" aria-expanded="false" aria-controls="mobileMenu">
+                <span></span><span></span><span></span>
+            </button>
+
             <div class="mobile-menu" id="mobileMenu">
-                <nav class="mobile-nav">
+                <nav class="mobile-nav" aria-label="Мобильное меню">
                     <button class="category-btn-mobile active" data-category="liquids">Жидкости</button>
                     <button class="category-btn-mobile" data-category="coils">Испарители/Картриджи</button>
                     <button class="category-btn-mobile" data-category="snus">Снюс</button>
                     <button class="category-btn-mobile" data-category="disposables">Одноразки/Pod-системы</button>
                 </nav>
             </div>
+
             <div class="header__user">
-                <button class="user-btn" id="userBtn">👤 Войти</button>
+                <button class="user-btn" id="userBtn" aria-label="Войти в профиль">👤 Войти</button>
             </div>
-            <button class="cart-btn" id="cartToggle">
-                <span class="cart-icon">🛒</span>
-                <span class="cart-badge" id="cartCount">0</span>
+
+            <button class="cart-btn" id="cartToggle" aria-label="Открыть корзину">
+                <span class="cart-icon" aria-hidden="true">🛒</span>
+                <span class="cart-badge" id="cartCount" aria-live="polite">0</span>
             </button>
         </div>
     </header>
 
-    <section class="hero">
-        <span class="hero__leaf hero__leaf--tl">🍁</span>
-        <span class="hero__leaf hero__leaf--tr">🍂</span>
-        <span class="hero__leaf hero__leaf--bl">🍂</span>
-        <span class="hero__leaf hero__leaf--br">🍁</span>
-        <div class="container">
-            <div class="hero__box">
-                <div class="hero__content">
-                    <h1>Ассортимент <br>для <span class="accent">Pod-систем.</span></h1>
-                    <p>Ассортимент оригинальных вкусов.<br>Только качественные бренды.<br>Работаем в Гомеле.</p>
-                    <a href="#catalog" class="btn btn-primary">Смотреть ассортимент <span class="btn-arrow">→</span></a>
+    <main>
+        <section class="hero">
+            <span class="hero__leaf hero__leaf--tl" aria-hidden="true">🍁</span>
+            <span class="hero__leaf hero__leaf--tr" aria-hidden="true">🍂</span>
+            <span class="hero__leaf hero__leaf--bl" aria-hidden="true">🍂</span>
+            <span class="hero__leaf hero__leaf--br" aria-hidden="true">🍁</span>
+            <div class="container">
+                <div class="hero__box">
+                    <div class="hero__content">
+                        <h1>Ассортимент <br>для <span class="accent">Pod-систем.</span></h1>
+                        <p>Ассортимент оригинальных вкусов.<br>Только качественные бренды.<br>Работаем в Гомеле.</p>
+                        <a href="#catalog" class="btn btn-primary">Смотреть ассортимент <span class="btn-arrow" aria-hidden="true">→</span></a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="catalog" id="catalog">
-        <div class="container"><div id="categoryContent"></div></div>
-    </section>
+        <section class="catalog" id="catalog">
+            <div class="container"><div id="categoryContent"></div></div>
+        </section>
 
-    <section class="about" id="about">
-        <div class="container">
-            <h2 class="section-title">О нас</h2>
-            <div class="about__grid">
-                <div class="about__card">
-                    <div class="about__icon">🍓</div>
-                    <div><h3>Оригинальная продукция</h3><p>Мы работаем только с проверенными поставщиками.</p></div>
-                </div>
-                <div class="about__card">
-                    <div class="about__icon">🤝</div>
-                    <div><h3>Профессиональный подход</h3><p>Консультанты помогут подобрать идеальный вкус.</p></div>
-                </div>
-                <div class="about__card">
-                    <div class="about__icon">🎁</div>
-                    <div><h3>Выгодные условия</h3><p>Акции, скидки и бонусы для постоянных клиентов.</p></div>
+        <section class="about" id="about">
+            <div class="container">
+                <h2 class="section-title">О нас</h2>
+                <div class="about__grid">
+                    <div class="about__card">
+                        <div class="about__icon" aria-hidden="true">🍓</div>
+                        <div><h3>Оригинальная продукция</h3><p>Мы работаем только с проверенными поставщиками.</p></div>
+                    </div>
+                    <div class="about__card">
+                        <div class="about__icon" aria-hidden="true">🤝</div>
+                        <div><h3>Профессиональный подход</h3><p>Консультанты помогут подобрать идеальный вкус.</p></div>
+                    </div>
+                    <div class="about__card">
+                        <div class="about__icon" aria-hidden="true">🎁</div>
+                        <div><h3>Выгодные условия</h3><p>Акции, скидки и бонусы для постоянных клиентов.</p></div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="faq" id="faq">
-        <div class="container">
-            <h2 class="section-title">Частые вопросы</h2>
-            <div class="faq__list">
-                <div class="faq__item"><div class="faq__question">Какие способы оплаты доступны?</div><div class="faq__answer">Оплата принимается только наличными при самовывозе.</div></div>
-                <div class="faq__item"><div class="faq__question">Как получить заказ?</div><div class="faq__answer">Самовывоз из магазина в Гомеле или доставка по городу.</div></div>
-                <div class="faq__item"><div class="faq__question">Есть ли доставка за пределы Гомеля?</div><div class="faq__answer">На данный момент работаем только по Гомелю.</div></div>
-                <div class="faq__item"><div class="faq__question">Можно ли вернуть товар?</div><div class="faq__answer">Да, в течение 14 дней при сохранении упаковки. Вскрытый товар возврату не подлежит.</div></div>
-                <div class="faq__item"><div class="faq__question">Как долго обрабатывается заказ?</div><div class="faq__answer">Обычно 1–2 часа после подтверждения.</div></div>
-                <div class="faq__item"><div class="faq__question">Что делать, если я не нашёл ответ?</div><div class="faq__answer">Напишите нам в Telegram — ответим быстро!</div></div>
+        <section class="faq" id="faq">
+            <div class="container">
+                <h2 class="section-title">Частые вопросы</h2>
+                <div class="faq__list">
+                    <div class="faq__item"><div class="faq__question">Какие способы оплаты доступны?</div><div class="faq__answer">Оплата принимается только наличными при самовывозе.</div></div>
+                    <div class="faq__item"><div class="faq__question">Как получить заказ?</div><div class="faq__answer">Самовывоз из магазина в Гомеле или доставка по городу.</div></div>
+                    <div class="faq__item"><div class="faq__question">Есть ли доставка за пределы Гомеля?</div><div class="faq__answer">На данный момент работаем только по Гомелю.</div></div>
+                    <div class="faq__item"><div class="faq__question">Можно ли вернуть товар?</div><div class="faq__answer">Да, в течение 14 дней при сохранении упаковки. Вскрытый товар возврату не подлежит.</div></div>
+                    <div class="faq__item"><div class="faq__question">Как долго обрабатывается заказ?</div><div class="faq__answer">Обычно 1–2 часа после подтверждения.</div></div>
+                    <div class="faq__item"><div class="faq__question">Что делать, если я не нашёл ответ?</div><div class="faq__answer">Напишите нам в Telegram — ответим быстро!</div></div>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="contacts" id="contacts">
-        <div class="container">
-            <h2 class="section-title">Контакты</h2>
-            <div class="contacts__simple">
-                <svg class="contacts__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28">
-                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-                </svg>
-                <a href="https://t.me/+oB1FldrU8v02NjEx" target="_blank" class="contacts__btn">Написать в Telegram</a>
+        <section class="contacts" id="contacts">
+            <div class="container">
+                <h2 class="section-title">Контакты</h2>
+                <div class="contacts__simple">
+                    <svg class="contacts__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                    </svg>
+                    <a href="https://t.me/+oB1FldrU8v02NjEx" target="_blank" rel="noopener noreferrer" class="contacts__btn">Написать в Telegram</a>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
     <footer class="footer">
         <div class="container">
@@ -122,23 +172,29 @@
         </div>
     </footer>
 
-    <div class="cart-panel" id="cartPanel">
-        <div class="cart-panel__header"><h3>Корзина</h3><button class="cart-panel__close" id="cartClose">✕</button></div>
-        <div class="cart-panel__body" id="cartItems"><p class="cart-empty">Корзина пуста</p></div>
+    <!-- Корзина -->
+    <aside class="cart-panel" id="cartPanel" aria-hidden="true" aria-label="Корзина">
+        <div class="cart-panel__header">
+            <h3>Корзина</h3>
+            <button class="cart-panel__close" id="cartClose" aria-label="Закрыть корзину">✕</button>
+        </div>
+        <div class="cart-panel__body" id="cartItems">
+            <p class="cart-empty">Корзина пуста</p>
+        </div>
         <div class="cart-panel__footer">
             <p><strong>Итого: <span id="cartTotal">0</span> BYN</strong></p>
             <button class="btn btn-primary" id="checkoutBtn">Оформить заказ</button>
         </div>
-    </div>
+    </aside>
 
-    <div class="overlay" id="overlay"></div>
-    <div class="toast-container" id="toastContainer"></div>
+    <div class="overlay" id="overlay" aria-hidden="true"></div>
+    <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
 
-    <!-- ===== МОДАЛКА ОБЪЯВЛЕНИЯ (УПРАВЛЯЕТСЯ ИЗ БОТА) ===== -->
-    <div class="announcement-modal" id="announcementModal">
+    <!-- Модалка объявления -->
+    <div class="announcement-modal" id="announcementModal" role="dialog" aria-modal="true" aria-labelledby="announcementTitle" aria-hidden="true">
         <div class="announcement-modal__content">
-            <button class="announcement-modal__close" id="announcementClose" aria-label="Закрыть">✕</button>
-            <div class="announcement-modal__badge">
+            <button class="announcement-modal__close" id="announcementClose" aria-label="Закрыть объявление">✕</button>
+            <div class="announcement-modal__badge" aria-hidden="true">
                 <span class="announcement-modal__badge-dot"></span>
                 Новость
             </div>
@@ -149,60 +205,59 @@
         </div>
     </div>
 
-    <!-- ===== МОДАЛКА ВХОДА / РЕГИСТРАЦИИ ===== -->
-    <div class="login-modal" id="loginModal">
+    <!-- Модалка входа -->
+    <div class="login-modal" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-hidden="true">
         <div class="login-modal__content">
-            <button class="login-modal__close" id="loginModalClose">✕</button>
-            <span class="login-modal__leaf">🍁</span>
+            <button class="login-modal__close" id="loginModalClose" aria-label="Закрыть окно входа">✕</button>
+            <span class="login-modal__leaf" aria-hidden="true">🍁</span>
             <div class="login-modal__brand">TORGOVCHIK</div>
             <h2 class="login-modal__title" id="authTitle">С возвращением</h2>
             <p class="login-modal__subtitle" id="authSubtitle">Войдите, чтобы продолжить покупки</p>
-            <div class="auth-tabs">
-                <button type="button" class="auth-tab active" data-tab="login">Вход</button>
-                <button type="button" class="auth-tab" data-tab="register">Регистрация</button>
+            <div class="auth-tabs" role="tablist">
+                <button type="button" class="auth-tab active" data-tab="login" role="tab" aria-selected="true">Вход</button>
+                <button type="button" class="auth-tab" data-tab="register" role="tab" aria-selected="false">Регистрация</button>
             </div>
             <form id="authForm" novalidate>
                 <div class="auth-field">
-                    <span class="auth-field__icon">👤</span>
-                    <input type="text" id="loginInput" placeholder="Username без @" autocomplete="username">
+                    <span class="auth-field__icon" aria-hidden="true">👤</span>
+                    <input type="text" id="loginInput" placeholder="Username без @" autocomplete="username" aria-label="Username" maxlength="33">
                 </div>
-                <div class="auth-error" id="usernameError"></div>
+                <div class="auth-error" id="usernameError" role="alert"></div>
                 <div class="auth-field">
-                    <span class="auth-field__icon">🔒</span>
-                    <input type="password" id="loginPassword" placeholder="Пароль" autocomplete="current-password">
+                    <span class="auth-field__icon" aria-hidden="true">🔒</span>
+                    <input type="password" id="loginPassword" placeholder="Пароль" autocomplete="current-password" aria-label="Пароль">
                     <button type="button" class="auth-field__eye" id="togglePassword" aria-label="Показать пароль">👁</button>
                 </div>
-                <div class="auth-error" id="passwordError"></div>
+                <div class="auth-error" id="passwordError" role="alert"></div>
                 <div class="auth-forgot" id="authForgot">
                     <a href="#" id="forgotPasswordLink">Забыли пароль?</a>
                 </div>
                 <button type="submit" class="btn btn-primary auth-submit" id="authSubmitBtn">
                     <span id="authSubmitText">Войти</span>
-                    <span class="auth-submit__arrow">→</span>
+                    <span class="auth-submit__arrow" aria-hidden="true">→</span>
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- ===== МОДАЛКА ПРОФИЛЯ ===== -->
-    <div class="profile-modal" id="profileModal">
+    <!-- Модалка профиля -->
+    <div class="profile-modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle" aria-hidden="true">
         <div class="profile-modal__content">
-
             <div class="profile-modal__top">
                 <div class="profile-modal__heading">
-                    <svg class="profile-modal__heading-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="profile-modal__heading-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                         <circle cx="12" cy="7" r="4"/>
                     </svg>
-                    <h2>Мой профиль</h2>
+                    <h2 id="profileModalTitle">Мой профиль</h2>
                 </div>
-                <button class="profile-modal__close" id="profileModalClose">✕</button>
+                <button class="profile-modal__close" id="profileModalClose" aria-label="Закрыть профиль">✕</button>
             </div>
 
             <div class="profile-banner-wrap">
                 <div class="profile-banner" id="profileHeader">
-                    <button class="banner-edit-btn" id="bannerEditBtn" title="Сменить шапку">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <button class="banner-edit-btn" id="bannerEditBtn" title="Сменить шапку" aria-label="Сменить шапку профиля">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M12 20h9"/>
                             <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/>
                         </svg>
@@ -212,9 +267,9 @@
                     <div class="profile-banner__name" id="profileName">Пользователь</div>
                 </div>
                 <div class="profile-avatar-wrap">
-                    <div class="profile-avatar" id="profileAvatar">👤</div>
-                    <button class="avatar-edit-btn" id="avatarEditBtn" title="Сменить аватарку">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <div class="profile-avatar" id="profileAvatar" aria-label="Аватар пользователя">👤</div>
+                    <button class="avatar-edit-btn" id="avatarEditBtn" title="Сменить аватарку" aria-label="Сменить аватарку">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M12 20h9"/>
                             <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/>
                         </svg>
@@ -224,7 +279,7 @@
 
             <div class="profile-stats-panel">
                 <div class="profile-stats-block">
-                    <div class="profile-stats-block__icon">
+                    <div class="profile-stats-block__icon" aria-hidden="true">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
                             <path d="M13 5v14"/>
@@ -235,7 +290,7 @@
                 </div>
                 <div class="profile-stats-block__divider"></div>
                 <div class="profile-stats-block">
-                    <div class="profile-stats-block__icon">
+                    <div class="profile-stats-block__icon" aria-hidden="true">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
                             <path d="m3.3 7 8.7 5 8.7-5"/>
@@ -251,7 +306,7 @@
 
             <div class="orders-section">
                 <h3 class="orders-section__title">
-                    <span class="orders-section__icon">
+                    <span class="orders-section__icon" aria-hidden="true">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
                             <path d="m3.3 7 8.7 5 8.7-5"/>
@@ -264,7 +319,7 @@
             </div>
 
             <button class="btn-logout" id="profileLogout">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                     <polyline points="16 17 21 12 16 7"/>
                     <line x1="21" x2="9" y1="12" y2="12"/>
@@ -274,11 +329,11 @@
         </div>
     </div>
 
-    <!-- ===== МОДАЛКА ВЫБОРА АВАТАРКИ ===== -->
-    <div class="avatar-modal" id="avatarModal">
+    <!-- Модалка аватарки -->
+    <div class="avatar-modal" id="avatarModal" role="dialog" aria-modal="true" aria-labelledby="avatarModalTitle" aria-hidden="true">
         <div class="avatar-modal__content">
-            <button class="avatar-modal__close" id="avatarModalClose">✕</button>
-            <h2>🎨 Выберите аватарку</h2>
+            <button class="avatar-modal__close" id="avatarModalClose" aria-label="Закрыть выбор аватарки">✕</button>
+            <h2 id="avatarModalTitle">🎨 Выберите аватарку</h2>
             <p class="avatar-modal__hint">Нажмите на понравившуюся и подтвердите выбор</p>
             <div class="avatar-grid" id="avatarGrid"></div>
             <div class="avatar-modal__buttons">
@@ -288,11 +343,11 @@
         </div>
     </div>
 
-    <!-- ===== МОДАЛКА ВЫБОРА ШАПКИ ===== -->
-    <div class="banner-modal" id="bannerModal">
+    <!-- Модалка шапки -->
+    <div class="banner-modal" id="bannerModal" role="dialog" aria-modal="true" aria-labelledby="bannerModalTitle" aria-hidden="true">
         <div class="banner-modal__content">
-            <button class="banner-modal__close" id="bannerModalClose">✕</button>
-            <h2>🎨 Шапка профиля</h2>
+            <button class="banner-modal__close" id="bannerModalClose" aria-label="Закрыть выбор шапки">✕</button>
+            <h2 id="bannerModalTitle">🎨 Шапка профиля</h2>
             <p class="banner-modal__hint">Выберите фон для профиля или уберите шапку</p>
             <div class="banner-grid" id="bannerGrid"></div>
             <div class="banner-modal__buttons">
@@ -302,27 +357,40 @@
         </div>
     </div>
 
-    <!-- ===== МОДАЛЬНОЕ ОКНО ФОРМЫ ЗАКАЗА ===== -->
-    <div class="order-modal" id="orderModal">
+    <!-- Модалка заказа -->
+    <div class="order-modal" id="orderModal" role="dialog" aria-modal="true" aria-labelledby="orderModalTitle" aria-hidden="true">
         <div class="order-modal__content">
-            <button class="order-modal__close" id="orderModalClose">✕</button>
-            <h2>Оформление заказа</h2>
-            <form id="orderForm">
-                <div class="form-group"><label for="orderName">Ваше имя *</label><input type="text" id="orderName" required placeholder="Иван Иванов"></div>
-                <div class="form-group"><label for="orderTelegram">Ваш Telegram (username) *</label><input type="text" id="orderTelegram" required placeholder="@username"></div>
-                <div class="form-group"><label for="orderAddress">Адрес (для доставки)</label><input type="text" id="orderAddress" placeholder="г. Гомель, ул. ..."></div>
-                <div class="form-group"><label for="orderComment">Комментарий к заказу</label><textarea id="orderComment" rows="3" placeholder="Пожелания, особые условия"></textarea></div>
+            <button class="order-modal__close" id="orderModalClose" aria-label="Закрыть оформление заказа">✕</button>
+            <h2 id="orderModalTitle">Оформление заказа</h2>
+            <form id="orderForm" novalidate>
+                <div class="form-group">
+                    <label for="orderName">Ваше имя *</label>
+                    <input type="text" id="orderName" required placeholder="Иван Иванов" autocomplete="name" maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label for="orderTelegram">Ваш Telegram (username) *</label>
+                    <input type="text" id="orderTelegram" required placeholder="@username" autocomplete="off" maxlength="33">
+                    <small class="form-hint">5–32 символа: латиница, цифры и _. Начинается с буквы.</small>
+                </div>
+                <div class="form-group">
+                    <label for="orderAddress">Адрес (для доставки)</label>
+                    <input type="text" id="orderAddress" placeholder="г. Гомель, ул. ..." autocomplete="street-address" maxlength="200">
+                </div>
+                <div class="form-group">
+                    <label for="orderComment">Комментарий к заказу</label>
+                    <textarea id="orderComment" rows="3" placeholder="Пожелания, особые условия" maxlength="500"></textarea>
+                </div>
                 <div class="form-group">
                     <label for="promoCode">Промокод</label>
                     <div style="display:flex; gap:10px;">
-                        <input type="text" id="promoCode" placeholder="Введите промокод" style="flex:1;">
+                        <input type="text" id="promoCode" placeholder="Введите промокод" style="flex:1;" autocomplete="off" maxlength="50">
                         <button type="button" class="btn btn-primary" id="applyPromoBtn" style="padding:12px 20px; font-size:14px; white-space:nowrap;">Применить</button>
                     </div>
-                    <div id="promoMessage" style="font-size:14px; margin-top:6px; color:#B9A99A;"></div>
+                    <div id="promoMessage" role="status" style="font-size:14px; margin-top:6px; color:#B9A99A;"></div>
                 </div>
                 <div class="form-group"><button type="submit" class="btn btn-primary" id="orderSubmit">Отправить заказ</button></div>
             </form>
-            <div id="orderMessage" style="display:none; text-align:center; margin-top:10px;"></div>
+            <div id="orderMessage" role="status" style="display:none; text-align:center; margin-top:10px;"></div>
         </div>
     </div>
 

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Страница не найдена — Torgovchik</title>
+    <meta name="description" content="Страница не найдена. Вернитесь на главную страницу магазина Torgovchik." />
+    <meta name="theme-color" content="#1C1715" />
+    <meta name="robots" content="noindex, follow" />
+
+    <link rel="icon" type="image/png" href="https://i.ibb.co/VWRmsGHt/logo.png" />
+    <link rel="apple-touch-icon" href="https://i.ibb.co/VWRmsGHt/logo.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/header.css" />
+
+    <style>
+        .notfound {
+            min-height: calc(100vh - 200px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        .notfound__inner {
+            max-width: 520px;
+        }
+        .notfound__code {
+            font-family: 'Bitter', serif;
+            font-size: 120px;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--accent);
+            text-shadow:
+                0 0 40px rgba(216, 137, 50, 0.45),
+                0 4px 20px rgba(0, 0, 0, 0.6);
+            margin-bottom: 16px;
+            letter-spacing: -4px;
+        }
+        .notfound__title {
+            font-family: 'Bitter', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        .notfound__text {
+            font-family: 'Manrope', sans-serif;
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+        .notfound__leaf {
+            font-size: 42px;
+            opacity: 0.35;
+            display: block;
+            margin-bottom: 8px;
+        }
+        @media (max-width: 600px) {
+            .notfound__code { font-size: 88px; }
+            .notfound__title { font-size: 22px; }
+            .notfound__text { font-size: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header__inner">
+            <a href="index.html" class="logo" aria-label="Torgovchik — на главную">
+                <img src="https://i.ibb.co/VWRmsGHt/logo.png" alt="Torgovchik" class="logo__image">
+            </a>
+        </div>
+    </header>
+
+    <main class="notfound">
+        <div class="notfound__inner">
+            <span class="notfound__leaf" aria-hidden="true">🍂</span>
+            <div class="notfound__code">404</div>
+            <h1 class="notfound__title">Страница не найдена</h1>
+            <p class="notfound__text">
+                Кажется, эта страница уже улетела с осенним ветром.<br>
+                Но у нас есть что-то повкуснее — загляни в каталог.
+            </p>
+            <a href="index.html" class="btn btn-primary">← Вернуться на главную</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 Torgovchik. Все права защищены.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

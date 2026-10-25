@@ -42,7 +42,7 @@ const BANNERS = [
 ];
 
 // =============================================
-// ===== ФРАЗЫ НА ЛОГОТИПЕ (пасхалка) =====
+// ===== ФРАЗЫ НА ЛОГОТИПЕ =====
 // =============================================
 const LOGO_PHRASES = [
     'Купил жижу? 😏',
@@ -70,6 +70,125 @@ let referralCode = null;
 let pendingAvatarId = null;
 let pendingBannerId = null;
 let currentAuthTab = 'login';
+let currentCategory = 'liquids';
+let orderIdempotencyKey = null;
+
+// =============================================
+// ===== УТИЛИТЫ =====
+// =============================================
+function generateUUID() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+function validateTelegramUsername(raw) {
+  if (!raw || typeof raw !== 'string') return 'Введите Telegram username';
+  const clean = raw.trim().startsWith('@') ? raw.trim().slice(1) : raw.trim();
+  if (clean.length === 0) return 'Введите Telegram username';
+  if (clean.length < 5) return 'Username должен быть минимум 5 символов';
+  if (clean.length > 32) return 'Username должен быть максимум 32 символа';
+  if (!/^[a-zA-Z]/.test(clean)) return 'Username должен начинаться с буквы';
+  if (!/^[a-zA-Z0-9_]+$/.test(clean)) return 'Только латиница, цифры и _';
+  if (clean.endsWith('_')) return 'Username не может заканчиваться на _';
+  if (clean.includes('__')) return 'Нельзя использовать __ подряд';
+  return null;
+}
+
+function normalizeTelegramUsername(raw) {
+  if (!raw) return '';
+  const trimmed = raw.trim();
+  return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
+}
+
+// =============================================
+// ===== УТИЛИТЫ МОДАЛОК (a11y) =====
+// =============================================
+function updateBodyOverflow() {
+  const anyOpen = document.querySelector(
+    '.login-modal.open, .profile-modal.open, .avatar-modal.open, .banner-modal.open, .order-modal.open, .announcement-modal.open'
+  );
+  document.body.style.overflow = anyOpen ? 'hidden' : '';
+}
+
+function setupModal(modalId, onClose) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return null;
+
+  const closeFn = () => {
+    modal.classList.remove('open');
+    updateBodyOverflow();
+    if (typeof onClose === 'function') onClose();
+  };
+
+  const getFocusable = () =>
+    modal.querySelectorAll(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+
+  let lastFocused = null;
+  let wasOpen = false;
+
+  modal.addEventListener('keydown', (e) => {
+    if (!modal.classList.contains('open')) return;
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeFn();
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      const focusable = Array.from(getFocusable()).filter(el => el.offsetParent !== null);
+      if (focusable.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeFn();
+  });
+
+  const observer = new MutationObserver(() => {
+    const isOpen = modal.classList.contains('open');
+
+    if (isOpen && !wasOpen) {
+      lastFocused = document.activeElement;
+      updateBodyOverflow();
+      setTimeout(() => {
+        const focusable = Array.from(getFocusable()).filter(el => el.offsetParent !== null);
+        if (focusable.length) focusable[0].focus();
+      }, 60);
+    } else if (!isOpen && wasOpen) {
+      updateBodyOverflow();
+      if (lastFocused && typeof lastFocused.focus === 'function') {
+        try { lastFocused.focus(); } catch (e) {}
+      }
+    }
+
+    wasOpen = isOpen;
+  });
+  observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+
+  return { modal, closeFn };
+}
 
 // =============================================
 // ===== ЗАГРУЗКА ТОВАРОВ И ПРОМОКОДОВ =====
@@ -80,24 +199,23 @@ async function loadProducts() {
     if (!response.ok) throw new Error('Ошибка загрузки товаров');
     products = await response.json();
     await loadPromocodes();
-    const activeCategory = document.querySelector('.category-btn.active');
-    if (activeCategory) {
-      switchCategory(activeCategory.dataset.category);
-    } else {
-      switchCategory('liquids');
-    }
+    switchCategory(currentCategory);
   } catch (error) {
     console.error('Ошибка загрузки товаров:', error);
     products = [];
-    showToast('⚠️ Не удалось загрузить ассортимент', 'error');
+    document.getElementById('categoryContent').innerHTML = `
+      <div class="placeholder">
+        <h3>Не удалось загрузить каталог</h3>
+        <p>Проверьте интернет-соединение</p>
+        <button class="btn btn-primary" onclick="loadProducts()" style="margin-top:20px;">Повторить</button>
+      </div>`;
   }
 }
 
 async function loadPromocodes() {
   try {
     const response = await fetch(WORKER_URL + 'promocodes');
-    if (!response.ok) throw new Error('Ошибка загрузки промокодов');
-    promocodes = await response.json();
+    if (response.ok) promocodes = await response.json();
   } catch (error) {
     console.error('Ошибка загрузки промокодов:', error);
     promocodes = [];
@@ -117,7 +235,7 @@ function checkReferral() {
 }
 
 // =============================================
-// ===== ОБЪЯВЛЕНИЕ (ВСПЛЫВАЮЩЕЕ ОКНО) =====
+// ===== ОБЪЯВЛЕНИЕ =====
 // =============================================
 async function checkAnnouncement() {
   try {
@@ -145,7 +263,6 @@ function showAnnouncement(data, seenKey) {
   const text = document.getElementById('announcementText');
   if (!modal) return;
 
-  // Заголовок
   if (data.title) {
     titleEl.textContent = data.title;
     titleEl.style.display = 'block';
@@ -154,7 +271,6 @@ function showAnnouncement(data, seenKey) {
     titleEl.style.display = 'none';
   }
 
-  // Картинка
   if (data.image) {
     img.src = data.image;
     img.style.display = 'block';
@@ -163,7 +279,6 @@ function showAnnouncement(data, seenKey) {
     img.style.display = 'none';
   }
 
-  // Текст
   if (data.text) {
     text.textContent = data.text;
     text.style.display = 'block';
@@ -173,30 +288,11 @@ function showAnnouncement(data, seenKey) {
   }
 
   modal.classList.add('open');
-  document.body.style.overflow = 'hidden';
-
   localStorage.setItem(seenKey, '1');
-
-  const close = () => {
-    modal.classList.remove('open');
-    document.body.style.overflow = '';
-  };
-
-  document.getElementById('announcementClose').onclick = close;
-  document.getElementById('announcementOk').onclick = close;
-  modal.onclick = (e) => { if (e.target === modal) close(); };
-
-  const escHandler = (e) => {
-    if (e.key === 'Escape') {
-      close();
-      document.removeEventListener('keydown', escHandler);
-    }
-  };
-  document.addEventListener('keydown', escHandler);
 }
 
 // =============================================
-// ===== СИСТЕМА ПРОФИЛЕЙ =====
+// ===== ПРОФИЛЬ =====
 // =============================================
 async function loadUserProfile(telegram) {
   try {
@@ -312,7 +408,7 @@ function updateProfileUI() {
           <div class="order-card ${status}">
             <div class="order-header">
               <span>Заказ #${order.id ? order.id.slice(-6) : '—'}</span>
-              <span class="order-total">${Math.round(total)} BYN</span>
+              <span class="order-total">${Number(total).toFixed(2)} BYN</span>
             </div>
             <div class="order-date">${date}</div>
             <span class="order-status ${status}">${statusLabel}</span>
@@ -337,9 +433,7 @@ function updateProfileUI() {
     applyAvatar(document.getElementById('profileAvatar'), null, null);
 
     const profileBanner = document.getElementById('profileHeader');
-    if (profileBanner) {
-      profileBanner.style.backgroundImage = '';
-    }
+    if (profileBanner) profileBanner.style.backgroundImage = '';
 
     const ordersDiv = document.getElementById('profileOrders');
     if (ordersDiv) {
@@ -364,26 +458,36 @@ function openAvatarModal() {
   document.getElementById('avatarModal').classList.add('open');
 }
 
-function closeAvatarModal() {
-  document.getElementById('avatarModal').classList.remove('open');
-  pendingAvatarId = null;
-}
-
 function renderAvatarGrid() {
   const grid = document.getElementById('avatarGrid');
   grid.innerHTML = AVATARS.map(a => `
     <div class="avatar-option ${pendingAvatarId === a.id ? 'selected' : ''}"
          data-avatar-id="${a.id}"
-         title="Аватарка ${a.id}">
+         title="Аватарка ${a.id}"
+         role="button"
+         tabindex="0"
+         aria-label="Аватарка ${a.id}"
+         aria-pressed="${pendingAvatarId === a.id ? 'true' : 'false'}">
       <img src="${a.image}" alt="Аватарка ${a.id}" loading="lazy">
     </div>
   `).join('');
 
   grid.querySelectorAll('.avatar-option').forEach(el => {
-    el.addEventListener('click', () => {
+    const select = () => {
       pendingAvatarId = parseInt(el.dataset.avatarId);
-      grid.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+      grid.querySelectorAll('.avatar-option').forEach(o => {
+        o.classList.remove('selected');
+        o.setAttribute('aria-pressed', 'false');
+      });
       el.classList.add('selected');
+      el.setAttribute('aria-pressed', 'true');
+    };
+    el.addEventListener('click', select);
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        select();
+      }
     });
   });
 }
@@ -406,10 +510,7 @@ async function saveAvatar() {
     const response = await fetch(WORKER_URL + 'update-avatar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        telegram: currentUser.telegram,
-        avatar: pendingAvatarId
-      })
+      body: JSON.stringify({ telegram: currentUser.telegram, avatar: pendingAvatarId })
     });
 
     const data = await response.json();
@@ -417,7 +518,7 @@ async function saveAvatar() {
 
     currentUser.avatar = pendingAvatarId;
     updateProfileUI();
-    closeAvatarModal();
+    avatarModalCtrl.closeFn();
     showToast('✅ Аватарка обновлена!', 'success');
   } catch (err) {
     showToast(`❌ ${err.message}`, 'error');
@@ -428,17 +529,12 @@ async function saveAvatar() {
 }
 
 // =============================================
-// ===== ШАПКА ПРОФИЛЯ =====
+// ===== ШАПКА =====
 // =============================================
 function openBannerModal() {
   pendingBannerId = (currentUser && currentUser.banner) ? currentUser.banner : null;
   renderBannerGrid();
   document.getElementById('bannerModal').classList.add('open');
-}
-
-function closeBannerModal() {
-  document.getElementById('bannerModal').classList.remove('open');
-  pendingBannerId = null;
 }
 
 function renderBannerGrid() {
@@ -447,14 +543,29 @@ function renderBannerGrid() {
     <div class="banner-option ${pendingBannerId === b.id ? 'selected' : ''}"
          data-banner-id="${b.id}"
          style="background-image: url('${b.image}');"
-         title="Шапка ${b.id}"></div>
+         title="Шапка ${b.id}"
+         role="button"
+         tabindex="0"
+         aria-label="Шапка ${b.id}"
+         aria-pressed="${pendingBannerId === b.id ? 'true' : 'false'}"></div>
   `).join('');
 
   grid.querySelectorAll('.banner-option').forEach(el => {
-    el.addEventListener('click', () => {
+    const select = () => {
       pendingBannerId = parseInt(el.dataset.bannerId);
-      grid.querySelectorAll('.banner-option').forEach(o => o.classList.remove('selected'));
+      grid.querySelectorAll('.banner-option').forEach(o => {
+        o.classList.remove('selected');
+        o.setAttribute('aria-pressed', 'false');
+      });
       el.classList.add('selected');
+      el.setAttribute('aria-pressed', 'true');
+    };
+    el.addEventListener('click', select);
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        select();
+      }
     });
   });
 }
@@ -473,10 +584,7 @@ async function saveBanner() {
     const response = await fetch(WORKER_URL + 'update-banner', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        telegram: currentUser.telegram,
-        banner: pendingBannerId
-      })
+      body: JSON.stringify({ telegram: currentUser.telegram, banner: pendingBannerId })
     });
 
     const data = await response.json();
@@ -484,7 +592,7 @@ async function saveBanner() {
 
     currentUser.banner = pendingBannerId;
     updateProfileUI();
-    closeBannerModal();
+    bannerModalCtrl.closeFn();
     showToast(pendingBannerId ? '✅ Шапка обновлена!' : '✅ Шапка убрана', 'success');
   } catch (err) {
     showToast(`❌ ${err.message}`, 'error');
@@ -497,34 +605,21 @@ async function saveBanner() {
 function removeBanner() {
   pendingBannerId = null;
   const grid = document.getElementById('bannerGrid');
-  grid.querySelectorAll('.banner-option').forEach(o => o.classList.remove('selected'));
+  grid.querySelectorAll('.banner-option').forEach(o => {
+    o.classList.remove('selected');
+    o.setAttribute('aria-pressed', 'false');
+  });
 }
 
 // =============================================
-// ===== КОПИРОВАНИЕ РЕФЕРАЛЬНОЙ ССЫЛКИ =====
-// =============================================
-window.copyReferralLink = function(link) {
-  navigator.clipboard.writeText(link).then(() => {
-    showToast('🔗 Реферальная ссылка скопирована!', 'success');
-  }).catch(() => {
-    const input = document.createElement('input');
-    input.value = link;
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand('copy');
-    document.body.removeChild(input);
-    showToast('🔗 Реферальная ссылка скопирована!', 'success');
-  });
-};
-
-// =============================================
-// ===== ВХОД / РЕГИСТРАЦИЯ =====
+// ===== АВТОРИЗАЦИЯ =====
 // =============================================
 function switchAuthTab(tab) {
   currentAuthTab = tab;
-  document.querySelectorAll('.auth-tab').forEach(t =>
-    t.classList.toggle('active', t.dataset.tab === tab)
-  );
+  document.querySelectorAll('.auth-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+    t.setAttribute('aria-selected', t.dataset.tab === tab ? 'true' : 'false');
+  });
 
   const title = document.getElementById('authTitle');
   const subtitle = document.getElementById('authSubtitle');
@@ -560,7 +655,11 @@ function clearAuthErrors() {
 function showFieldError(fieldId, errorId, message) {
   const field = document.getElementById(fieldId);
   const error = document.getElementById(errorId);
-  if (field) field.closest('.auth-field').classList.add('error');
+  if (field) {
+    field.closest('.auth-field').classList.add('error');
+    field.setAttribute('aria-invalid', 'true');
+    field.setAttribute('aria-describedby', errorId);
+  }
   if (error) {
     error.textContent = message;
     error.classList.add('visible');
@@ -581,11 +680,12 @@ async function login() {
 
   const input = document.getElementById('loginInput');
   const passwordInput = document.getElementById('loginPassword');
-  const username = input.value.trim();
+  const username = normalizeTelegramUsername(input.value);
   const password = passwordInput.value.trim();
 
-  if (!username) {
-    showFieldError('loginInput', 'usernameError', 'Введите username');
+  const userErr = validateTelegramUsername(username);
+  if (userErr) {
+    showFieldError('loginInput', 'usernameError', userErr);
     return;
   }
   if (!password) {
@@ -620,7 +720,7 @@ async function login() {
     localStorage.setItem('user_telegram', username);
     currentUser = data;
     updateProfileUI();
-    document.getElementById('loginModal').classList.remove('open');
+    loginModalCtrl.closeFn();
     showToast(`✅ Добро пожаловать, ${username}!`, 'success');
     resetAuthForm();
   } catch (err) {
@@ -635,11 +735,12 @@ async function register() {
 
   const input = document.getElementById('loginInput');
   const passwordInput = document.getElementById('loginPassword');
-  const username = input.value.trim();
+  const username = normalizeTelegramUsername(input.value);
   const password = passwordInput.value.trim();
 
-  if (!username) {
-    showFieldError('loginInput', 'usernameError', 'Введите username');
+  const userErr = validateTelegramUsername(username);
+  if (userErr) {
+    showFieldError('loginInput', 'usernameError', userErr);
     return;
   }
   if (!password) {
@@ -658,11 +759,7 @@ async function register() {
     const response = await fetch(WORKER_URL + 'register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        telegram: username,
-        password,
-        ref: referralCode || null
-      })
+      body: JSON.stringify({ telegram: username, password, ref: referralCode || null })
     });
     const data = await response.json();
 
@@ -671,7 +768,7 @@ async function register() {
       if (errMsg.toLowerCase().includes('существует')) {
         showFieldError('loginInput', 'usernameError', 'Такой пользователь уже существует');
       } else {
-        showFieldError('loginPassword', 'passwordError', errMsg);
+        showFieldError('loginInput', 'usernameError', errMsg);
       }
       return;
     }
@@ -694,82 +791,6 @@ function initProfile() {
 }
 
 // =============================================
-// ===== ОБРАБОТЧИКИ МОДАЛОК =====
-// =============================================
-document.getElementById('userBtn').addEventListener('click', () => {
-  if (currentUser && currentUser.telegram) {
-    document.getElementById('profileModal').classList.add('open');
-    updateProfileUI();
-  } else {
-    resetAuthForm();
-    document.getElementById('loginModal').classList.add('open');
-  }
-});
-
-document.getElementById('loginModalClose').addEventListener('click', () => {
-  document.getElementById('loginModal').classList.remove('open');
-});
-
-document.querySelectorAll('.auth-tab').forEach(tab => {
-  tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab));
-});
-
-document.getElementById('authForm').addEventListener('submit', (e) => {
-  e.preventDefault();
-  if (currentAuthTab === 'register') register();
-  else login();
-});
-
-document.getElementById('togglePassword').addEventListener('click', function() {
-  const input = document.getElementById('loginPassword');
-  const isPassword = input.type === 'password';
-  input.type = isPassword ? 'text' : 'password';
-  this.textContent = isPassword ? '🙈' : '👁';
-});
-
-document.querySelectorAll('.auth-field input').forEach(input => {
-  input.addEventListener('focus', () => input.closest('.auth-field').classList.add('focused'));
-  input.addEventListener('blur', () => input.closest('.auth-field').classList.remove('focused'));
-  input.addEventListener('input', () => {
-    input.closest('.auth-field').classList.remove('error');
-  });
-});
-
-document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
-  e.preventDefault();
-  showToast('📩 Напишите в наш Telegram — поможем восстановить пароль', 'info');
-});
-
-document.getElementById('profileModalClose').addEventListener('click', () => {
-  document.getElementById('profileModal').classList.remove('open');
-});
-
-document.getElementById('profileLogout').addEventListener('click', () => {
-  localStorage.removeItem('user_telegram');
-  currentUser = null;
-  updateProfileUI();
-  document.getElementById('profileModal').classList.remove('open');
-  showToast('👋 Вы вышли из профиля', 'info');
-});
-
-document.getElementById('avatarEditBtn').addEventListener('click', openAvatarModal);
-document.getElementById('avatarModalClose').addEventListener('click', closeAvatarModal);
-document.getElementById('avatarCancelBtn').addEventListener('click', closeAvatarModal);
-document.getElementById('avatarSaveBtn').addEventListener('click', saveAvatar);
-
-document.getElementById('bannerEditBtn').addEventListener('click', openBannerModal);
-document.getElementById('bannerModalClose').addEventListener('click', closeBannerModal);
-document.getElementById('bannerRemoveBtn').addEventListener('click', removeBanner);
-document.getElementById('bannerSaveBtn').addEventListener('click', saveBanner);
-
-document.getElementById('overlay').addEventListener('click', () => {
-  document.getElementById('loginModal').classList.remove('open');
-  document.getElementById('profileModal').classList.remove('open');
-  document.getElementById('avatarModal').classList.remove('open');
-  document.getElementById('bannerModal').classList.remove('open');
-});
-
-// =============================================
 // ===== КОРЗИНА =====
 // =============================================
 const cartCount = document.getElementById('cartCount');
@@ -778,25 +799,66 @@ const cartItems = document.getElementById('cartItems');
 const cartTotal = document.getElementById('cartTotal');
 const overlay = document.getElementById('overlay');
 
+function loadCartFromStorage() {
+  try {
+    const saved = localStorage.getItem('torgovchik_cart');
+    if (saved) {
+      cart = JSON.parse(saved);
+      cart = cart.map(item => {
+        const actual = products.find(p => p.id === item.id);
+        return actual ? { ...actual, quantity: item.quantity } : item;
+      });
+      updateCartUI();
+    }
+  } catch (e) {
+    console.error('Ошибка загрузки корзины:', e);
+    cart = [];
+  }
+}
+
+function saveCartToStorage() {
+  localStorage.setItem('torgovchik_cart', JSON.stringify(cart));
+}
+
 function addToCart(productId) {
   const product = products.find(p => p.id === productId);
   if (!product) return;
+
   const existing = cart.find(item => item.id === productId);
-  if (existing) existing.quantity += 1;
-  else cart.push({ ...product, quantity: 1 });
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    cart.push({ ...product, quantity: 1 });
+  }
+  saveCartToStorage();
   updateCartUI();
   showToast(`✅ ${product.name} добавлен в корзину`, 'success');
 }
 
+function changeQuantity(productId, delta) {
+  const item = cart.find(i => i.id === productId);
+  if (!item) return;
+
+  item.quantity += delta;
+  if (item.quantity <= 0) {
+    cart = cart.filter(i => i.id !== productId);
+  }
+  saveCartToStorage();
+  updateCartUI();
+}
+
 function removeFromCart(productId) {
   cart = cart.filter(item => item.id !== productId);
+  saveCartToStorage();
   updateCartUI();
 }
 
 function getCartTotal() {
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  if (discountPercent > 0) return subtotal * (1 - discountPercent / 100);
-  return subtotal;
+  if (discountPercent > 0) {
+    return parseFloat((subtotal * (1 - discountPercent / 100)).toFixed(2));
+  }
+  return parseFloat(subtotal.toFixed(2));
 }
 
 function updateCartUI() {
@@ -805,43 +867,39 @@ function updateCartUI() {
 
   if (cart.length === 0) {
     cartItems.innerHTML = '<p class="cart-empty">Корзина пуста</p>';
-    cartTotal.textContent = '0';
+    cartTotal.textContent = '0.00';
     return;
   }
 
   cartItems.innerHTML = cart.map(item => `
     <div class="cart-item">
       <div class="cart-item__info">
-        <span class="cart-item__name">
-          <img src="${item.image}" alt="${item.name}" style="width:24px; height:24px; object-fit:cover; border-radius:4px; vertical-align:middle; margin-right:6px;">
-          ${item.name} × ${item.quantity}
-        </span>
+        <span class="cart-item__name">${item.name}</span>
         <span class="cart-item__price">${item.price} BYN</span>
       </div>
-      <button class="cart-item__remove" data-id="${item.id}">✕</button>
+      <div class="cart-item__controls">
+        <button class="cart-qty-btn" onclick="changeQuantity(${item.id}, -1)" aria-label="Уменьшить количество">−</button>
+        <span class="cart-qty-val">${item.quantity}</span>
+        <button class="cart-qty-btn" onclick="changeQuantity(${item.id}, 1)" aria-label="Увеличить количество">+</button>
+        <button class="cart-item__remove" onclick="removeFromCart(${item.id})" aria-label="Удалить товар">✕</button>
+      </div>
     </div>
   `).join('');
 
-  document.querySelectorAll('.cart-item__remove').forEach(btn => {
-    btn.addEventListener('click', () => removeFromCart(parseInt(btn.dataset.id)));
-  });
-
-  cartTotal.textContent = Math.round(getCartTotal());
+  cartTotal.textContent = getCartTotal();
 }
 
 function openCart() {
   cartPanel.classList.add('open');
   overlay.classList.add('show');
+  cartPanel.setAttribute('aria-hidden', 'false');
 }
 
 function closeCart() {
   cartPanel.classList.remove('open');
   overlay.classList.remove('show');
+  cartPanel.setAttribute('aria-hidden', 'true');
 }
-
-document.getElementById('cartToggle').addEventListener('click', openCart);
-document.getElementById('cartClose').addEventListener('click', closeCart);
-overlay.addEventListener('click', closeCart);
 
 // =============================================
 // ===== ТОСТЫ =====
@@ -851,6 +909,7 @@ const toastContainer = document.getElementById('toastContainer');
 function showToast(message, type = 'success') {
   const toast = document.createElement('div');
   toast.className = 'toast';
+  toast.setAttribute('role', 'status');
   const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
   toast.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-message">${message}</span>`;
   toastContainer.appendChild(toast);
@@ -895,9 +954,6 @@ function applyPromo() {
   }
 }
 
-applyPromoBtn.addEventListener('click', applyPromo);
-promoInput.addEventListener('keypress', e => { if (e.key === 'Enter') applyPromo(); });
-
 // =============================================
 // ===== ФИЛЬТРЫ =====
 // =============================================
@@ -915,6 +971,7 @@ function initFilters(category) {
   const firstBtn = container.querySelector('.filter-btn');
   if (firstBtn) {
     firstBtn.classList.add('active');
+    firstBtn.setAttribute('aria-pressed', 'true');
     renderProducts(category, firstBtn.dataset.filter);
   } else {
     renderProducts(category, 'Все');
@@ -922,8 +979,12 @@ function initFilters(category) {
 
   container.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      container.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      container.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
       renderProducts(category, btn.dataset.filter);
     });
   });
@@ -940,145 +1001,20 @@ function renderProducts(category, filter = 'Все') {
   if (filter !== 'Все') filtered = filtered.filter(p => p.brand === filter);
 
   if (filtered.length === 0) {
-    grid.innerHTML = `<div class="placeholder"><p>🛠 В этой категории пока нет товаров</p></div>`;
+    grid.innerHTML = `<div class="placeholder"><p>В этой категории пока нет товаров</p></div>`;
     return;
   }
 
   grid.innerHTML = filtered.map(p => `
     <div class="product-card" data-id="${p.id}">
-      <img src="${p.image}" alt="${p.name}" class="product-card__image">
+      <img src="${p.image}" alt="${p.name}" class="product-card__image" loading="lazy" onerror="this.src='https://i.ibb.co/VWRmsGHt/logo.png'">
       <div class="product-card__name">${p.name}</div>
       <div class="product-card__brand">${p.brand}</div>
       <div class="product-card__price">${p.price} BYN</div>
-      <button class="product-card__btn" data-id="${p.id}">Добавить в корзину</button>
+      <button class="product-card__btn" onclick="addToCart(${p.id})" aria-label="Добавить ${p.name} в корзину">В корзину</button>
     </div>
   `).join('');
-
-  document.querySelectorAll('.product-card').forEach(card => {
-    card.addEventListener('click', function(e) {
-      if (e.target.classList.contains('product-card__btn')) return;
-      document.querySelectorAll('.product-card.expanded').forEach(other => {
-        if (other !== this) other.classList.remove('expanded');
-      });
-      this.classList.toggle('expanded');
-    });
-  });
-
-  document.querySelectorAll('.product-card__btn').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      addToCart(parseInt(this.dataset.id));
-    });
-  });
 }
-
-// =============================================
-// ===== ФОРМА ЗАКАЗА =====
-// =============================================
-const orderModal = document.getElementById('orderModal');
-const orderModalClose = document.getElementById('orderModalClose');
-const orderForm = document.getElementById('orderForm');
-const orderMessage = document.getElementById('orderMessage');
-
-document.getElementById('checkoutBtn').addEventListener('click', () => {
-  if (cart.length === 0) {
-    showToast('Корзина пуста. Добавьте товары.', 'error');
-    return;
-  }
-  if (currentUser && currentUser.telegram) {
-    document.getElementById('orderTelegram').value = '@' + currentUser.telegram;
-  }
-  orderModal.classList.add('open');
-  orderMessage.style.display = 'none';
-  orderMessage.textContent = '';
-});
-
-orderModalClose.addEventListener('click', () => orderModal.classList.remove('open'));
-overlay.addEventListener('click', () => orderModal.classList.remove('open'));
-
-orderForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const name = document.getElementById('orderName').value.trim();
-  const telegram = document.getElementById('orderTelegram').value.trim();
-  const address = document.getElementById('orderAddress').value.trim();
-  const comment = document.getElementById('orderComment').value.trim();
-
-  if (!name || !telegram) {
-    orderMessage.style.display = 'block';
-    orderMessage.textContent = '⚠️ Пожалуйста, заполните имя и Telegram.';
-    orderMessage.style.color = '#ff7777';
-    return;
-  }
-  if (!telegram.startsWith('@')) {
-    orderMessage.style.display = 'block';
-    orderMessage.textContent = '⚠️ Укажите Telegram username, начиная с @';
-    orderMessage.style.color = '#ff7777';
-    return;
-  }
-
-  const orderData = {
-    name, telegram, address, comment,
-    items: cart,
-    subtotal: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-    total: getCartTotal(),
-    promo: appliedPromo,
-    discount: discountPercent
-  };
-
-  let message = `🛒 Новый заказ!\n\n`;
-  message += `👤 Имя: ${orderData.name}\n`;
-  message += `📱 Telegram: ${orderData.telegram}\n`;
-  if (orderData.address) message += `📍 Адрес: ${orderData.address}\n`;
-  if (orderData.comment) message += `💬 Комментарий: ${orderData.comment}\n`;
-  message += `\n📦 Товары:\n`;
-  orderData.items.forEach(item => {
-    message += `  • ${item.brand} | ${item.name} × ${item.quantity} = ${item.price * item.quantity} BYN\n`;
-  });
-  message += `\n💰 Сумма: ${orderData.subtotal} BYN`;
-  if (orderData.discount > 0) message += `\n🎉 Скидка: ${orderData.discount}%`;
-  message += `\n💰 Итого: ${Math.round(orderData.total)} BYN`;
-
-  try {
-    const response = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, order: orderData })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Ошибка отправки заказа');
-    }
-
-    orderMessage.style.display = 'block';
-    orderMessage.textContent = '✅ Заказ успешно отправлен! Мы свяжемся с вами в Telegram.';
-    orderMessage.style.color = '#8aff8a';
-
-    setTimeout(() => {
-      cart = [];
-      appliedPromo = null;
-      discountPercent = 0;
-      updateCartUI();
-      closeCart();
-      orderModal.classList.remove('open');
-      orderForm.reset();
-      orderMessage.style.display = 'none';
-      promoInput.value = '';
-      promoInput.disabled = false;
-      applyPromoBtn.disabled = false;
-      promoMessage.textContent = '';
-      showToast('✅ Заказ оформлен! Спасибо!', 'success');
-      if (currentUser && currentUser.telegram) loadUserProfile(currentUser.telegram);
-    }, 2000);
-
-  } catch (error) {
-    console.error('Ошибка отправки:', error);
-    orderMessage.style.display = 'block';
-    orderMessage.textContent = `⚠️ Ошибка: ${error.message || 'Неизвестная ошибка'}. Попробуйте позже.`;
-    orderMessage.style.color = '#ff7777';
-  }
-});
 
 // =============================================
 // ===== КАТЕГОРИИ =====
@@ -1088,6 +1024,8 @@ const categoryBtnsMobile = document.querySelectorAll('.category-btn-mobile');
 const categoryContent = document.getElementById('categoryContent');
 
 function switchCategory(category) {
+  currentCategory = category;
+
   categoryBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.category === category));
   categoryBtnsMobile.forEach(btn => btn.classList.toggle('active', btn.dataset.category === category));
 
@@ -1115,30 +1053,233 @@ function switchCategory(category) {
   }
 }
 
+// =============================================
+// ===== ИНИЦИАЛИЗАЦИЯ МОДАЛОК =====
+// =============================================
+const loginModalCtrl = setupModal('loginModal');
+const profileModalCtrl = setupModal('profileModal');
+const avatarModalCtrl = setupModal('avatarModal', () => { pendingAvatarId = null; });
+const bannerModalCtrl = setupModal('bannerModal', () => { pendingBannerId = null; });
+const orderModalCtrl = setupModal('orderModal');
+const announcementCtrl = setupModal('announcementModal');
+
+document.getElementById('loginModalClose').addEventListener('click', () => loginModalCtrl.closeFn());
+document.getElementById('profileModalClose').addEventListener('click', () => profileModalCtrl.closeFn());
+document.getElementById('avatarModalClose').addEventListener('click', () => avatarModalCtrl.closeFn());
+document.getElementById('avatarCancelBtn').addEventListener('click', () => avatarModalCtrl.closeFn());
+document.getElementById('bannerModalClose').addEventListener('click', () => bannerModalCtrl.closeFn());
+document.getElementById('orderModalClose').addEventListener('click', () => orderModalCtrl.closeFn());
+document.getElementById('announcementClose').addEventListener('click', () => announcementCtrl.closeFn());
+document.getElementById('announcementOk').addEventListener('click', () => announcementCtrl.closeFn());
+
+document.getElementById('userBtn').addEventListener('click', () => {
+  if (currentUser && currentUser.telegram) {
+    document.getElementById('profileModal').classList.add('open');
+    updateProfileUI();
+  } else {
+    resetAuthForm();
+    document.getElementById('loginModal').classList.add('open');
+  }
+});
+
+document.querySelectorAll('.auth-tab').forEach(tab => {
+  tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab));
+});
+
+document.getElementById('authForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (currentAuthTab === 'register') register();
+  else login();
+});
+
+document.getElementById('togglePassword').addEventListener('click', function() {
+  const input = document.getElementById('loginPassword');
+  const isPassword = input.type === 'password';
+  input.type = isPassword ? 'text' : 'password';
+  this.textContent = isPassword ? '🙈' : '👁';
+  this.setAttribute('aria-label', isPassword ? 'Скрыть пароль' : 'Показать пароль');
+});
+
+document.querySelectorAll('.auth-field input').forEach(input => {
+  input.addEventListener('focus', () => input.closest('.auth-field').classList.add('focused'));
+  input.addEventListener('blur', () => input.closest('.auth-field').classList.remove('focused'));
+  input.addEventListener('input', () => {
+    input.closest('.auth-field').classList.remove('error');
+    input.removeAttribute('aria-invalid');
+  });
+});
+
+document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  showToast('📩 Напишите в наш Telegram — поможем восстановить пароль', 'info');
+});
+
+document.getElementById('profileLogout').addEventListener('click', () => {
+  localStorage.removeItem('user_telegram');
+  currentUser = null;
+  updateProfileUI();
+  profileModalCtrl.closeFn();
+  showToast('👋 Вы вышли из профиля', 'info');
+});
+
+document.getElementById('avatarEditBtn').addEventListener('click', openAvatarModal);
+document.getElementById('avatarSaveBtn').addEventListener('click', saveAvatar);
+
+document.getElementById('bannerEditBtn').addEventListener('click', openBannerModal);
+document.getElementById('bannerRemoveBtn').addEventListener('click', removeBanner);
+document.getElementById('bannerSaveBtn').addEventListener('click', saveBanner);
+
+document.getElementById('cartToggle').addEventListener('click', openCart);
+document.getElementById('cartClose').addEventListener('click', closeCart);
+overlay.addEventListener('click', closeCart);
+
+// =============================================
+// ===== ФОРМА ЗАКАЗА =====
+// =============================================
+const orderForm = document.getElementById('orderForm');
+const orderMessage = document.getElementById('orderMessage');
+
+document.getElementById('checkoutBtn').addEventListener('click', () => {
+  if (cart.length === 0) {
+    showToast('Корзина пуста. Добавьте товары.', 'error');
+    return;
+  }
+  if (currentUser && currentUser.telegram) {
+    document.getElementById('orderTelegram').value = '@' + currentUser.telegram;
+  }
+  orderIdempotencyKey = null;
+  document.getElementById('orderModal').classList.add('open');
+  orderMessage.style.display = 'none';
+  orderMessage.textContent = '';
+});
+
+orderForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById('orderName').value.trim();
+  const telegramRaw = document.getElementById('orderTelegram').value.trim();
+  const address = document.getElementById('orderAddress').value.trim();
+  const comment = document.getElementById('orderComment').value.trim();
+
+  if (!name) {
+    orderMessage.style.display = 'block';
+    orderMessage.textContent = '⚠️ Пожалуйста, укажите имя.';
+    orderMessage.style.color = '#ff7777';
+    return;
+  }
+
+  const telegramClean = normalizeTelegramUsername(telegramRaw);
+  const telegramErr = validateTelegramUsername(telegramClean);
+  if (telegramErr) {
+    orderMessage.style.display = 'block';
+    orderMessage.textContent = '⚠️ ' + telegramErr;
+    orderMessage.style.color = '#ff7777';
+    return;
+  }
+  const telegramForServer = '@' + telegramClean;
+
+  const submitBtn = document.getElementById('orderSubmit');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Отправка...';
+
+  if (!orderIdempotencyKey) {
+    orderIdempotencyKey = generateUUID();
+  }
+
+  const orderData = {
+    name,
+    telegram: telegramForServer,
+    address,
+    comment,
+    items: cart,
+    subtotal: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    total: getCartTotal(),
+    promo: appliedPromo,
+    discount: discountPercent,
+    idempotencyKey: orderIdempotencyKey
+  };
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order: orderData })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Ошибка отправки заказа');
+    }
+
+    orderMessage.style.display = 'block';
+    orderMessage.textContent = '✅ Заказ успешно отправлен! Мы свяжемся с вами в Telegram.';
+    orderMessage.style.color = '#8aff8a';
+
+    setTimeout(() => {
+      cart = [];
+      appliedPromo = null;
+      discountPercent = 0;
+      orderIdempotencyKey = null;
+      saveCartToStorage();
+      updateCartUI();
+      closeCart();
+      orderModalCtrl.closeFn();
+      orderForm.reset();
+      orderMessage.style.display = 'none';
+      promoInput.value = '';
+      promoInput.disabled = false;
+      applyPromoBtn.disabled = false;
+      promoMessage.textContent = '';
+      showToast('✅ Заказ оформлен! Спасибо!', 'success');
+      if (currentUser && currentUser.telegram) loadUserProfile(currentUser.telegram);
+    }, 2000);
+
+  } catch (error) {
+    console.error('Ошибка отправки:', error);
+    orderMessage.style.display = 'block';
+    orderMessage.textContent = `⚠️ Ошибка: ${error.message || 'Неизвестная ошибка'}. Попробуйте позже.`;
+    orderMessage.style.color = '#ff7777';
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Отправить заказ';
+  }
+});
+
+applyPromoBtn.addEventListener('click', applyPromo);
+promoInput.addEventListener('keypress', e => { if (e.key === 'Enter') applyPromo(); });
+
+// =============================================
+// ===== ПЕРЕКЛЮЧЕНИЕ КАТЕГОРИЙ =====
+// =============================================
 categoryBtns.forEach(btn => btn.addEventListener('click', () => switchCategory(btn.dataset.category)));
 categoryBtnsMobile.forEach(btn => {
   btn.addEventListener('click', () => {
     switchCategory(btn.dataset.category);
     burger.classList.remove('active');
     mobileMenu.classList.remove('open');
+    burger.setAttribute('aria-expanded', 'false');
   });
 });
 
 // =============================================
-// ===== БУРГЕР-МЕНЮ =====
+// ===== БУРГЕР =====
 // =============================================
 const burger = document.getElementById('burgerBtn');
 const mobileMenu = document.getElementById('mobileMenu');
 
+burger.setAttribute('aria-expanded', 'false');
+
 burger.addEventListener('click', () => {
-  burger.classList.toggle('active');
+  const isOpen = burger.classList.toggle('active');
   mobileMenu.classList.toggle('open');
+  burger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 });
 
 document.addEventListener('click', e => {
   if (!e.target.closest('.header__inner')) {
     burger.classList.remove('active');
     mobileMenu.classList.remove('open');
+    burger.setAttribute('aria-expanded', 'false');
   }
 });
 
@@ -1146,15 +1287,28 @@ document.addEventListener('click', e => {
 // ===== FAQ =====
 // =============================================
 document.querySelectorAll('.faq__question').forEach(question => {
-  question.addEventListener('click', function() {
-    const parent = this.closest('.faq__item');
+  question.setAttribute('role', 'button');
+  question.setAttribute('tabindex', '0');
+  question.setAttribute('aria-expanded', 'false');
+
+  const toggle = () => {
+    const parent = question.closest('.faq__item');
     if (!parent) return;
-    parent.classList.toggle('open');
+    const isOpen = parent.classList.toggle('open');
+    question.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  };
+
+  question.addEventListener('click', toggle);
+  question.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggle();
+    }
   });
 });
 
 // =============================================
-// ===== ПОДСКАЗКА НА ЛОГОТИПЕ =====
+// ===== ПАСХАЛКА НА ЛОГОТИПЕ =====
 // =============================================
 document.addEventListener('DOMContentLoaded', function() {
   const logo = document.querySelector('.logo');
@@ -1173,6 +1327,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tooltip = document.createElement('div');
     tooltip.className = 'logo-tooltip';
     tooltip.textContent = phrase;
+    tooltip.setAttribute('role', 'status');
 
     logo.appendChild(tooltip);
     requestAnimationFrame(() => tooltip.classList.add('show'));
@@ -1188,6 +1343,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // ===== ЗАПУСК =====
 // =============================================
 checkReferral();
-loadProducts();
-initProfile();
-checkAnnouncement();
+loadProducts().then(() => {
+  loadCartFromStorage();
+  initProfile();
+  checkAnnouncement();
+});

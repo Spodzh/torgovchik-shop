@@ -41,6 +41,16 @@
     --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.65), 0 0 30px rgba(216, 137, 50, 0.12);
     --shadow-warm: 0 8px 30px rgba(184, 92, 50, 0.28);
     --shadow-warm-hover: 0 12px 40px rgba(184, 92, 50, 0.42);
+
+    /* Z-index слои */
+    --z-mobile-menu: 90;
+    --z-header: 100;
+    --z-overlay: 150;
+    --z-cart: 200;
+    --z-modal: 250;
+    --z-toast: 300;
+    --z-announcement: 500;
+    --z-tooltip: 1000;
 }
 
 body {
@@ -50,6 +60,17 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
+}
+
+/* Фокус — видимый */
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+button:focus:not(:focus-visible) {
+    outline: none;
 }
 
 .container {
@@ -125,7 +146,7 @@ body {
     opacity: 0.55;
 }
 
-/* ===== ГЕРОЙ / ОСЕННИЙ ВАЙБ (окошко с картинкой + листья снаружи) ===== */
+/* ===== ГЕРОЙ ===== */
 .hero {
     position: relative;
     padding: 60px 0 70px;
@@ -133,7 +154,6 @@ body {
     overflow: hidden;
 }
 
-/* ===== ЛИСТЬЯ СНАРУЖИ, по углам секции ===== */
 .hero__leaf {
     position: absolute;
     font-size: 90px;
@@ -148,7 +168,6 @@ body {
 .hero__leaf--bl { bottom: 10px; left: 30px;   transform: rotate(20deg); }
 .hero__leaf--br { bottom: 15px; right: 10px;  transform: rotate(-25deg); }
 
-/* ===== ОКОШКО С КАРТИНКОЙ ===== */
 .hero__box {
     position: relative;
     z-index: 1;
@@ -170,7 +189,6 @@ body {
         0 0 40px rgba(184, 92, 50, 0.12);
 }
 
-/* Blur + затемнение, только на левой части окна */
 .hero__box::before {
     content: '';
     position: absolute;
@@ -203,7 +221,6 @@ body {
     pointer-events: none;
 }
 
-/* Тёплое янтарное свечение за текстом */
 .hero__box::after {
     content: '';
     position: absolute;
@@ -221,7 +238,6 @@ body {
     z-index: 0;
 }
 
-/* ===== ТЕКСТ ===== */
 .hero__content {
     position: relative;
     z-index: 1;
@@ -320,7 +336,7 @@ body {
     line-height: 1.6;
 }
 
-/* ===== ЧАСТЫЕ ВОПРОСЫ ===== */
+/* ===== FAQ ===== */
 .faq {
     padding: 60px 0;
     background: var(--bg-main);
@@ -358,6 +374,7 @@ body {
     align-items: center;
     user-select: none;
     transition: color 0.2s;
+    outline: none;
 }
 
 .faq__question::after {
@@ -461,7 +478,7 @@ body {
     color: var(--accent-hover);
 }
 
-/* ===== АДАПТИВ: ПЛАНШЕТЫ (≤ 900px) ===== */
+/* ===== ОБЩИЙ АДАПТИВ ===== */
 @media (max-width: 900px) {
     .hero__box {
         min-height: 420px;
@@ -474,7 +491,6 @@ body {
     .section-title::before { left: -26px; font-size: 16px; }
 }
 
-/* ===== АДАПТИВ: МОБИЛЬНЫЕ (≤ 768px) ===== */
 @media (max-width: 768px) {
     .hero { padding: 30px 0 40px; }
 
@@ -503,10 +519,7 @@ body {
 
     .hero__box::after { display: none; }
 
-    .hero__content {
-        max-width: 100%;
-        text-align: left;
-    }
+    .hero__content { max-width: 100%; text-align: left; }
 
     .hero__content h1 {
         font-size: 30px;
@@ -527,22 +540,40 @@ body {
     .hero__leaf--br { bottom: 6px; right: 6px; }
 }
 
-/* ===== АДАПТИВ: МАЛЕНЬКИЕ ТЕЛЕФОНЫ (≤ 600px) ===== */
 @media (max-width: 600px) {
+    .container { padding: 0 16px; }
     .hero__content h1 { font-size: 28px; }
     .hero__content p { font-size: 14px; }
     .about__card { max-width: 100%; flex: 1 1 100%; }
     .faq__question { font-size: 14px; padding: 14px 16px; }
     .faq__answer { font-size: 13px; }
     .contacts__btn { font-size: 15px; padding: 10px 24px; }
+    .btn { padding: 12px 24px; font-size: 14px; }
 }
 
-/* ===== АДАПТИВ: МАЛЕНЬКИЕ ТЕЛЕФОНЫ (≤ 480px) ===== */
 @media (max-width: 480px) {
-    .hero__box {
-        padding: 26px 18px 260px;
-    }
+    .hero__box { padding: 26px 18px 260px; }
     .hero__content h1 { font-size: 26px; }
     .hero__content p { font-size: 14px; }
     .hero__leaf { font-size: 42px; }
+}
+
+@media (max-width: 375px) {
+    .container { padding: 0 12px; }
+    .hero__box { padding: 22px 16px 220px; }
+    .hero__content h1 { font-size: 24px; }
+    .hero__content p { font-size: 13px; margin-bottom: 18px; }
+    .btn { padding: 11px 20px; font-size: 13px; }
+}
+
+/* ===== A11Y: уважаем предпочтения к анимациям ===== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
