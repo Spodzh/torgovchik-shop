@@ -1474,6 +1474,35 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // =============================================
+// ===== СЕКРЕТНАЯ КНОПКА (ПАСХАЛКА) =====
+// =============================================
+let secretClickCount = 0;
+let secretClickTimeout = null;
+const secretBtn = document.getElementById('secretGameBtn');
+
+if (secretBtn) {
+  secretBtn.addEventListener('click', () => {
+    secretClickCount++;
+    
+    // Немного подсвечиваем кнопку при клике
+    secretBtn.style.opacity = '0.5';
+    
+    if (secretClickTimeout) clearTimeout(secretClickTimeout);
+
+    if (secretClickCount >= 3) {
+      // Перекидываем в игру
+      window.location.href = 'flappy.html';
+    } else {
+      // Если не успел кликнуть 3 раза за 2 секунды, счетчик сбрасывается
+      secretClickTimeout = setTimeout(() => {
+        secretClickCount = 0;
+        secretBtn.style.opacity = '0.05';
+      }, 2000);
+    }
+  });
+}
+
+// =============================================
 // ===== ЗАПУСК =====
 // =============================================
 initAgeGate();

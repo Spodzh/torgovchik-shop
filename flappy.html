@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Flappy Slush 🧃</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@700;800&family=Manrope:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #100D12;
+            overflow: hidden;
+            font-family: 'Manrope', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: none;
+        }
+        canvas { display: block; background-color: #100D12; box-shadow: 0 0 50px rgba(155, 93, 229, 0.3); }
+        
+        .ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;
+        }
+        .score-display {
+            position: absolute; top: 40px; font-family: 'Bitter', serif; font-size: 72px; font-weight: 800;
+            color: #F7F0F8; text-shadow: 0 0 20px rgba(255, 118, 40, 0.8); pointer-events: none; z-index: 10;
+        }
+        .screen {
+            background: linear-gradient(180deg, rgba(33, 25, 35, 0.95), rgba(16, 13, 18, 0.95));
+            backdrop-filter: blur(15px); border: 2px solid rgba(255, 118, 40, 0.4);
+            border-radius: 24px; padding: 30px 40px; text-align: center; pointer-events: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 40px rgba(255, 118, 40, 0.2);
+            animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: 90%; width: 400px; z-index: 20;
+        }
+        .screen.hidden { display: none; }
+        .screen h1 {
+            font-family: 'Bitter', serif; color: #FF7628; font-size: 42px; margin-bottom: 10px;
+            text-transform: uppercase; text-shadow: 0 2px 10px rgba(255, 118, 40, 0.4);
+        }
+        .screen p { color: #B5A7BA; margin-bottom: 20px; font-size: 16px; line-height: 1.5; }
+        .screen .score-text { font-family: 'Bitter', serif; font-size: 36px; color: #F7F0F8; margin-bottom: 10px; }
+        
+        .new-record {
+            display: none; font-family: 'Bitter', serif; font-size: 20px; font-weight: 800;
+            color: #FFD700; text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            margin-bottom: 15px; animation: pulse 1s infinite alternate;
+            align-items: center; justify-content: center; gap: 8px;
+        }
+        .new-record.show { display: flex; }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+        .btn-play {
+            background: linear-gradient(135deg, #FF7628, #FFAA52); color: #100D12;
+            border: none; padding: 16px 40px; font-size: 20px; font-weight: 800;
+            border-radius: 12px; cursor: pointer; text-transform: uppercase;
+            transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 8px 25px rgba(255, 118, 40, 0.4);
+            width: 100%; margin-bottom: 15px; display: block; text-decoration: none; line-height: 1.5;
+        }
+        .btn-play:active { transform: scale(0.95); }
+        .back-link { display: block; color: #8A7A90; font-size: 14px; text-decoration: none; cursor: pointer; }
+        .back-link:hover { color: #FFAA52; }
+        
+        .leaderboard {
+            background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; margin-bottom: 20px;
+            max-height: 150px; overflow-y: auto; text-align: left;
+        }
+        .leaderboard-title { color: #FFAA52; font-weight: 700; text-align: center; margin-bottom: 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .leaderboard-row { display: flex; justify-content: space-between; color: #F7F0F8; font-size: 14px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .leaderboard-row:last-child { border-bottom: none; }
+        .leaderboard-row span:first-child { color: #B5A7BA; }
+        .leaderboard-row span:last-child { font-weight: 700; color: #FF7628; }
+
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="ui-layer">
+        <div class="score-display" id="scoreDisplay" style="display: none;">0</div>
+
+        <div class="screen hidden" id="authScreen">
+            <h1>Вход закрыт</h1>
+            <p>Чтобы играть в Flappy Slush и попасть в таблицу лидеров,<br>войдите в свой аккаунт на сайте.</p>
+            <a href="index.html" class="btn-play" style="text-decoration:none;">Войти на сайт</a>
+            <a href="index.html" class="back-link">← Вернуться в магазин</a>
+        </div>
+
+        <div class="screen hidden" id="startScreen">
+            <h1>Flappy Slush</h1>
+            <p>Тапай по экрану, чтобы заправляться и летать.<br>Пролетай через подики и ставь рекорды!</p>
+            <div class="leaderboard" id="leaderboardStart">
+                <div class="leaderboard-title">🏆 Топ игроков</div>
+                <div id="leaderboardListStart" style="color:#B5A7BA; font-size:14px; text-align:center;">Загрузка...</div>
+            </div>
+            <button class="btn-play" id="startBtn">Играть</button>
+            <a href="index.html" class="back-link">← Вернуться в магазин</a>
+        </div>
+
+        <div class="screen hidden" id="gameOverScreen">
+            <h1>Game Over</h1>
+            <div class="new-record" id="newRecordBadge">👑 НОВЫЙ РЕКОРД! 👑</div>
+            <div class="score-text">Счет: <span id="finalScore">0</span></div>
+            <div style="color: #FFAA52; margin-bottom: 20px; font-weight: 700;">Твой рекорд: <span id="highScore">0</span></div>
+            
+            <div class="leaderboard" id="leaderboardGameOver">
+                <div class="leaderboard-title">🏆 Топ игроков</div>
+                <div id="leaderboardListGameOver" style="color:#B5A7BA; font-size:14px; text-align:center;">Загрузка...</div>
+            </div>
+            
+            <button class="btn-play" id="restartBtn">Ещё раз</button>
+            <a href="index.html" class="back-link">← В магазин</a>
+        </div>
+
+        <div class="screen hidden" id="winScreen">
+            <h1 style="color: #C77DFF; text-shadow: 0 0 20px #9B5DE5;">Победа!</h1>
+            <p style="color: #F7F0F8; font-size: 18px;">Ты настоящий мастер заправки!<br>100 очков пройдено!</p>
+            <button class="btn-play" id="winRestartBtn">Играть снова</button>
+            <a href="index.html" class="back-link">← В магазин</a>
+        </div>
+    </div>
+
+    <script>
+        const WORKER_URL = 'https://torgovchik-bot.ernest-chanel.workers.dev/';
+        const currentTelegram = localStorage.getItem('user_telegram');
+        
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const GRAVITY = 0.4;
+        const JUMP_FORCE = -6.5;
+        const PIPE_WIDTH = 85;
+        const PIPE_GAP = 210;
+        const PIPE_SPEED = 3.2;
+        const SPAWN_RATE = 95;
+
+        let frames = 0;
+        let score = 0;
+        let lastMilestone = 0;
+        let gameState = 'start'; 
+        let highScore = localStorage.getItem('flappySlushHighScore') || 0;
+        let currentBg = 0;
+        let timeOfDay = 'night'; 
+        let weather = 'clear'; 
+        let lightningTimer = 0;
+        let explodingTimer = 0;
+        
+        let weatherParticles = [];
+        let birdParticles = [];
+        let pipePieces = [];
+        let smokeParticles = [];
+
+        const bgColors = {
+            night: ['#100D12', '#19131D'],
+            day: ['#87CEEB', '#E0F6FF'],
+            sunset: ['#FF7B54', '#FFD56B'],
+            autumn: ['#5E1F1F', '#D84315'],
+            morning: ['#FF9A9E', '#FECFEF']
+        };
+        let currentPalette = bgColors.night;
+
+        let bgOffset = 0;
+        let buildings = [];
+        for (let i = 0; i < 50; i++) {
+            buildings.push({
+                x: i * 60 + Math.random() * 30,
+                w: Math.random() * 40 + 30,
+                h: Math.random() * 180 + 80
+            });
+        }
+
+        let bird = { x: 50, y: 150, width: 0, height: 0, velocity: 0, rotation: 0 };
+        let pipes = [];
+
+        const imgJuice = new Image(); imgJuice.src = 'https://i.ibb.co/5y9C351/jija.png';
+        const imgPod1 = new Image(); imgPod1.src = 'https://i.ibb.co/SX5MpJgr/pod1.png';
+        const imgPod2 = new Image(); imgPod2.src = 'https://i.ibb.co/hxFDTJDH/pod2.png';
+
+        let imagesLoaded = 0;
+        function checkImages() {
+            imagesLoaded++;
+            if (imagesLoaded === 3) {
+                const ratio = imgJuice.height / imgJuice.width;
+                bird.width = 90; 
+                bird.height = 90 * ratio;
+                resizeCanvas();
+                loop();
+            }
+        }
+        imgJuice.onload = checkImages;
+        imgPod1.onload = checkImages;
+        imgPod2.onload = checkImages;
+
+        const authScreen = document.getElementById('authScreen');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const winScreen = document.getElementById('winScreen');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const finalScore = document.getElementById('finalScore');
+        const highScoreEl = document.getElementById('highScore');
+        const newRecordBadge = document.getElementById('newRecordBadge');
+
+        if (!currentTelegram) {
+            authScreen.classList.remove('hidden');
+        } else {
+            startScreen.classList.remove('hidden');
+            loadLeaderboard();
+        }
+
+        function resizeCanvas() {
+            let width = window.innerWidth;
+            let height = window.innerHeight;
+            if (width > 600) width = 600; 
+            if (height > 800) height = 800;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function jump() { 
+            if (gameState === 'play') {
+                bird.velocity = JUMP_FORCE;
+                for (let i = 0; i < 6; i++) {
+                    birdParticles.push({
+                        x: bird.x + bird.width/2,
+                        y: bird.y + bird.height,
+                        vx: (Math.random() - 0.5) * 6,
+                        vy: Math.random() * 3 + 1,
+                        life: 1,
+                        color: Math.random() > 0.5 ? 'rgba(255, 118, 40, 0.25)' : 'rgba(199, 125, 255, 0.25)',
+                        size: Math.random() * 4 + 2
+                    });
+                }
+            }
+        }
+        
+        canvas.addEventListener('mousedown', jump);
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); }, { passive: false });
+        document.addEventListener('keydown', (e) => { if (e.code === 'Space') jump(); });
+
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        document.getElementById('restartBtn').addEventListener('click', startGame);
+        document.getElementById('winRestartBtn').addEventListener('click', startGame);
+
+        function startGame() {
+            bird.y = 150;
+            bird.velocity = 0;
+            bird.rotation = 0;
+            pipes = [];
+            weatherParticles = [];
+            birdParticles = [];
+            pipePieces = [];
+            smokeParticles = [];
+            score = 0;
+            lastMilestone = 0;
+            currentBg = 0;
+            bgOffset = 0;
+            timeOfDay = 'night';
+            weather = 'clear';
+            currentPalette = bgColors.night;
+            scoreDisplay.textContent = '0';
+            scoreDisplay.style.display = 'block';
+            newRecordBadge.classList.remove('show');
+            frames = 0;
+            gameState = 'play';
+            
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            winScreen.classList.add('hidden');
+        }
+
+        async function loadLeaderboard() {
+            try {
+                const r = await fetch(WORKER_URL + 'leaderboard');
+                if (!r.ok) throw new Error();
+                const data = await r.json();
+                let html = '';
+                if (data.length === 0) {
+                    html = '<div style="color:#B5A7BA; font-size:14px; text-align:center; padding:10px;">Пока пусто</div>';
+                } else {
+                    data.forEach((item, i) => {
+                        html += `<div class="leaderboard-row"><span>${i+1}. ${item.telegram}</span><span>${item.score}</span></div>`;
+                    });
+                }
+                document.getElementById('leaderboardListStart').innerHTML = html;
+                document.getElementById('leaderboardListGameOver').innerHTML = html;
+            } catch (e) {
+                document.getElementById('leaderboardListStart').innerHTML = '<div style="color:#8A7A90; font-size:12px; text-align:center;">Не удалось загрузить</div>';
+                document.getElementById('leaderboardListGameOver').innerHTML = '<div style="color:#8A7A90; font-size:12px; text-align:center;">Не удалось загрузить</div>';
+            }
+        }
+
+        async function submitScore(finalScoreValue) {
+            if (!currentTelegram) return;
+            try {
+                await fetch(WORKER_URL + 'leaderboard', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegram: currentTelegram, score: finalScoreValue })
+                });
+                loadLeaderboard();
+            } catch (e) {}
+        }
+
+        function triggerFireworks() {
+            const colors = ['#FF7628', '#FFAA52', '#9B5DE5', '#C77DFF', '#F7F0F8'];
+            for (let i = 0; i < 50; i++) {
+                birdParticles.push({
+                    x: canvas.width / 2, y: canvas.height / 3,
+                    vx: (Math.random() - 0.5) * 15, vy: (Math.random() - 0.5) * 15,
+                    life: 1, color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 4 + 2
+                });
+            }
+        }
+
+        function initWeather(type) {
+            weather = type;
+            weatherParticles = [];
+            if (type === 'rain' || type === 'storm') {
+                for (let i = 0; i < 120; i++) {
+                    weatherParticles.push({
+                        x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height,
+                        speed: Math.random() * 8 + 8, length: Math.random() * 20 + 15
+                    });
+                }
+            } else if (type === 'snow') {
+                for (let i = 0; i < 150; i++) {
+                    weatherParticles.push({
+                        x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height,
+                        speed: Math.random() * 1.5 + 1, size: Math.random() * 3 + 1, drift: (Math.random() - 0.5) * 2
+                    });
+                }
+            } else if (type === 'leaves') {
+                for (let i = 0; i < 30; i++) {
+                    weatherParticles.push({
+                        x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height,
+                        speed: Math.random() * 2 + 1, size: Math.random() * 6 + 4, drift: (Math.random() - 0.5) * 3, rot: Math.random() * Math.PI
+                    });
+                }
+            }
+        }
+
+        function checkMilestones() {
+            if (score > 0 && score % 10 === 0 && score !== lastMilestone) {
+                lastMilestone = score;
+                triggerFireworks();
+
+                if (score === 20) initWeather('rain');
+                else if (score === 30) { timeOfDay = 'day'; currentPalette = bgColors.day; weather = 'clear'; }
+                else if (score === 40) initWeather('snow');
+                else if (score === 50) { timeOfDay = 'night'; currentPalette = bgColors.night; initWeather('storm'); }
+                else if (score === 60) { timeOfDay = 'sunset'; currentPalette = bgColors.sunset; weather = 'clear'; }
+                else if (score === 70) { timeOfDay = 'autumn'; currentPalette = bgColors.autumn; initWeather('leaves'); }
+                else if (score === 80) { weather = 'fog'; }
+                else if (score === 90) { timeOfDay = 'morning'; currentPalette = bgColors.morning; weather = 'clear'; }
+
+                if (score >= 100) {
+                    gameState = 'win';
+                    scoreDisplay.style.display = 'none';
+                    winScreen.classList.remove('hidden');
+                    submitScore(score);
+                }
+            }
+        }
+
+        function drawBackground() {
+            let grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            grd.addColorStop(0, currentPalette[0]);
+            grd.addColorStop(1, currentPalette[1]);
+            ctx.fillStyle = grd;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (timeOfDay === 'night' || timeOfDay === 'autumn') {
+                ctx.shadowBlur = 50; ctx.shadowColor = '#FFAA52'; ctx.fillStyle = '#FFAA52';
+                ctx.beginPath(); ctx.arc(canvas.width * 0.8, 100, 40, 0, Math.PI * 2); ctx.fill();
+            } else if (timeOfDay === 'day' || timeOfDay === 'morning') {
+                ctx.shadowBlur = 60; ctx.shadowColor = '#FFD700'; ctx.fillStyle = '#FFD700';
+                ctx.beginPath(); ctx.arc(canvas.width * 0.8, 100, 50, 0, Math.PI * 2); ctx.fill();
+            } else {
+                ctx.shadowBlur = 50; ctx.shadowColor = '#FF4D00'; ctx.fillStyle = '#FF4D00';
+                ctx.beginPath(); ctx.arc(canvas.width * 0.8, canvas.height * 0.4, 80, 0, Math.PI * 2); ctx.fill();
+            }
+            ctx.shadowBlur = 0;
+
+            bgOffset += PIPE_SPEED * 0.2;
+            for (let b of buildings) {
+                let x = (b.x - bgOffset) % 3000;
+                if (x < -100) x += 3000;
+                ctx.fillStyle = (timeOfDay === 'day' || timeOfDay === 'morning') ? '#2C3E50' : '#0A070C';
+                ctx.fillRect(x, canvas.height - b.h, b.w, b.h);
+                if (timeOfDay !== 'day' && timeOfDay !== 'morning') {
+                    ctx.fillStyle = timeOfDay === 'sunset' ? 'rgba(255, 170, 82, 0.6)' : '#FFAA52';
+                    for (let wy = canvas.height - b.h + 10; wy < canvas.height - 15; wy += 20) {
+                        for (let wx = x + 8; wx < x + b.w - 10; wx += 15) {
+                            if ((wx + wy) % 4 !== 0) ctx.fillRect(wx, wy, 6, 8);
+                        }
+                    }
+                }
+            }
+
+            if (weather === 'rain' || weather === 'storm') {
+                ctx.strokeStyle = 'rgba(150, 200, 255, 0.5)'; ctx.lineWidth = 1.5;
+                for (let p of weatherParticles) {
+                    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - 5, p.y + p.length); ctx.stroke();
+                    p.y += p.speed; p.x -= 2;
+                    if (p.y > canvas.height) { p.y = -20; p.x = Math.random() * canvas.width; }
+                }
+                if (weather === 'storm') {
+                    lightningTimer--;
+                    if (lightningTimer <= 0 && Math.random() < 0.05) {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        lightningTimer = 5;
+                    }
+                }
+            } else if (weather === 'snow') {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                for (let p of weatherParticles) {
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+                    p.y += p.speed; p.x += p.drift;
+                    if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+                }
+            } else if (weather === 'fog') {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else if (weather === 'leaves') {
+                for (let p of weatherParticles) {
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+                    ctx.fillStyle = Math.random() > 0.5 ? '#D84315' : '#FFAA52';
+                    ctx.beginPath(); ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2); ctx.fill();
+                    ctx.restore();
+                    p.y += p.speed; p.x += p.drift; p.rot += 0.02;
+                    if (p.y > canvas.height) { p.y = -20; p.x = Math.random() * canvas.width; }
+                }
+            }
+        }
+
+        // --- ЗЕРКАЛЬНЫЕ ПОДИКИ (чтоб не накладывались друг на друга) ---
+        function drawPipes() {
+            pipes.forEach(pipe => {
+                // --- ВЕРХНИЙ ПОДИК ---
+                let imgH2 = PIPE_WIDTH * (imgPod2.height / imgPod2.width);
+                let yTop = pipe.topHeight;
+                let flipTop = false; // Флаг для чередования поворота
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(pipe.x, 0, PIPE_WIDTH, pipe.topHeight);
+                ctx.clip();
+
+                while (yTop > -imgH2) {
+                    ctx.save();
+                    if (!flipTop) {
+                        // Перевернутая картинка (смотрит вниз к проему)
+                        ctx.translate(pipe.x, yTop);
+                        ctx.scale(1, -1);
+                        ctx.drawImage(imgPod2, 0, 0, PIPE_WIDTH, imgH2);
+                    } else {
+                        // Обычная картинка (смотрит вверх)
+                        ctx.drawImage(imgPod2, pipe.x, yTop - imgH2, PIPE_WIDTH, imgH2);
+                    }
+                    ctx.restore();
+                    yTop -= imgH2;
+                    flipTop = !flipTop; // Переключаем флаг
+                }
+                ctx.restore();
+
+                // --- НИЖНИЙ ПОДИК ---
+                let imgH1 = PIPE_WIDTH * (imgPod1.height / imgPod1.width);
+                let yBottom = pipe.topHeight + PIPE_GAP;
+                let flipBottom = false;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(pipe.x, yBottom, PIPE_WIDTH, canvas.height - yBottom);
+                ctx.clip();
+
+                while (yBottom < canvas.height) {
+                    ctx.save();
+                    if (flipBottom) {
+                        // Перевернутая картинка (смотрит вниз)
+                        ctx.translate(pipe.x, yBottom + imgH1);
+                        ctx.scale(1, -1);
+                        ctx.drawImage(imgPod1, 0, 0, PIPE_WIDTH, imgH1);
+                    } else {
+                        // Обычная картинка (смотрит вверх к проему)
+                        ctx.drawImage(imgPod1, pipe.x, yBottom, PIPE_WIDTH, imgH1);
+                    }
+                    ctx.restore();
+                    yBottom += imgH1;
+                    flipBottom = !flipBottom; // Переключаем флаг
+                }
+                ctx.restore();
+            });
+        }
+
+        function drawBird() {
+            ctx.save();
+            ctx.translate(bird.x + bird.width/2, bird.y + bird.height/2);
+            let angle = bird.velocity * 0.08;
+            if (angle < -0.5) angle = -0.5;
+            if (angle > 1.5) angle = 1.5;
+            ctx.rotate(angle);
+            ctx.drawImage(imgJuice, -bird.width/2, -bird.height/2, bird.width, bird.height);
+            ctx.restore();
+        }
+
+        function updateParticles() {
+            // Легкие частицы от прыжков
+            for (let i = birdParticles.length - 1; i >= 0; i--) {
+                let p = birdParticles[i];
+                p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life -= 0.015;
+                if (p.life <= 0) { birdParticles.splice(i, 1); continue; }
+                ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+            }
+            
+            // Осколки подиков
+            for (let i = pipePieces.length - 1; i >= 0; i--) {
+                let p = pipePieces[i];
+                p.x += p.vx; p.y += p.vy; p.vy += 0.5; p.rot += p.vr; p.life -= 0.02;
+                if (p.life <= 0) { pipePieces.splice(i, 1); continue; }
+                ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+                ctx.globalAlpha = p.life;
+                ctx.drawImage(p.img, -p.w/2, -p.h/2, p.w, p.h);
+                ctx.restore();
+            }
+
+            // ДЫМ / ПАР ПРИ ЗАТЯЖКЕ
+            for (let i = smokeParticles.length - 1; i >= 0; i--) {
+                let s = smokeParticles[i];
+                s.x += s.vx;
+                s.y += s.vy;
+                s.size += 0.4;
+                s.life -= 0.012;
+                
+                if (s.life <= 0) {
+                    smokeParticles.splice(i, 1);
+                    continue;
+                }
+                
+                ctx.fillStyle = `rgba(220, 220, 220, ${s.life * 0.5})`;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.globalAlpha = 1;
+        }
+
+        function updatePipes() {
+            if (frames % SPAWN_RATE === 0) {
+                let minHeight = 50;
+                let maxHeight = canvas.height - PIPE_GAP - 50;
+                if (maxHeight < minHeight) maxHeight = minHeight + 50;
+                let topHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
+                pipes.push({ x: canvas.width, topHeight: topHeight, passed: false });
+            }
+
+            for (let i = pipes.length - 1; i >= 0; i--) {
+                let p = pipes[i];
+                p.x -= PIPE_SPEED;
+                if (!p.passed && bird.x > p.x + PIPE_WIDTH) {
+                    p.passed = true; score++; scoreDisplay.textContent = score; checkMilestones();
+                }
+                if (p.x + PIPE_WIDTH < 0) pipes.splice(i, 1);
+            }
+        }
+
+        function checkCollisions() {
+            let hit = false;
+            
+            if (bird.y + bird.height >= canvas.height || bird.y <= 0) {
+                hit = true;
+            }
+            for (let p of pipes) {
+                if (bird.x + bird.width - 15 > p.x && bird.x + 15 < p.x + PIPE_WIDTH) {
+                    if (bird.y < p.topHeight || bird.y + bird.height > p.topHeight + PIPE_GAP) {
+                        hit = true;
+                    }
+                }
+            }
+
+            if (hit && gameState === 'play') {
+                gameState = 'exploding';
+                explodingTimer = 40;
+                
+                // Осколки подиков
+                for (let i = 0; i < 30; i++) {
+                    pipePieces.push({
+                        x: bird.x + bird.width/2,
+                        y: bird.y + bird.height/2,
+                        w: Math.random() * 20 + 10,
+                        h: Math.random() * 20 + 10,
+                        vx: (Math.random() - 0.5) * 15,
+                        vy: (Math.random() - 0.5) * 15,
+                        rot: Math.random() * Math.PI * 2,
+                        vr: (Math.random() - 0.5) * 0.4,
+                        img: Math.random() > 0.5 ? imgPod1 : imgPod2,
+                        life: 1
+                    });
+                }
+                
+                // ПАР / ДЫМ
+                for (let i = 0; i < 30; i++) {
+                    smokeParticles.push({
+                        x: bird.x + bird.width/2,
+                        y: bird.y + bird.height/2,
+                        vx: (Math.random() - 0.5) * 5,
+                        vy: -Math.random() * 5 - 1,
+                        size: Math.random() * 15 + 10,
+                        life: 1
+                    });
+                }
+            }
+        }
+
+        function gameOver() {
+            let isNewRecord = false;
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('flappySlushHighScore', highScore);
+                isNewRecord = true;
+            }
+            
+            finalScore.textContent = score;
+            highScoreEl.textContent = highScore;
+            
+            if (isNewRecord) newRecordBadge.classList.add('show');
+            else newRecordBadge.classList.remove('show');
+
+            scoreDisplay.style.display = 'none';
+            gameOverScreen.classList.remove('hidden');
+            submitScore(score);
+        }
+
+        function loop() {
+            if (gameState === 'play') {
+                bird.velocity += GRAVITY;
+                bird.y += bird.velocity;
+                updatePipes();
+                checkCollisions();
+                frames++;
+            } else if (gameState === 'exploding') {
+                explodingTimer--;
+                if (explodingTimer <= 0) {
+                    gameState = 'gameover';
+                    gameOver();
+                }
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBackground();
+            drawPipes();
+            drawBird();
+            updateParticles();
+            
+            requestAnimationFrame(loop);
+        }
+    </script>
+</body>
+</html>
