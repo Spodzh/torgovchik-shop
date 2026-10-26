@@ -182,11 +182,11 @@ input, textarea, select {
     text-transform: uppercase;
     letter-spacing: 2px;
     position: relative;
-    display: block; /* Изменено с inline-block */
+    display: block;
     width: max-content;
     max-width: 100%;
-    margin-left: auto; /* Центрирование */
-    margin-right: auto; /* Центрирование */
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .section-title::before {
@@ -525,16 +525,18 @@ input, textarea, select {
     .section-title::before { left: -30px; font-size: 20px; }
 }
 
+/* ===== МОБИЛЬНЫЕ УСТРОЙСТВА (УМЕНЬШАЕМ ШАПКУ) ===== */
 @media (max-width: 768px) {
-    .hero { padding: 30px 0 40px; }
+    .hero { padding: 20px 0 30px; }
 
     .hero__box {
         min-height: auto;
-        padding: 32px 22px 320px;
+        /* Уменьшили нижний отступ с 320px до 220px, чтобы блок не был на весь экран */
+        padding: 24px 20px 220px; 
         display: block;
         background-position: center bottom;
         background-size: cover;
-        border-radius: 20px;
+        border-radius: 16px;
     }
 
     .hero__box::before {
@@ -554,18 +556,27 @@ input, textarea, select {
     .hero__box::after { display: none; }
 
     .hero__content { max-width: 100%; text-align: left; }
+    .hero__tag { margin-bottom: 12px; font-size: 10px; padding: 4px 10px; }
 
+    /* Уменьшили размеры шрифтов и отступы */
     .hero__content h1 {
-        font-size: 32px;
+        font-size: 28px;
         line-height: 1.15;
-        margin-bottom: 14px;
+        margin-bottom: 10px;
     }
 
     .hero__content p {
-        font-size: 15px;
-        margin-bottom: 22px;
-        line-height: 1.65;
+        font-size: 14px;
+        margin-bottom: 18px;
+        line-height: 1.55;
     }
+    
+    .hero__btn {
+        padding: 12px 24px;
+        font-size: 13px;
+    }
+
+    .hero__bottom-text { margin-top: 20px; font-size: 10px; letter-spacing: 2px; }
 
     .hero__leaf { font-size: 50px; opacity: 0.09; }
     .hero__leaf--tl { top: 6px; left: 6px; }
@@ -574,27 +585,25 @@ input, textarea, select {
     .hero__leaf--br { bottom: 6px; right: 6px; }
 }
 
+@media (max-width: 480px) {
+    /* Еще сильнее уменьшили отступ снизу для маленьких экранов */
+    .hero__box { padding: 20px 16px 180px; }
+    .hero__content h1 { font-size: 24px; }
+    .hero__content p { font-size: 13px; margin-bottom: 14px; }
+    .hero__leaf { font-size: 36px; }
+}
+
 @media (max-width: 600px) {
     :root { --header-height: 54px; }
     .container { padding: 0 16px; }
-    .hero__content h1 { font-size: 28px; }
-    .hero__content p { font-size: 14px; }
     .about__card { max-width: 100%; flex: 1 1 100%; }
     .faq__question { font-size: 15px; padding: 16px 20px; }
     .faq__answer { font-size: 14px; }
     .contacts__btn { font-size: 14px; padding: 12px 24px; width: 100%; }
     
-    /* На мобилках скрываем тыкву перед заголовком, чтобы она не обрезалась */
     .section-title::before {
         display: none;
     }
-}
-
-@media (max-width: 480px) {
-    .hero__box { padding: 26px 18px 260px; }
-    .hero__content h1 { font-size: 26px; }
-    .hero__content p { font-size: 14px; }
-    .hero__leaf { font-size: 42px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
