@@ -57,7 +57,7 @@ const LOGO_PHRASES = [
 // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
 // =============================================
 let products = [];
-let productStats = {}; // { productId: count }
+let productStats = {}; 
 let promocodes = [];
 let cart = [];
 let favorites = [];
@@ -71,7 +71,6 @@ let currentAuthTab = 'login';
 let currentCategory = 'liquids';
 let orderIdempotencyKey = null;
 
-// Для auto-retry
 let retryTimer = null;
 let retryCountdown = 0;
 
@@ -144,7 +143,6 @@ function showConfirm(options) {
     okBtn.textContent = options.okText || 'Подтвердить';
     cancelBtn.textContent = options.cancelText || 'Отмена';
     
-    // Сброс класса опасности
     okBtn.className = 'confirm-modal__btn ' + (options.danger ? 'confirm-modal__btn--danger' : 'confirm-modal__btn--primary');
 
     modal.classList.add('open');
@@ -277,7 +275,6 @@ function showToast(message, type, action) {
     setTimeout(() => toast.remove(), 300);
   }, action ? 5000 : 3000);
 
-  // При клике на кнопку таймаут сбрасывается
   if (action) {
     toast.addEventListener('mouseenter', () => clearTimeout(timeout), { once: true });
   }
@@ -345,7 +342,6 @@ function startAutoRetry() {
   if (counter) counter.textContent = retryCountdown;
   const interval = setInterval(tick, 1000);
   
-  // Таймаут дублирует интервал на случай если DOM пропал
   retryTimer = setTimeout(() => {
     clearInterval(interval);
     loadProducts();
@@ -359,7 +355,6 @@ async function loadProductStats() {
       productStats = await response.json();
     }
   } catch (e) {
-    // Игнорируем ошибку, это не критично
     productStats = {};
   }
 }
@@ -378,13 +373,10 @@ async function loadProducts() {
     
     products = await response.json();
     
-    // Параллельно грузим промокоды и статистику
     await Promise.all([loadPromocodes(), loadProductStats()]);
     
     switchCategory(currentCategory);
     renderRecentlyViewedOnIndex();
-    
-    // Восстанавливаем корзину с учётом актуальных цен
     loadCartFromStorage();
     
   } catch (error) {
@@ -1038,7 +1030,6 @@ function flyToCart(sourceEl, imageSrc) {
   img.style.height = startRect.height + 'px';
   document.body.appendChild(img);
 
-  // Форсируем reflow
   img.getBoundingClientRect();
 
   requestAnimationFrame(() => {
@@ -1068,18 +1059,15 @@ function addToCart(productId, event) {
   saveCartToStorage();
   updateCartUI();
   
-  // Анимация полета
   if (event) {
     const btn = event.currentTarget || event.target;
     flyToCart(btn, product.image);
   }
 
-  // Показываем тост с кнопкой перехода
   showToast(`${product.name} добавлен`, 'success', {
     text: 'Открыть корзину',
     onClick: () => {
       openCart();
-      // Закрываем тост принудительно
       document.querySelectorAll('.toast').forEach(t => t.classList.add('hide'));
     }
   });
@@ -1124,6 +1112,7 @@ function getCartTotal() {
   return Utils.calculateCartTotal(cart, discountPercent);
 }
 
+// ИСПРАВЛЕНИЕ №1: Добавлен бренд в корзину
 function updateCartUI() {
   const totalItems = Utils.countCartItems(cart);
   cartCount.textContent = totalItems;
@@ -1140,7 +1129,10 @@ function updateCartUI() {
   cartItems.innerHTML = cart.map(item => `
     <div class="cart-item">
       <div class="cart-item__info">
-        <span class="cart-item__name">${item.name}</span>
+        <span class="cart-item__name">
+          <span style="display:block; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">${item.brand}</span>
+          ${item.name}
+        </span>
         <span class="cart-item__price">${item.price} BYN</span>
       </div>
       <div class="cart-item__controls">
@@ -1195,11 +1187,21 @@ function applyPromo() {
 // =============================================
 // ===== ФИЛЬТРЫ =====
 // =============================================
+// ИСПРАВЛЕНИЕ №2: Сортировка брендов по новизне (по убыванию ID товаров)
 function initFilters(category) {
   const container = document.getElementById('filterContainer');
   if (!container) return;
   const catProducts = products.filter(p => p.category === category);
+  
+  // Собираем уникальные бренды
   const brands = [...new Set(catProducts.map(p => p.brand))];
+  
+  // Сортируем бренды так, чтобы те, у которых есть товары с большим ID (новинки), были первыми
+  brands.sort((a, b) => {
+    const maxIdA = Math.max(...catProducts.filter(p => p.brand === a).map(p => p.id));
+    const maxIdB = Math.max(...catProducts.filter(p => p.brand === b).map(p => p.id));
+    return maxIdB - maxIdA;
+  });
 
   container.innerHTML = brands.map(b => `<button class="filter-btn" data-filter="${b}">${b}</button>`).join('');
 
