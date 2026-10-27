@@ -94,7 +94,7 @@
 
         <div class="screen hidden" id="startScreen">
             <h1>Flappy Slush</h1>
-            <p>Тапай по экрану, чтобы заправляться и летать.<br>Пролетай через подики и ставь рекорды!</p>
+            <p>Тапай по экрану, чтобы заправляться и летать.<br>Игра бесконечна. С каждым рубежом подики ускоряются!</p>
             <div class="leaderboard" id="leaderboardStart">
                 <div class="leaderboard-title">🏆 Топ игроков</div>
                 <div id="leaderboardListStart" style="color:#B5A7BA; font-size:14px; text-align:center;">Загрузка...</div>
@@ -117,13 +117,6 @@
             <button class="btn-play" id="restartBtn">Ещё раз</button>
             <a href="index.html" class="back-link">← В магазин</a>
         </div>
-
-        <div class="screen hidden" id="winScreen">
-            <h1 style="color: #C77DFF; text-shadow: 0 0 20px #9B5DE5;">Победа!</h1>
-            <p style="color: #F7F0F8; font-size: 18px;">Ты настоящий мастер заправки!<br>100 очков пройдено!</p>
-            <button class="btn-play" id="winRestartBtn">Играть снова</button>
-            <a href="index.html" class="back-link">← В магазин</a>
-        </div>
     </div>
 
     <script>
@@ -137,7 +130,7 @@
         const JUMP_FORCE = -6.5;
         const PIPE_WIDTH = 85;
         const PIPE_GAP = 210;
-        const PIPE_SPEED = 3.2;
+        let PIPE_SPEED = 3.2; // Теперь изменяемая
         const SPAWN_RATE = 95;
 
         let frames = 0;
@@ -200,7 +193,6 @@
         const authScreen = document.getElementById('authScreen');
         const startScreen = document.getElementById('startScreen');
         const gameOverScreen = document.getElementById('gameOverScreen');
-        const winScreen = document.getElementById('winScreen');
         const scoreDisplay = document.getElementById('scoreDisplay');
         const finalScore = document.getElementById('finalScore');
         const highScoreEl = document.getElementById('highScore');
@@ -246,7 +238,6 @@
 
         document.getElementById('startBtn').addEventListener('click', startGame);
         document.getElementById('restartBtn').addEventListener('click', startGame);
-        document.getElementById('winRestartBtn').addEventListener('click', startGame);
 
         function startGame() {
             bird.y = 150;
@@ -261,6 +252,7 @@
             lastMilestone = 0;
             currentBg = 0;
             bgOffset = 0;
+            PIPE_SPEED = 3.2; // Сброс скорости
             timeOfDay = 'night';
             weather = 'clear';
             currentPalette = bgColors.night;
@@ -272,7 +264,6 @@
             
             startScreen.classList.add('hidden');
             gameOverScreen.classList.add('hidden');
-            winScreen.classList.add('hidden');
         }
 
         async function loadLeaderboard() {
@@ -351,21 +342,29 @@
             if (score > 0 && score % 10 === 0 && score !== lastMilestone) {
                 lastMilestone = score;
                 triggerFireworks();
+                
+                // Увеличиваем скорость с каждым рубежом, но не больше 7.5
+                if (PIPE_SPEED < 7.5) PIPE_SPEED += 0.15;
 
-                if (score === 20) initWeather('rain');
-                else if (score === 30) { timeOfDay = 'day'; currentPalette = bgColors.day; weather = 'clear'; }
-                else if (score === 40) initWeather('snow');
-                else if (score === 50) { timeOfDay = 'night'; currentPalette = bgColors.night; initWeather('storm'); }
-                else if (score === 60) { timeOfDay = 'sunset'; currentPalette = bgColors.sunset; weather = 'clear'; }
-                else if (score === 70) { timeOfDay = 'autumn'; currentPalette = bgColors.autumn; initWeather('leaves'); }
-                else if (score === 80) { weather = 'fog'; }
-                else if (score === 90) { timeOfDay = 'morning'; currentPalette = bgColors.morning; weather = 'clear'; }
+                // Берем остаток от деления на 100, чтобы бесконечно повторять цикл
+                let milestone = score % 100;
+                if (milestone === 0) milestone = 100;
 
-                if (score >= 100) {
-                    gameState = 'win';
-                    scoreDisplay.style.display = 'none';
-                    winScreen.classList.remove('hidden');
-                    submitScore(score);
+                if (milestone === 10) { timeOfDay = 'night'; currentPalette = bgColors.night; weather = 'clear'; }
+                else if (milestone === 20) initWeather('rain');
+                else if (milestone === 30) { timeOfDay = 'day'; currentPalette = bgColors.day; weather = 'clear'; }
+                else if (milestone === 40) initWeather('snow');
+                else if (milestone === 50) { timeOfDay = 'night'; currentPalette = bgColors.night; initWeather('storm'); }
+                else if (milestone === 60) { timeOfDay = 'sunset'; currentPalette = bgColors.sunset; weather = 'clear'; }
+                else if (milestone === 70) { timeOfDay = 'autumn'; currentPalette = bgColors.autumn; initWeather('leaves'); }
+                else if (milestone === 80) { weather = 'fog'; }
+                else if (milestone === 90) { timeOfDay = 'morning'; currentPalette = bgColors.morning; weather = 'clear'; }
+                else if (milestone === 100) { 
+                    // На каждые 100 очков делаем тройной салют
+                    triggerFireworks();
+                    triggerFireworks();
+                    triggerFireworks();
+                    timeOfDay = 'night'; currentPalette = bgColors.night; weather = 'clear';
                 }
             }
         }
@@ -442,7 +441,7 @@
             }
         }
 
-        // --- ЗЕРКАЛЬНЫЕ ПОДИКИ (чтоб не накладывались друг на друга) ---
+        // --- ЗЕРКАЛЬНЫЕ ПОДИКИ ---
         function drawPipes() {
             pipes.forEach(pipe => {
                 // --- ВЕРХНИЙ ПОДИК ---
