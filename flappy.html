@@ -130,7 +130,7 @@
         const JUMP_FORCE = -6.5;
         const PIPE_WIDTH = 85;
         const PIPE_GAP = 210;
-        let PIPE_SPEED = 3.2; // Теперь изменяемая
+        let PIPE_SPEED = 3.2; 
         const SPAWN_RATE = 95;
 
         let frames = 0;
@@ -171,14 +171,22 @@
         let bird = { x: 50, y: 150, width: 0, height: 0, velocity: 0, rotation: 0 };
         let pipes = [];
 
+        // Загрузка картинок
         const imgJuice = new Image(); imgJuice.src = 'https://i.ibb.co/5y9C351/jija.png';
-        const imgPod1 = new Image(); imgPod1.src = 'https://i.ibb.co/SX5MpJgr/pod1.png';
-        const imgPod2 = new Image(); imgPod2.src = 'https://i.ibb.co/hxFDTJDH/pod2.png';
+        
+        const podImages = [
+            new Image(), // 0
+            new Image(), // 1
+            new Image()  // 2
+        ];
+        podImages[0].src = 'https://i.ibb.co/hQfJKfH/pixil-frame-0.png';
+        podImages[1].src = 'https://i.ibb.co/1thdJ6qj/pixil-frame-0-1.png';
+        podImages[2].src = 'https://i.ibb.co/0jStL6X7/pixil-frame-0-2.png';
 
         let imagesLoaded = 0;
         function checkImages() {
             imagesLoaded++;
-            if (imagesLoaded === 3) {
+            if (imagesLoaded === 4) {
                 const ratio = imgJuice.height / imgJuice.width;
                 bird.width = 90; 
                 bird.height = 90 * ratio;
@@ -187,8 +195,9 @@
             }
         }
         imgJuice.onload = checkImages;
-        imgPod1.onload = checkImages;
-        imgPod2.onload = checkImages;
+        podImages[0].onload = checkImages;
+        podImages[1].onload = checkImages;
+        podImages[2].onload = checkImages;
 
         const authScreen = document.getElementById('authScreen');
         const startScreen = document.getElementById('startScreen');
@@ -252,7 +261,7 @@
             lastMilestone = 0;
             currentBg = 0;
             bgOffset = 0;
-            PIPE_SPEED = 3.2; // Сброс скорости
+            PIPE_SPEED = 3.2;
             timeOfDay = 'night';
             weather = 'clear';
             currentPalette = bgColors.night;
@@ -343,10 +352,8 @@
                 lastMilestone = score;
                 triggerFireworks();
                 
-                // Увеличиваем скорость с каждым рубежом, но не больше 7.5
                 if (PIPE_SPEED < 7.5) PIPE_SPEED += 0.15;
 
-                // Берем остаток от деления на 100, чтобы бесконечно повторять цикл
                 let milestone = score % 100;
                 if (milestone === 0) milestone = 100;
 
@@ -360,7 +367,6 @@
                 else if (milestone === 80) { weather = 'fog'; }
                 else if (milestone === 90) { timeOfDay = 'morning'; currentPalette = bgColors.morning; weather = 'clear'; }
                 else if (milestone === 100) { 
-                    // На каждые 100 очков делаем тройной салют
                     triggerFireworks();
                     triggerFireworks();
                     triggerFireworks();
@@ -441,38 +447,39 @@
             }
         }
 
-        // --- ЗЕРКАЛЬНЫЕ ПОДИКИ ---
+        // --- ЗЕРКАЛЬНЫЕ ПОДИКИ С РАЗНЫМИ ЦВЕТАМИ ---
         function drawPipes() {
             pipes.forEach(pipe => {
+                const imgTop = pipe.imgTop;
+                const imgBottom = pipe.imgBottom;
+                
                 // --- ВЕРХНИЙ ПОДИК ---
-                let imgH2 = PIPE_WIDTH * (imgPod2.height / imgPod2.width);
+                let imgHTop = PIPE_WIDTH * (imgTop.height / imgTop.width);
                 let yTop = pipe.topHeight;
-                let flipTop = false; // Флаг для чередования поворота
+                let flipTop = true; 
 
                 ctx.save();
                 ctx.beginPath();
                 ctx.rect(pipe.x, 0, PIPE_WIDTH, pipe.topHeight);
                 ctx.clip();
 
-                while (yTop > -imgH2) {
+                while (yTop > -imgHTop) {
                     ctx.save();
-                    if (!flipTop) {
-                        // Перевернутая картинка (смотрит вниз к проему)
+                    if (flipTop) {
                         ctx.translate(pipe.x, yTop);
                         ctx.scale(1, -1);
-                        ctx.drawImage(imgPod2, 0, 0, PIPE_WIDTH, imgH2);
+                        ctx.drawImage(imgTop, 0, 0, PIPE_WIDTH, imgHTop);
                     } else {
-                        // Обычная картинка (смотрит вверх)
-                        ctx.drawImage(imgPod2, pipe.x, yTop - imgH2, PIPE_WIDTH, imgH2);
+                        ctx.drawImage(imgTop, pipe.x, yTop - imgHTop, PIPE_WIDTH, imgHTop);
                     }
                     ctx.restore();
-                    yTop -= imgH2;
-                    flipTop = !flipTop; // Переключаем флаг
+                    yTop -= imgHTop;
+                    flipTop = !flipTop; 
                 }
                 ctx.restore();
 
                 // --- НИЖНИЙ ПОДИК ---
-                let imgH1 = PIPE_WIDTH * (imgPod1.height / imgPod1.width);
+                let imgHBottom = PIPE_WIDTH * (imgBottom.height / imgBottom.width);
                 let yBottom = pipe.topHeight + PIPE_GAP;
                 let flipBottom = false;
 
@@ -484,17 +491,15 @@
                 while (yBottom < canvas.height) {
                     ctx.save();
                     if (flipBottom) {
-                        // Перевернутая картинка (смотрит вниз)
-                        ctx.translate(pipe.x, yBottom + imgH1);
+                        ctx.translate(pipe.x, yBottom + imgHBottom);
                         ctx.scale(1, -1);
-                        ctx.drawImage(imgPod1, 0, 0, PIPE_WIDTH, imgH1);
+                        ctx.drawImage(imgBottom, 0, 0, PIPE_WIDTH, imgHBottom);
                     } else {
-                        // Обычная картинка (смотрит вверх к проему)
-                        ctx.drawImage(imgPod1, pipe.x, yBottom, PIPE_WIDTH, imgH1);
+                        ctx.drawImage(imgBottom, pipe.x, yBottom, PIPE_WIDTH, imgHBottom);
                     }
                     ctx.restore();
-                    yBottom += imgH1;
-                    flipBottom = !flipBottom; // Переключаем флаг
+                    yBottom += imgHBottom;
+                    flipBottom = !flipBottom; 
                 }
                 ctx.restore();
             });
@@ -512,7 +517,6 @@
         }
 
         function updateParticles() {
-            // Легкие частицы от прыжков
             for (let i = birdParticles.length - 1; i >= 0; i--) {
                 let p = birdParticles[i];
                 p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life -= 0.015;
@@ -521,7 +525,6 @@
                 ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
             }
             
-            // Осколки подиков
             for (let i = pipePieces.length - 1; i >= 0; i--) {
                 let p = pipePieces[i];
                 p.x += p.vx; p.y += p.vy; p.vy += 0.5; p.rot += p.vr; p.life -= 0.02;
@@ -532,7 +535,6 @@
                 ctx.restore();
             }
 
-            // ДЫМ / ПАР ПРИ ЗАТЯЖКЕ
             for (let i = smokeParticles.length - 1; i >= 0; i--) {
                 let s = smokeParticles[i];
                 s.x += s.vx;
@@ -560,7 +562,18 @@
                 let maxHeight = canvas.height - PIPE_GAP - 50;
                 if (maxHeight < minHeight) maxHeight = minHeight + 50;
                 let topHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
-                pipes.push({ x: canvas.width, topHeight: topHeight, passed: false });
+                
+                // Выбираем случайную картинку для ВЕРХНЕГО и НИЖНЕГО подика независимо
+                let topImgIndex = Math.floor(Math.random() * podImages.length);
+                let bottomImgIndex = Math.floor(Math.random() * podImages.length);
+                
+                pipes.push({ 
+                    x: canvas.width, 
+                    topHeight: topHeight, 
+                    passed: false,
+                    imgTop: podImages[topImgIndex],
+                    imgBottom: podImages[bottomImgIndex]
+                });
             }
 
             for (let i = pipes.length - 1; i >= 0; i--) {
@@ -591,7 +604,6 @@
                 gameState = 'exploding';
                 explodingTimer = 40;
                 
-                // Осколки подиков
                 for (let i = 0; i < 30; i++) {
                     pipePieces.push({
                         x: bird.x + bird.width/2,
@@ -602,12 +614,11 @@
                         vy: (Math.random() - 0.5) * 15,
                         rot: Math.random() * Math.PI * 2,
                         vr: (Math.random() - 0.5) * 0.4,
-                        img: Math.random() > 0.5 ? imgPod1 : imgPod2,
+                        img: podImages[Math.floor(Math.random() * podImages.length)],
                         life: 1
                     });
                 }
                 
-                // ПАР / ДЫМ
                 for (let i = 0; i < 30; i++) {
                     smokeParticles.push({
                         x: bird.x + bird.width/2,
