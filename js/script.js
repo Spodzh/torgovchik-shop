@@ -863,20 +863,34 @@ function removeBanner() {
 // =============================================
 function switchAuthTab(tab) {
   currentAuthTab = tab;
-  document.querySelectorAll('.auth-tab').forEach(t => { t.classList.toggle('active', t.dataset.tab === tab); t.setAttribute('aria-selected', t.dataset.tab === tab ? 'true' : 'false'); });
+  document.querySelectorAll('.auth-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+    t.setAttribute('aria-selected', t.dataset.tab === tab ? 'true' : 'false');
+  });
+
   const title = document.getElementById('authTitle');
   const subtitle = document.getElementById('authSubtitle');
   const submitText = document.getElementById('authSubmitText');
   const forgot = document.getElementById('authForgot');
   const passwordInput = document.getElementById('loginPassword');
+  const consentWrap = document.getElementById('authConsentWrap');
 
   if (tab === 'register') {
-    title.textContent = 'Создать аккаунт'; subtitle.textContent = 'Зарегистрируйтесь, чтобы получать билетики';
-    submitText.textContent = 'Зарегистрироваться'; forgot.classList.add('hidden'); passwordInput.setAttribute('autocomplete', 'new-password');
+    title.textContent = 'Создать аккаунт';
+    subtitle.textContent = 'Зарегистрируйтесь, чтобы получать билетики';
+    submitText.textContent = 'Зарегистрироваться';
+    forgot.classList.add('hidden');
+    passwordInput.setAttribute('autocomplete', 'new-password');
+    if (consentWrap) consentWrap.style.display = 'block';
   } else {
-    title.textContent = 'С возвращением'; subtitle.textContent = 'Войдите, чтобы продолжить покупки';
-    submitText.textContent = 'Войти'; forgot.classList.remove('hidden'); passwordInput.setAttribute('autocomplete', 'current-password');
+    title.textContent = 'С возвращением';
+    subtitle.textContent = 'Войдите, чтобы продолжить покупки';
+    submitText.textContent = 'Войти';
+    forgot.classList.remove('hidden');
+    passwordInput.setAttribute('autocomplete', 'current-password');
+    if (consentWrap) consentWrap.style.display = 'none';
   }
+
   clearAuthErrors();
 }
 
@@ -941,6 +955,19 @@ async function login() {
 
 async function register() {
   clearAuthErrors();
+  
+  // --- ПРОВЕРКА ЧЕКБОКСА ---
+  const consentCheckbox = document.getElementById('authConsent');
+  if (consentCheckbox && !consentCheckbox.checked) {
+    const err = document.getElementById('consentError');
+    if (err) {
+      err.textContent = 'Необходимо согласие на обработку данных';
+      err.classList.add('visible');
+    }
+    return;
+  }
+  
+  const input = document.getElementById('loginInput');
   const username = Utils.normalizeTelegramUsername(document.getElementById('loginInput').value);
   const password = document.getElementById('loginPassword').value.trim();
   const userErr = Utils.validateTelegramUsername(username);
@@ -1369,6 +1396,16 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
 
 orderForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+  
+  // --- ПРОВЕРКА ЧЕКБОКСА ---
+  const orderConsent = document.getElementById('orderConsent');
+  if (orderConsent && !orderConsent.checked) {
+    orderMessage.style.display = 'block';
+    orderMessage.textContent = '⚠️ Необходимо согласие на обработку персональных данных.';
+    orderMessage.style.color = '#ff7777';
+    return;
+  }
+  
   const name = document.getElementById('orderName').value.trim();
   const telegramRaw = document.getElementById('orderTelegram').value.trim();
   const address = document.getElementById('orderAddress').value.trim();

@@ -220,10 +220,12 @@
     <footer class="footer">
         <div class="container">
             <p>© 2026 Torgovchik. Все права защищены.</p>
-            <p style="margin-top: 8px; font-size: 14px; opacity: 0.8;">
-                <a href="terms.html">Пользовательское соглашение</a>
+            <p style="margin-top: 8px; font-size: 14px; opacity: 0.8; line-height: 1.8;">
+                <a href="terms.html">Пользовательское соглашение</a> • 
+                <a href="privacy.html">Политика конфиденциальности</a> • 
+                <a href="consent.html">Согласие на обработку данных</a>
             </p>
-            <!-- СЕКРЕТНАЯ КНОПКА (уже заметная) -->
+            <!-- СЕКРЕТНАЯ КНОПКА -->
             <button id="secretGameBtn" style="background: rgba(255, 118, 40, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 10px 20px; border-radius: 8px; margin-top: 20px; cursor: pointer; font-family: 'Manrope', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; box-shadow: 0 0 15px rgba(255,118,40,0.2);" onmouseover="this.style.background='rgba(255, 118, 40, 0.2)'" onmouseout="this.style.background='rgba(255, 118, 40, 0.1)'">
                 🎮 Секретная игра
             </button>
@@ -309,6 +311,16 @@
                     <button type="button" class="auth-field__eye" id="togglePassword" aria-label="Показать пароль">👁</button>
                 </div>
                 <div class="auth-error" id="passwordError" role="alert"></div>
+                
+                <!-- ЧЕКБОКС ДЛЯ РЕГИСТРАЦИИ -->
+                <div id="authConsentWrap" style="display: none; margin: 10px 0 16px; text-align: left; padding: 0 4px;">
+                    <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text-secondary); line-height: 1.4;">
+                        <input type="checkbox" id="authConsent" style="margin-top: 3px; accent-color: var(--accent); width: 16px; height: 16px; flex-shrink: 0;">
+                        <span>Я согласен с <a href="privacy.html" target="_blank" style="color: var(--accent); text-decoration: underline;">Политикой конфиденциальности</a> и даю <a href="consent.html" target="_blank" style="color: var(--accent); text-decoration: underline;">Согласие на обработку данных</a></span>
+                    </label>
+                    <div class="auth-error" id="consentError" role="alert"></div>
+                </div>
+
                 <div class="auth-forgot" id="authForgot">
                     <a href="#" id="forgotPasswordLink">Забыли пароль?</a>
                 </div>
@@ -464,6 +476,15 @@
                     </div>
                     <div id="promoMessage" role="status" style="font-size:14px; margin-top:6px; color:#B5A7BA;"></div>
                 </div>
+                
+                <!-- ЧЕКБОКС ДЛЯ ЗАКАЗА -->
+                <div class="form-group" style="margin-top: 20px;">
+                    <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text-secondary); line-height: 1.4; font-weight: normal; text-transform: none; letter-spacing: 0;">
+                        <input type="checkbox" id="orderConsent" style="margin-top: 3px; accent-color: var(--accent); width: 16px; height: 16px; flex-shrink: 0;">
+                        <span>Я согласен с <a href="privacy.html" target="_blank" style="color: var(--accent); text-decoration: underline;">Политикой конфиденциальности</a> и даю <a href="consent.html" target="_blank" style="color: var(--accent); text-decoration: underline;">Согласие на обработку данных</a></span>
+                    </label>
+                </div>
+                
                 <div class="form-group"><button type="submit" class="btn btn-primary" id="orderSubmit">Отправить заказ</button></div>
             </form>
             <div id="orderMessage" role="status" style="display:none; text-align:center; margin-top:10px;"></div>
