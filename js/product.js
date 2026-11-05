@@ -51,7 +51,7 @@ function showToast(message, type, action) {
 
   const closeBtn = document.createElement('button');
   closeBtn.className = 'toast__close';
-  closeBtn.innerHTML = '✕';
+  closeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
   closeBtn.addEventListener('click', () => {
     toast.classList.add('hiding');
     setTimeout(() => toast.remove(), 300);
@@ -385,7 +385,7 @@ function renderProduct(p) {
   const categoryLabel = categoryLabels[p.category] || p.category || '—';
 
   const popularityHtml = boughtCount > 0
-    ? `<div class="product-info__brand" style="color:var(--accent); background:rgba(197,138,69,0.1); display:inline-block; padding:4px 12px; border-radius:20px; margin-bottom:12px; width:fit-content;">🔥 Купили ${boughtCount} раз</div>`
+    ? `<div class="product-info__brand" style="color:var(--accent); background:rgba(197,138,69,0.1); display:inline-block; padding:4px 12px; border-radius:20px; margin-bottom:12px; width:fit-content;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Купили ${boughtCount} раз</div>`
     : '';
 
   content.innerHTML = `
@@ -394,7 +394,7 @@ function renderProduct(p) {
         <button class="product-card__fav ${isFav ? 'active' : ''}"
                 id="productFavBtn"
                 aria-label="${isFav ? 'Убрать из избранного' : 'Добавить в избранное'}"
-                aria-pressed="${isFav ? 'true' : 'false'}">${isFav ? '❤' : '♡'}</button>
+                aria-pressed="${isFav ? 'true' : 'false'}">${isFav ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'}</button>
         <img src="${p.image}"
              alt="${p.name}"
              onerror="this.src='assets/logo.png'">
@@ -518,7 +518,7 @@ function updateProductActions() {
   const favBtn = document.getElementById('productFavBtn');
   if (favBtn) {
     favBtn.classList.toggle('active', isFav);
-    favBtn.textContent = isFav ? '❤' : '♡';
+    favBtn.innerHTML = isFav ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
     favBtn.setAttribute('aria-label', isFav ? 'Убрать из избранного' : 'Добавить в избранное');
     favBtn.setAttribute('aria-pressed', isFav ? 'true' : 'false');
   }

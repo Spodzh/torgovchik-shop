@@ -284,7 +284,7 @@ function showToast(message, type, action) {
 
   const closeBtn = document.createElement('button');
   closeBtn.className = 'toast__close';
-  closeBtn.innerHTML = '✕';
+  closeBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
   closeBtn.addEventListener('click', () => {
     toast.classList.add('hiding');
     setTimeout(() => toast.remove(), 300);
@@ -518,7 +518,7 @@ function updateFavoritesUI() {
   const toggleBtn = document.getElementById('favoritesToggle');
   if (toggleBtn) {
     const icon = toggleBtn.querySelector('.favorites-icon');
-    if (icon) icon.textContent = favorites.length > 0 ? '❤' : '♡';
+    if (icon) icon.innerHTML = favorites.length > 0 ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
   }
 
   const grid = document.getElementById('favoritesGrid');
@@ -532,7 +532,7 @@ function refreshFavoriteIcons() {
     if (heart) {
       const active = Utils.isFavorite(favorites, id);
       heart.classList.toggle('active', active);
-      heart.textContent = active ? '❤' : '♡';
+      heart.innerHTML = active ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
       heart.setAttribute('aria-label', active ? 'Убрать из избранного' : 'Добавить в избранное');
       heart.setAttribute('aria-pressed', active ? 'true' : 'false');
     }
@@ -568,7 +568,7 @@ function renderFavoritesModal() {
 
   grid.innerHTML = favProducts.map(p => `
     <div class="favorites-card" data-id="${p.id}">
-      <button class="favorites-card__fav" data-id="${p.id}" aria-label="Убрать из избранного" aria-pressed="true">❤</button>
+      <button class="favorites-card__fav" data-id="${p.id}" aria-label="Убрать из избранного" aria-pressed="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
       <a href="product.html?id=${p.id}" class="favorites-card__link" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1;">
         <img src="${p.image}" alt="${p.name}" class="favorites-card__image" loading="lazy" onerror="this.src='assets/logo.png'">
         <div class="favorites-card__name">${p.name}</div>
@@ -684,7 +684,7 @@ function updateProfileUI() {
     userBtn.innerHTML = `
       <span class="user-btn__avatar"></span>
       <span class="user-btn__name">${currentUser.telegram}</span>
-      <span class="user-btn__tickets">🎟️${tickets}</span>
+      <span class="user-btn__tickets"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 2px;"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v14"/></svg>${tickets}</span>
     `;
     applyAvatar(userBtn.querySelector('.user-btn__avatar'), avatarId, currentUser.telegram);
 
@@ -766,7 +766,7 @@ function updateProfileUI() {
       ordersDiv.innerHTML = `<div class="orders-empty" style="text-align:center; padding:20px; color:var(--text-muted);"><div class="orders-empty__icon" style="font-size:32px; margin-bottom:10px;">📦</div><div class="orders-empty__title">Пока здесь пусто</div></div>`;
     }
   } else {
-    userBtn.innerHTML = '👤 Войти';
+    userBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 6px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Войти`;
     document.getElementById('profileName').textContent = 'Пользователь';
     document.getElementById('profileTickets').textContent = '0';
     document.getElementById('profileOrdersCount').textContent = '0';
@@ -935,7 +935,7 @@ function resetAuthForm() {
   document.getElementById('loginInput').value = '';
   document.getElementById('loginPassword').value = '';
   document.getElementById('loginPassword').type = 'password';
-  document.getElementById('togglePassword').textContent = '👁';
+  document.getElementById('togglePassword').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
   clearAuthErrors(); switchAuthTab('login');
 }
 
@@ -1195,7 +1195,7 @@ function updateCartUI() {
           <button class="cart-qty-btn" onclick="changeQuantity(${item.id}, -1)" aria-label="Уменьшить количество">−</button>
           <span class="cart-qty-val">${item.quantity}</span>
           <button class="cart-qty-btn" onclick="changeQuantity(${item.id}, 1)" aria-label="Увеличить количество">+</button>
-          <button class="cart-item__remove" onclick="removeFromCart(${item.id})" aria-label="Удалить товар">✕</button>
+          <button class="cart-item__remove" onclick="removeFromCart(${item.id})" aria-label="Удалить товар"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
       </div>
     `).join('');
@@ -1297,7 +1297,7 @@ function renderProducts(category, filter = 'Все') {
     
     return `
       <div class="product-card" data-id="${p.id}">
-        <button class="product-card__fav ${fav ? 'active' : ''}" data-id="${p.id}" aria-label="${fav ? 'Убрать из избранного' : 'Добавить в избранное'}" aria-pressed="${fav ? 'true' : 'false'}">${fav ? '❤' : '♡'}</button>
+        <button class="product-card__fav ${fav ? 'active' : ''}" data-id="${p.id}" aria-label="${fav ? 'Убрать из избранного' : 'Добавить в избранное'}" aria-pressed="${fav ? 'true' : 'false'}">${fav ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'}</button>
         <a href="product.html?id=${p.id}" class="product-card__link" aria-label="Открыть ${p.name}">
           <img src="${p.image}" alt="${p.name}" class="product-card__image" loading="lazy" onerror="this.src='assets/logo.png'">
           ${popularity}
@@ -1377,7 +1377,7 @@ document.getElementById('togglePassword').addEventListener('click', function() {
   const input = document.getElementById('loginPassword');
   const isPassword = input.type === 'password';
   input.type = isPassword ? 'text' : 'password';
-  this.textContent = isPassword ? '🙈' : '👁';
+  this.innerHTML = isPassword ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
   this.setAttribute('aria-label', isPassword ? 'Скрыть пароль' : 'Показать пароль');
 });
 

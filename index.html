@@ -111,23 +111,26 @@
             </div>
 
             <div class="header__user">
-                <button class="user-btn" id="userBtn" aria-label="Войти в профиль">👤 Войти</button>
+                <button class="user-btn" id="userBtn" aria-label="Войти в профиль">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Войти</span>
+                </button>
             </div>
 
             <button class="favorites-btn" id="favoritesToggle" aria-label="Открыть избранное">
-                <span class="favorites-icon" aria-hidden="true">♡</span>
+                <svg class="favorites-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                 <span class="favorites-badge" id="favoritesCount" aria-live="polite">0</span>
             </button>
 
             <button class="cart-btn" id="cartToggle" aria-label="Открыть корзину">
-                <span class="cart-icon" aria-hidden="true">🛒</span>
+                <svg class="cart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                 <span class="cart-badge" id="cartCount" aria-live="polite">0</span>
             </button>
         </div>
     </header>
 
     <main>
-        <!-- HERO SECTION (NOVEMBER / FIRST FROST) -->
+        <!-- HERO SECTION -->
         <section class="hero">
             <span class="hero__leaf hero__leaf--tl" aria-hidden="true">🍁</span>
             <span class="hero__leaf hero__leaf--tr" aria-hidden="true">🍂</span>
@@ -215,17 +218,14 @@
                 <a href="privacy.html">Политика конфиденциальности</a> • 
                 <a href="consent.html">Согласие на обработку данных</a>
             </p>
-            <!-- СЕКРЕТНАЯ КНОПКА -->
             <button id="secretGameBtn">
                 🎮 Секретная игра
             </button>
         </div>
     </footer>
 
-    <!-- Кнопка "Наверх" -->
     <button class="scroll-to-top" id="scrollToTop" aria-label="Наверх" type="button">↑</button>
 
-    <!-- Confirm-модалка -->
     <div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
         <div class="confirm-modal__content">
             <div class="confirm-modal__icon" id="confirmIcon">⚠️</div>
@@ -241,7 +241,9 @@
     <aside class="cart-panel" id="cartPanel" aria-hidden="true" aria-label="Корзина">
         <div class="cart-panel__header">
             <h3>Корзина</h3>
-            <button class="cart-panel__close" id="cartClose" aria-label="Закрыть корзину">✕</button>
+            <button class="cart-panel__close" id="cartClose" aria-label="Закрыть корзину">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
         </div>
         <div class="cart-panel__body" id="cartItems">
             <p class="cart-empty">Корзина пуста</p>
@@ -258,7 +260,9 @@
 
     <div class="favorites-modal" id="favoritesModal" role="dialog" aria-modal="true" aria-labelledby="favoritesModalTitle" aria-hidden="true">
         <div class="favorites-modal__content">
-            <button class="favorites-modal__close" id="favoritesModalClose" aria-label="Закрыть избранное">✕</button>
+            <button class="favorites-modal__close" id="favoritesModalClose" aria-label="Закрыть избранное">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
             <h2 id="favoritesModalTitle">❤️ Избранное</h2>
             <div class="favorites-grid" id="favoritesGrid"></div>
         </div>
@@ -266,7 +270,9 @@
 
     <div class="announcement-modal" id="announcementModal" role="dialog" aria-modal="true" aria-labelledby="announcementTitle" aria-hidden="true">
         <div class="announcement-modal__content">
-            <button class="announcement-modal__close" id="announcementClose" aria-label="Закрыть объявление">✕</button>
+            <button class="announcement-modal__close" id="announcementClose" aria-label="Закрыть объявление">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
             <div class="announcement-modal__badge" aria-hidden="true">
                 <span class="announcement-modal__badge-dot"></span>
                 Новость
@@ -280,7 +286,9 @@
 
     <div class="login-modal" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-hidden="true">
         <div class="login-modal__content">
-            <button class="login-modal__close" id="loginModalClose" aria-label="Закрыть окно входа">✕</button>
+            <button class="login-modal__close" id="loginModalClose" aria-label="Закрыть окно входа">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
             <span class="login-modal__leaf" aria-hidden="true">🍂</span>
             <div class="login-modal__brand">TORGOVCHIK</div>
             <h2 class="login-modal__title" id="authTitle">С возвращением</h2>
@@ -302,7 +310,6 @@
                 </div>
                 <div class="auth-error" id="passwordError" role="alert"></div>
                 
-                <!-- ЧЕКБОКС ДЛЯ РЕГИСТРАЦИИ -->
                 <div id="authConsentWrap" style="display: none; margin: 10px 0 16px; text-align: left; padding: 0 4px;">
                     <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text-secondary); line-height: 1.4;">
                         <input type="checkbox" id="authConsent" style="margin-top: 3px; accent-color: var(--accent); width: 16px; height: 16px; flex-shrink: 0;">
@@ -332,7 +339,9 @@
                     </svg>
                     <h2 id="profileModalTitle">Мой профиль</h2>
                 </div>
-                <button class="profile-modal__close" id="profileModalClose" aria-label="Закрыть профиль">✕</button>
+                <button class="profile-modal__close" id="profileModalClose" aria-label="Закрыть профиль">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
 
             <div class="profile-banner-wrap">
@@ -412,7 +421,9 @@
 
     <div class="avatar-modal" id="avatarModal" role="dialog" aria-modal="true" aria-labelledby="avatarModalTitle" aria-hidden="true">
         <div class="avatar-modal__content">
-            <button class="avatar-modal__close" id="avatarModalClose" aria-label="Закрыть выбор аватарки">✕</button>
+            <button class="avatar-modal__close" id="avatarModalClose" aria-label="Закрыть выбор аватарки">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
             <h2 id="avatarModalTitle">🎨 Выберите аватарку</h2>
             <p class="avatar-modal__hint">Нажмите на понравившуюся и подтвердите выбор</p>
             <div class="avatar-grid" id="avatarGrid"></div>
@@ -425,7 +436,9 @@
 
     <div class="banner-modal" id="bannerModal" role="dialog" aria-modal="true" aria-labelledby="bannerModalTitle" aria-hidden="true">
         <div class="banner-modal__content">
-            <button class="banner-modal__close" id="bannerModalClose" aria-label="Закрыть выбор шапки">✕</button>
+            <button class="banner-modal__close" id="bannerModalClose" aria-label="Закрыть выбор шапки">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
             <h2 id="bannerModalTitle">🎨 Шапка профиля</h2>
             <p class="banner-modal__hint">Выберите фон для профиля или уберите шапку</p>
             <div class="banner-grid" id="bannerGrid"></div>
@@ -438,7 +451,9 @@
 
     <div class="order-modal" id="orderModal" role="dialog" aria-modal="true" aria-labelledby="orderModalTitle" aria-hidden="true">
         <div class="order-modal__content">
-            <button class="order-modal__close" id="orderModalClose" aria-label="Закрыть оформление заказа">✕</button>
+            <button class="order-modal__close" id="orderModalClose" aria-label="Закрыть оформление заказа">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
             <h2 id="orderModalTitle">Оформление заказа</h2>
             <form id="orderForm" novalidate>
                 <div class="form-group">
@@ -463,7 +478,6 @@
                     <div id="promoMessage" role="status" style="font-size:14px; margin-top:6px; color:#A7AAA8;"></div>
                 </div>
                 
-                <!-- ЧЕКБОКС ДЛЯ ЗАКАЗА -->
                 <div class="form-group" style="margin-top: 20px;">
                     <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text-secondary); line-height: 1.4; font-weight: normal; text-transform: none; letter-spacing: 0;">
                         <input type="checkbox" id="orderConsent" style="margin-top: 3px; accent-color: var(--accent); width: 16px; height: 16px; flex-shrink: 0;">
@@ -471,7 +485,7 @@
                     </label>
                 </div>
                 
-                <div class="form-group"><button type="submit" class="btn btn-primary" id="orderSubmit">Отправить заказ</button></div>
+                <div class="form-group"><button type="submit" class="btn btn-primary" id="orderSubmit" style="width:100%;">Отправить заказ</button></div>
             </form>
             <div id="orderMessage" role="status" style="display:none; text-align:center; margin-top:10px;"></div>
         </div>
