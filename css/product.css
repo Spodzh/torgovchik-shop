@@ -1,24 +1,226 @@
-/* ===== СТРАНИЦА ТОВАРА / HALLOWEEN NIGHT ===== */
+/* ===== PRODUCT PAGE / NOVEMBER / FIRST FROST ===== */
 .product-page {
     padding: 40px 0 80px;
     background: var(--bg-main);
-    min-height: calc(100vh - 200px);
-    position: relative;
+    min-height: 70vh;
 }
 
-.product-breadcrumbs { margin-bottom: 32px; }
-
+/* Хлебные крошки / Кнопка назад */
+.product-breadcrumbs {
+    margin-bottom: 32px;
+}
 .product-breadcrumbs__link {
-    display: inline-flex; align-items: center; gap: 8px;
-    color: var(--text-secondary); text-decoration: none;
-    font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 600;
-    padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border-soft);
-    background: var(--bg-card); transition: all 0.25s;
-    text-transform: uppercase; letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    padding: 10px 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+}
+.product-breadcrumbs__link:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(197,138,69,0.05);
+    box-shadow: 0 0 15px rgba(197,138,69,0.1);
 }
 
-/* ===== ОСНОВНАЯ КАРТОЧКА ===== */
-.product-detail {
+/* Основной контейнер */
+.product-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    border-radius: 24px;
+    padding: 48px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Красивое свечение на фоне карточки */
+.product-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 30%, rgba(197, 138, 69, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Блок с картинкой */
+.product-image-wrap {
+    position: relative;
+    z-index: 1;
+    background: var(--bg-main);
+    border: 1px solid var(--border-soft);
+    border-radius: 20px;
+    padding: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.product-image-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(197, 138, 69, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.product-image-wrap img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
+}
+
+/* Кнопка избранного на картинке */
+.product-card__fav {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(23, 25, 27, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-soft);
+    color: var(--cold-blue);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 10;
+    padding: 0;
+}
+.product-card__fav:hover {
+    transform: scale(1.1);
+    background: rgba(130, 149, 160, 0.2);
+    border-color: var(--cold-blue);
+}
+.product-card__fav.active {
+    background: rgba(130, 149, 160, 0.2);
+    border-color: var(--cold-blue);
+    box-shadow: 0 0 12px rgba(130, 149, 160, 0.3);
+}
+
+/* Блок с информацией */
+.product-info {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.product-info__brand {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.product-info__title {
+    font-family: 'Bitter', serif;
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+}
+
+.product-info__price {
+    font-family: 'Bitter', serif;
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--price);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+.product-info__price span {
+    font-size: 20px;
+    color: var(--text-secondary);
+    font-family: 'Manrope', sans-serif;
+    font-weight: 500;
+}
+
+.product-info__desc {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+/* Кнопки действий */
+.product-info__actions {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.product-info__actions .btn {
+    flex: 1;
+    text-align: center;
+    padding: 18px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Характеристики */
+.product-info__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.product-meta-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+    padding: 8px 0;
+    border-bottom: 1px dashed rgba(130, 149, 160, 0.15);
+}
+.product-meta-item:last-child {
+    border-bottom: none;
+}
+
+.product-meta-item strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Скелетон загрузки */
+.product-skeleton {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 60px;
@@ -26,136 +228,75 @@
     border: 1px solid var(--border-soft);
     border-radius: 24px;
     padding: 48px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-    position: relative;
-    overflow: hidden;
 }
-
-/* Легкое мистическое свечение на фоне карточки */
-.product-detail::before {
-    content: '';
-    position: absolute;
-    top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle at 70% 30%, rgba(155, 93, 229, 0.05) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
+.product-skeleton__image {
+    aspect-ratio: 1;
+    border-radius: 20px;
+    background: var(--bg-main);
 }
-
-.product-detail__image-wrap {
-    position: relative;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(16, 13, 18, 0.5);
-    border-radius: 16px;
-    padding: 40px;
-    aspect-ratio: 1 / 1;
-    border: 1px solid var(--border-soft);
-    z-index: 1;
-}
-
-.product-detail__image {
-    max-width: 100%; max-height: 100%; object-fit: contain; display: block;
-    filter: drop-shadow(0 15px 45px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 30px rgba(255, 118, 40, 0.15));
-    transition: transform 0.3s ease;
-}
-
-.product-detail__fav {
-    position: absolute; top: 16px; right: 16px; width: 48px; height: 48px;
-    border-radius: 12px; background: rgba(16, 13, 18, 0.8); backdrop-filter: blur(8px);
-    border: 1px solid var(--border-soft); color: var(--purple);
-    font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: all 0.25s; z-index: 2; padding: 0;
-}
-
-.product-detail__fav.active {
-    background: rgba(155, 93, 229, 0.2);
-    border-color: var(--purple);
-    box-shadow: 0 0 20px rgba(155, 93, 229, 0.5);
-}
-
-.product-detail__info { display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1; }
-.product-detail__brand { font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
-.product-detail__name { font-family: 'Bitter', serif; font-size: 42px; font-weight: 800; line-height: 1.1; color: var(--text-primary); margin-bottom: 24px; letter-spacing: -0.5px; word-wrap: break-word; }
-
-.product-detail__price { font-family: 'Bitter', serif; font-size: 44px; font-weight: 800; color: var(--price); margin-bottom: 32px; text-shadow: 0 0 20px rgba(255, 170, 82, 0.4); }
-.product-detail__price span { font-size: 24px; font-weight: 700; color: var(--text-secondary); margin-left: 6px; }
-
-.product-detail__category {
-    display: inline-block; padding: 8px 16px; border-radius: 8px;
-    background: rgba(155, 93, 229, 0.1); border: 1px solid var(--border-medium);
-    color: var(--purple-glow); font-family: 'Manrope', sans-serif; font-size: 12px;
-    font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 32px; width: max-content;
-}
-
-.product-detail__actions { display: flex; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
-.product-detail__btn {
-    flex: 1; min-width: 200px; padding: 18px 32px; font-size: 16px; font-weight: 700;
-    border-radius: 8px; cursor: pointer; border: none; font-family: 'Manrope', sans-serif;
-    transition: all 0.25s ease; text-transform: uppercase; letter-spacing: 1px;
-}
-.product-detail__btn--primary { background: var(--grad-accent); color: #100D12; box-shadow: 0 8px 30px rgba(255, 118, 40, 0.3); }
-.product-detail__btn--secondary { background: transparent; color: var(--text-primary); border: 1px solid var(--border-medium); }
-.product-detail__btn--in-cart { background: rgba(155, 93, 229, 0.2); color: var(--purple-glow); border: 1px solid var(--purple); cursor: default; }
-
-.product-detail__meta { padding-top: 32px; border-top: 1px solid var(--border-soft); display: flex; flex-direction: column; gap: 16px; }
-.product-detail__meta-row { display: flex; justify-content: space-between; align-items: baseline; font-family: 'Manrope', sans-serif; font-size: 15px; }
-.product-detail__meta-label { color: var(--text-muted); text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
-.product-detail__meta-value { color: var(--text-primary); font-weight: 600; }
-
-.product-detail__popularity {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
-    color: var(--accent); background: rgba(255, 118, 40, 0.1); border: 1px solid var(--border-orange);
-    padding: 8px 16px; border-radius: 8px; margin-bottom: 24px; width: max-content;
-}
-
-/* ===== СКЕЛЕТОН СТРАНИЦЫ ТОВАРА ===== */
-.product-skeleton { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: 24px; padding: 48px; }
-.product-skeleton__image { aspect-ratio: 1 / 1; border-radius: 16px; }
-.product-skeleton__info { display: flex; flex-direction: column; gap: 16px; justify-content: center; }
-.product-skeleton__info .skeleton-line { height: 20px; width: 100%; }
-.product-skeleton__info .skeleton-line--short { width: 60%; height: 24px; }
-.product-skeleton__info .skeleton-line--tiny { width: 40%; height: 16px; }
-.product-skeleton__info .skeleton-line--price { width: 50%; height: 36px; margin: 16px 0; }
-
-/* ===== ПУСТО / ОШИБКА ===== */
-.product-not-found { text-align: center; padding: 80px 20px; background: var(--bg-card); border: 1px solid var(--border-soft); border-radius: 24px; }
-.product-not-found__icon { font-size: 72px; margin-bottom: 24px; opacity: 0.8; filter: drop-shadow(0 0 20px rgba(255, 118, 40, 0.4)); }
-.product-not-found__title { font-family: 'Bitter', serif; font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 16px; }
-.product-not-found__text { font-family: 'Manrope', sans-serif; font-size: 16px; color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
-
-/* ===== ХОВЕРЫ ===== */
-@media (hover: hover) and (pointer: fine) {
-    .product-breadcrumbs__link:hover { border-color: var(--accent); color: var(--accent); background: rgba(255, 118, 40, 0.08); }
-    .product-detail__image-wrap:hover .product-detail__image { transform: scale(1.05); }
-    .product-detail__fav:hover { transform: scale(1.1); background: rgba(155, 93, 229, 0.2); }
-    .product-detail__btn--primary:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(255, 118, 40, 0.5); }
-    .product-detail__btn--secondary:hover { border-color: var(--accent); color: var(--accent); }
+.product-skeleton__info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
 }
 
 /* ===== АДАПТИВ ===== */
+@media (max-width: 1024px) {
+    .product-container {
+        gap: 40px;
+        padding: 32px;
+    }
+    .product-info__title {
+        font-size: 32px;
+    }
+    .product-info__price {
+        font-size: 30px;
+    }
+}
+
 @media (max-width: 900px) {
-    .product-detail { grid-template-columns: 1fr; gap: 32px; padding: 32px; }
-    .product-detail__image-wrap { max-width: 100%; padding: 24px; }
-    .product-detail__name { font-size: 32px; }
-    .product-detail__price { font-size: 36px; }
+    .product-container, .product-skeleton {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+    .product-image-wrap {
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    .product-info__title {
+        font-size: 28px;
+    }
+    .product-info__price {
+        font-size: 26px;
+    }
+    .product-info__actions {
+        flex-direction: column;
+    }
 }
 
 @media (max-width: 600px) {
-    .product-page { padding: 20px 0 60px; }
-    .product-detail { padding: 20px; gap: 24px; border-radius: 16px; }
-    .product-detail__image-wrap { padding: 16px; border-radius: 12px; }
-    .product-detail__name { font-size: 26px; margin-bottom: 16px; }
-    .product-detail__brand { font-size: 12px; }
-    .product-detail__price { font-size: 32px; margin-bottom: 24px; }
-    .product-detail__btn { padding: 16px 24px; font-size: 15px; min-width: 100%; }
-    .product-detail__actions { gap: 12px; }
-    .product-detail__meta-row { font-size: 14px; }
-    
-    .product-skeleton { grid-template-columns: 1fr; padding: 20px; gap: 24px; }
-}
-
-@media (max-width: 375px) {
-    .product-detail__name { font-size: 22px; }
-    .product-detail__price { font-size: 28px; }
-    .product-detail__btn { font-size: 14px; padding: 14px 20px; }
+    .product-page {
+        padding: 20px 0 40px;
+    }
+    .product-container {
+        padding: 20px;
+        border-radius: 16px;
+    }
+    .product-info__title {
+        font-size: 24px;
+    }
+    .product-info__price {
+        font-size: 24px;
+    }
+    .product-info__desc {
+        font-size: 14px;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+    }
+    .product-breadcrumbs__link {
+        font-size: 13px;
+        padding: 8px 14px;
+    }
 }

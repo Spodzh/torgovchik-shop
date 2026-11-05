@@ -4,10 +4,6 @@
 (function (window) {
   'use strict';
 
-  /**
-   * Валидация Telegram username по правилам Telegram.
-   * Возвращает строку с ошибкой или null, если всё ок.
-   */
   function validateTelegramUsername(raw) {
     if (typeof raw !== 'string') return 'Введите Telegram username';
     const clean = raw.trim().startsWith('@') ? raw.trim().slice(1) : raw.trim();
@@ -21,18 +17,12 @@
     return null;
   }
 
-  /**
-   * Убирает ведущий @ из username.
-   */
   function normalizeTelegramUsername(raw) {
     if (typeof raw !== 'string') return '';
     const trimmed = raw.trim();
     return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
   }
 
-  /**
-   * Генерация UUID v4 (с fallback).
-   */
   function generateUUID() {
     if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
       return crypto.randomUUID();
@@ -44,31 +34,17 @@
     });
   }
 
-  /**
-   * Проверка, что UUID соответствует формату v4.
-   */
   function isValidUUID(uuid) {
     if (typeof uuid !== 'string') return false;
     return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid);
   }
 
-  /**
-   * Округление до 2 знаков (денежный формат).
-   * Использует экспоненциальную запись для обхода багов с плавающей точкой.
-   */
   function roundPrice(value) {
     const n = Number(value);
     if (!isFinite(n)) return 0;
-    // "e2" сдвигает точку на 2 знака вправо, Math.round округляет, "e-2" возвращает обратно
     return Number(Math.round(Number(n + 'e2')) + 'e-2');
   }
 
-  /**
-   * Расчёт стоимости корзины с учётом скидки в процентах.
-   * @param {Array<{price:number, quantity:number}>} items
-   * @param {number} discountPercent
-   * @returns {number}
-   */
   function calculateCartTotal(items, discountPercent) {
     if (!Array.isArray(items)) return 0;
     const subtotal = items.reduce(function (sum, item) {
@@ -83,9 +59,6 @@
     return roundPrice(subtotal);
   }
 
-  /**
-   * Суммарное количество товаров в корзине.
-   */
   function countCartItems(items) {
     if (!Array.isArray(items)) return 0;
     return items.reduce(function (sum, item) {
@@ -93,18 +66,11 @@
     }, 0);
   }
 
-  /**
-   * Проверка, есть ли товар в избранном.
-   */
   function isFavorite(favorites, productId) {
     if (!Array.isArray(favorites)) return false;
     return favorites.indexOf(productId) !== -1;
   }
 
-  /**
-   * Переключение избранного. Возвращает новый массив и флаг added.
-   * Не мутирует входной массив.
-   */
   function toggleFavoriteInList(favorites, productId) {
     const arr = Array.isArray(favorites) ? favorites.slice() : [];
     const idx = arr.indexOf(productId);
@@ -116,7 +82,6 @@
     return { list: arr, added: true };
   }
 
-  // Экспорт в window (без модулей, чтобы работало прямо из браузера)
   window.Utils = {
     validateTelegramUsername: validateTelegramUsername,
     normalizeTelegramUsername: normalizeTelegramUsername,

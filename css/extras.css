@@ -1,186 +1,115 @@
-/* =============================================
-   ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ / HALLOWEEN NIGHT =====
-   ============================================= */
+/* ===== EXTRA SECTIONS / NOVEMBER / FIRST FROST ===== */
+/* (О нас, FAQ, Контакты, Footer, Scroll-to-top, Secret Game) */
+/* Примечание: базовые стили этих блоков уже есть в base.css.
+   Здесь мы дополняем и переопределяем специфичные элементы. */
 
-/* ===== КНОПКА "НАВЕРХ" ===== */
+/* --- О НАС --- */
+.about__icon {
+    filter: drop-shadow(0 0 12px rgba(197, 138, 69, 0.4));
+}
+
+/* --- FAQ --- */
+.faq__item {
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.faq__item:hover {
+    border-color: var(--border-orange);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.faq__question {
+    font-family: 'Manrope', sans-serif;
+}
+
+/* --- КОНТАКТЫ --- */
+.contacts__btn:hover {
+    background: rgba(197, 138, 69, 0.1);
+    box-shadow: 0 0 20px rgba(197, 138, 69, 0.2);
+    color: var(--accent-hover);
+}
+
+/* --- FOOTER --- */
+.footer::before {
+    background: linear-gradient(90deg, transparent, var(--cold-blue), var(--accent), transparent);
+    opacity: 0.4;
+}
+
+.footer a {
+    transition: color 0.2s, border-color 0.2s;
+}
+.footer a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+/* --- СЕКРЕТНАЯ ИГРА --- */
+#secretGameBtn {
+    background: rgba(197, 138, 69, 0.08) !important;
+    border: 1px solid var(--accent) !important;
+    color: var(--accent) !important;
+    padding: 12px 24px !important;
+    border-radius: 8px !important;
+    margin-top: 24px !important;
+    cursor: pointer !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 0 15px rgba(197, 138, 69, 0.15) !important;
+}
+#secretGameBtn:hover {
+    background: rgba(197, 138, 69, 0.2) !important;
+    box-shadow: 0 0 25px rgba(197, 138, 69, 0.3) !important;
+    transform: translateY(-2px);
+}
+
+/* --- КНОПКА НАВЕРХ --- */
 .scroll-to-top {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
-    bottom: max(30px, env(safe-area-inset-bottom));
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
+    bottom: 24px;
+    right: 24px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
     background: var(--bg-card);
     border: 1px solid var(--border-medium);
     color: var(--text-primary);
-    font-size: 24px;
-    font-weight: 700;
-    cursor: pointer;
+    font-size: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 90;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(155, 93, 229, 0.2);
+    cursor: pointer;
+    z-index: var(--z-tooltip);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(20px);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
-.scroll-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
-
-/* ===== CONFIRM-МОДАЛКА ===== */
-.confirm-modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%; height: 100dvh;
-    background: rgba(16, 13, 18, 0.85);
-    backdrop-filter: blur(12px);
-    z-index: calc(var(--z-modal) + 10);
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+.scroll-to-top.visible {
+    opacity: 1;
+    visibility: visible;
 }
 
-.confirm-modal.open { display: flex; opacity: 1; }
-
-.confirm-modal__content {
-    background: var(--bg-modal);
-    border-radius: 16px;
-    padding: 32px 28px;
-    max-width: 440px;
-    width: 100%;
-    border: 1px solid var(--border-medium);
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 118, 40, 0.15);
-    text-align: center;
-    position: relative;
-    transform: translateY(20px) scale(0.95);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+.scroll-to-top:hover {
+    background: var(--accent);
+    color: #17191B;
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(197, 138, 69, 0.3);
 }
 
-.confirm-modal.open .confirm-modal__content { transform: translateY(0) scale(1); }
-
-.confirm-modal__icon { font-size: 56px; margin-bottom: 16px; line-height: 1; filter: drop-shadow(0 0 15px rgba(255,118,40,0.5)); }
-.confirm-modal__title { font-family: 'Bitter', serif; font-size: 24px; font-weight: 800; color: var(--text-primary); margin: 0 0 12px; text-transform: uppercase; }
-.confirm-modal__text { font-family: 'Manrope', sans-serif; font-size: 15px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 28px; }
-
-.confirm-modal__buttons { display: flex; gap: 12px; }
-.confirm-modal__btn {
-    flex: 1; padding: 16px 20px; border-radius: 8px;
-    font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; border: none;
-    transition: all 0.25s; text-transform: uppercase; letter-spacing: 1px;
-}
-.confirm-modal__btn--cancel { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-soft); }
-.confirm-modal__btn--danger { background: rgba(255, 118, 40, 0.15); color: var(--accent); border: 1px solid var(--accent); }
-.confirm-modal__btn--primary { background: var(--grad-accent); color: #100D12; }
-
-/* ===== 18+ ВРАТА ===== */
-.age-gate-modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%; height: 100dvh;
-    background: #100D12;
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.age-gate-modal.open { display: flex; }
-
-.age-gate-modal__content {
-    background: linear-gradient(180deg, #19131D 0%, #100D12 100%);
-    border-radius: 20px;
-    padding: 48px 36px;
-    max-width: 480px;
-    width: 100%;
-    border: 1px solid var(--border-medium);
-    box-shadow: 0 0 100px rgba(155, 93, 229, 0.2);
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.age-gate-modal__content::before {
-    content: '';
-    position: absolute;
-    top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle at center, rgba(255, 118, 40, 0.1), transparent 60%);
-    pointer-events: none;
-    animation: pulseGlow 5s ease-in-out infinite alternate;
-}
-
-.age-gate-modal__icon { font-size: 64px; margin-bottom: 20px; display: inline-block; position: relative; z-index: 1; filter: drop-shadow(0 0 20px rgba(255,118,40,0.5)); }
-.age-gate-modal__badge { display: inline-block; font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 3px; color: #100D12; background: var(--accent); padding: 6px 16px; border-radius: 4px; margin-bottom: 20px; position: relative; z-index: 1; }
-.age-gate-modal__title { font-family: 'Bitter', serif; font-size: 32px; font-weight: 800; color: var(--text-primary); margin: 0 0 16px; line-height: 1.1; text-transform: uppercase; position: relative; z-index: 1; }
-.age-gate-modal__text { font-family: 'Manrope', sans-serif; font-size: 16px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 32px; position: relative; z-index: 1; }
-.age-gate-modal__text strong { color: var(--text-primary); }
-.age-gate-modal__buttons { display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; }
-.age-gate-modal__btn { padding: 18px 24px; border-radius: 8px; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 16px; cursor: pointer; border: none; width: 100%; transition: all 0.25s; text-transform: uppercase; letter-spacing: 1px; }
-.age-gate-modal__btn--yes { background: var(--grad-accent); color: #100D12; box-shadow: 0 8px 30px rgba(255, 118, 40, 0.3); }
-.age-gate-modal__btn--no { background: transparent; color: var(--text-muted); border: 1px solid var(--border-soft); }
-.age-gate-modal__deny { display: none; text-align: center; position: relative; z-index: 1; }
-.age-gate-modal__deny.open { display: block; }
-.age-gate-modal__deny-icon { font-size: 72px; margin-bottom: 20px; display: block; filter: grayscale(1); opacity: 0.5; }
-.age-gate-modal__deny-title { font-family: 'Bitter', serif; font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; text-transform: uppercase; }
-.age-gate-modal__deny-text { font-family: 'Manrope', sans-serif; font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
-
-/* ===== TOAST С КНОПКОЙ ДЕЙСТВИЯ ===== */
-.toast--action { flex-direction: column; padding: 16px; }
-.toast__body { display: flex; align-items: center; gap: 12px; width: 100%; }
-.toast__action {
-    margin-top: 12px; padding: 12px 16px; border-radius: 6px;
-    background: rgba(255, 118, 40, 0.15); border: 1px solid var(--border-orange);
-    color: var(--accent); font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
-    cursor: pointer; transition: all 0.2s; text-align: center; width: 100%; text-transform: uppercase; letter-spacing: 1px;
-}
-
-/* ===== FLY-TO-CART АНИМАЦИЯ ===== */
-.fly-to-cart {
-    position: fixed; z-index: 500; pointer-events: none;
-    border-radius: 12px; object-fit: cover; opacity: 1;
-    box-shadow: 0 8px 30px rgba(255, 118, 40, 0.6);
-    transition: all 0.7s cubic-bezier(0.5, 0, 0.75, 0);
-    will-change: left, top, width, height, opacity, transform;
-}
-.cart-btn--bump { animation: cartBump 0.4s ease; }
-@keyframes cartBump { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.18); } 70% { transform: scale(0.96); } }
-
-.catalog-retry-notice { font-family: 'Manrope', sans-serif; font-size: 14px; color: var(--text-muted); margin-top: 16px; }
-.catalog-retry-notice__count { color: var(--accent); font-weight: 700; }
-
-.product-card__popularity {
-    display: inline-block; font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 700;
-    color: var(--accent); background: rgba(255, 118, 40, 0.1); border: 1px solid rgba(255, 118, 40, 0.3);
-    padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
-}
-.product-detail__popularity {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
-    color: var(--accent); background: rgba(255, 118, 40, 0.1); border: 1px solid var(--border-orange);
-    padding: 8px 16px; border-radius: 8px; margin-bottom: 24px; width: max-content;
-}
-
-/* ===== ХОВЕРЫ ===== */
-@media (hover: hover) and (pointer: fine) {
-    .scroll-to-top:hover { border-color: var(--accent); color: var(--accent); background: rgba(255,118,40,0.1); box-shadow: 0 10px 40px rgba(255,118,40,0.3); transform: translateY(-4px); }
-    .confirm-modal__btn--cancel:hover { border-color: var(--text-primary); color: var(--text-primary); background: rgba(255,255,255,0.05); }
-    .confirm-modal__btn--danger:hover { background: var(--accent); color: #100D12; box-shadow: 0 0 20px rgba(255,118,40,0.4); }
-    .confirm-modal__btn--primary:hover { filter: brightness(1.1); transform: translateY(-2px); }
-    .age-gate-modal__btn--yes:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 12px 40px rgba(255,118,40,0.5); }
-    .age-gate-modal__btn--no:hover { border-color: var(--text-secondary); color: var(--text-secondary); }
-    .toast__action:hover { background: var(--accent); color: #100D12; border-color: var(--accent); box-shadow: 0 0 15px rgba(255,118,40,0.5); }
-}
-
-@media (max-width: 600px) {
-    .scroll-to-top { bottom: 20px; right: 20px; bottom: max(20px, env(safe-area-inset-bottom)); width: 44px; height: 44px; font-size: 20px; }
-    .confirm-modal__content { padding: 24px 20px; }
-    .confirm-modal__title { font-size: 20px; }
-    .confirm-modal__btn { padding: 14px 16px; font-size: 14px; }
-    .age-gate-modal__content { padding: 32px 24px; border-radius: 16px; }
-    .age-gate-modal__title { font-size: 26px; }
-    .age-gate-modal__btn { padding: 16px 20px; font-size: 15px; }
+@media (max-width: 768px) {
+    .scroll-to-top {
+        bottom: 16px;
+        right: 16px;
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
 }

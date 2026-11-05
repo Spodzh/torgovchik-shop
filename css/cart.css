@@ -1,4 +1,4 @@
-/* ===== КОРЗИНА / HALLOWEEN NIGHT ===== */
+/* ===== КОРЗИНА / NOVEMBER / FIRST FROST ===== */
 .cart-panel {
     position: fixed;
     top: 0;
@@ -6,7 +6,7 @@
     width: 420px;
     height: 100vh;
     height: 100dvh; 
-    background: rgba(25, 19, 29, 0.95);
+    background: rgba(32, 35, 38, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-left: 1px solid var(--border-medium);
@@ -16,7 +16,7 @@
     z-index: var(--z-cart);
     display: flex;
     flex-direction: column;
-    box-shadow: -10px 0 50px rgba(0, 0, 0, 0.8), -5px 0 30px rgba(155, 93, 229, 0.15);
+    box-shadow: -10px 0 50px rgba(0, 0, 0, 0.6);
     max-width: 100vw;
 }
 
@@ -42,7 +42,7 @@
 }
 
 .cart-panel__close {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-soft);
     font-size: 22px;
     color: var(--text-secondary);
@@ -138,7 +138,7 @@
 .cart-item__remove {
     margin-left: auto;
     background: transparent;
-    border: 1px solid rgba(255, 118, 40, 0.3);
+    border: 1px solid rgba(197, 138, 69, 0.3);
     color: var(--accent);
     cursor: pointer;
     font-size: 18px;
@@ -164,10 +164,10 @@
 }
 
 .cart-empty::before {
-    content: '🕸️';
+    content: '🍂';
     font-size: 64px;
     margin-bottom: 20px;
-    filter: drop-shadow(0 0 15px rgba(255, 118, 40, 0.3));
+    filter: drop-shadow(0 0 15px rgba(197, 138, 69, 0.3));
 }
 
 .cart-empty p {
@@ -219,7 +219,6 @@
     color: var(--price);
     font-weight: 800;
     margin-left: 8px;
-    text-shadow: 0 0 15px rgba(255, 170, 82, 0.4);
 }
 
 .cart-panel__footer .btn {
@@ -229,13 +228,12 @@
     font-size: 16px;
 }
 
-/* Кнопка очистки корзины */
 .btn-clear-cart {
     display: none;
     width: 100%;
     margin-top: 16px;
     background: transparent;
-    border: 1px dashed rgba(255, 118, 40, 0.4);
+    border: 1px dashed rgba(197, 138, 69, 0.4);
     color: var(--text-muted);
     padding: 14px 20px;
     border-radius: 8px;
@@ -254,7 +252,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(16, 13, 18, 0.8);
+    background: rgba(23, 25, 27, 0.8);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     z-index: var(--z-overlay);
@@ -267,10 +265,10 @@
 
 /* ===== ХОВЕРЫ ===== */
 @media (hover: hover) and (pointer: fine) {
-    .cart-panel__close:hover { color: var(--accent); border-color: var(--accent); background: rgba(255, 118, 40, 0.1); }
-    .cart-qty-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(255, 118, 40, 0.05); }
-    .cart-item__remove:hover { background: rgba(255, 118, 40, 0.15); border-color: var(--accent); }
-    .btn-clear-cart:hover { color: var(--accent); border-color: var(--accent); background: rgba(255, 118, 40, 0.05); }
+    .cart-panel__close:hover { color: var(--accent); border-color: var(--accent); background: rgba(197, 138, 69, 0.08); }
+    .cart-qty-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(197, 138, 69, 0.05); }
+    .cart-item__remove:hover { background: rgba(197, 138, 69, 0.15); border-color: var(--accent); }
+    .btn-clear-cart:hover { color: var(--accent); border-color: var(--accent); background: rgba(197, 138, 69, 0.05); }
 }
 
 /* ===== АДАПТИВ ===== */

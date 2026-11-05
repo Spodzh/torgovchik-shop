@@ -19,40 +19,53 @@ let renderFinished = false;
 // ===== ТОСТЫ =====
 // =============================================
 function showToast(message, type, action) {
-  type = type || 'success';
+  type = type || 'info';
   const container = document.getElementById('toastContainer');
   if (!container) return;
 
   const toast = document.createElement('div');
-  toast.className = 'toast' + (action ? ' toast--action' : '');
+  toast.className = `toast toast--${type}`;
   toast.setAttribute('role', 'status');
-  const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+  
+  let icon = 'ℹ️';
+  if (type === 'success') icon = '✅';
+  if (type === 'error') icon = '❌';
 
   toast.innerHTML = `
-    <div class="toast__body">
-      <span class="toast-icon">${icon}</span>
-      <span class="toast-message">${message}</span>
-    </div>
+    <span class="toast__icon">${icon}</span>
+    <span class="toast__message">${message}</span>
   `;
 
   if (action) {
     const btn = document.createElement('button');
     btn.className = 'toast__action';
     btn.textContent = action.text;
+    btn.style.cssText = 'background:var(--accent); color:#17191B; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; margin-left:10px; cursor:pointer; font-size:12px;';
     btn.addEventListener('click', () => {
       action.onClick();
-      toast.classList.add('hide');
+      toast.classList.add('hiding');
       setTimeout(() => toast.remove(), 300);
     });
     toast.appendChild(btn);
   }
 
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'toast__close';
+  closeBtn.innerHTML = '✕';
+  closeBtn.addEventListener('click', () => {
+    toast.classList.add('hiding');
+    setTimeout(() => toast.remove(), 300);
+  });
+  toast.appendChild(closeBtn);
+
   container.appendChild(toast);
 
   const timeout = setTimeout(() => {
-    toast.classList.add('hide');
-    setTimeout(() => toast.remove(), 300);
-  }, action ? 5000 : 3000);
+    if (toast.parentNode) {
+      toast.classList.add('hiding');
+      setTimeout(() => toast.remove(), 300);
+    }
+  }, action ? 5000 : 3500);
 
   if (action) {
     toast.addEventListener('mouseenter', () => clearTimeout(timeout), { once: true });
@@ -60,7 +73,7 @@ function showToast(message, type, action) {
 }
 
 // =============================================
-// ===== 18+ ВРАТА (защищённая инициализация) =====
+// ===== 18+ ВРАТА =====
 // =============================================
 function initAgeGate() {
   const modal = document.getElementById('ageGateModal');
@@ -68,12 +81,12 @@ function initAgeGate() {
 
   const isVerified = localStorage.getItem('torgovchik_age_verified') === 'true';
   if (isVerified) {
-    modal.classList.remove('open');
+    modal.classList.remove('open', 'show');
     document.body.style.overflow = '';
     return;
   }
 
-  modal.classList.add('open');
+  modal.classList.add('open', 'show');
   document.body.style.overflow = 'hidden';
 
   const question = document.getElementById('ageGateQuestion');
@@ -84,7 +97,7 @@ function initAgeGate() {
   if (yesBtn) {
     yesBtn.addEventListener('click', () => {
       localStorage.setItem('torgovchik_age_verified', 'true');
-      modal.classList.remove('open');
+      modal.classList.remove('open', 'show');
       document.body.style.overflow = '';
     });
   }
@@ -92,13 +105,13 @@ function initAgeGate() {
   if (noBtn && question && deny) {
     noBtn.addEventListener('click', () => {
       question.style.display = 'none';
-      deny.classList.add('open');
+      deny.classList.add('open', 'show');
     });
   }
 }
 
 // =============================================
-// ===== КНОПКА "НАВЕРХ" (защищённая) =====
+// ===== КНОПКА "НАВЕРХ" =====
 // =============================================
 function initScrollToTop() {
   const btn = document.getElementById('scrollToTop');
@@ -201,7 +214,7 @@ function addToCart(productId, event) {
   }
 
   showToast(`${product.name} добавлен в корзину`, 'success', {
-    text: 'Перейти в корзину',
+    text: 'В корзину',
     onClick: () => {
       window.location.href = 'index.html#catalog';
     }
@@ -307,7 +320,7 @@ function renderRecentlyViewed(currentProductId) {
   section.style.display = 'block';
   grid.innerHTML = items.map(p => `
     <a href="product.html?id=${p.id}" class="recently-viewed__card">
-      <img src="${p.image}" alt="${p.name}" class="recently-viewed__image" loading="lazy" onerror="this.src='https://i.ibb.co/VWRmsGHt/logo.png'">
+      <img src="${p.image}" alt="${p.name}" class="recently-viewed__image" loading="lazy" onerror="this.src='assets/logo.png'">
       <div class="recently-viewed__name">${p.name}</div>
       <div class="recently-viewed__brand">${p.brand}</div>
       <div class="recently-viewed__price">${p.price} BYN</div>
@@ -329,14 +342,14 @@ function renderNotFound(message) {
   if (!content) return;
   renderFinished = true;
   content.innerHTML = `
-    <div class="product-not-found">
-      <div class="product-not-found__icon">🍂</div>
-      <h2 class="product-not-found__title">Товар не найден</h2>
-      <p class="product-not-found__text">
+    <div class="product-not-found" style="text-align:center; padding:60px 20px;">
+      <div class="product-not-found__icon" style="font-size:64px; margin-bottom:20px; filter:drop-shadow(0 0 10px rgba(197,138,69,0.3));">🍂</div>
+      <h2 class="product-not-found__title" style="font-family:'Bitter', serif; font-size:28px; color:var(--text-primary); margin-bottom:12px;">Товар не найден</h2>
+      <p class="product-not-found__text" style="color:var(--text-secondary); margin-bottom:24px; line-height:1.6;">
         ${message || 'Возможно, он уже распродан или вы перешли по устаревшей ссылке.'}<br>
         Загляните в каталог — там много вкусного.
       </p>
-      <a href="index.html" class="btn btn-primary">← В каталог</a>
+      <a href="index.html" class="btn btn-primary" style="display:inline-block; padding:14px 28px;">← В каталог</a>
     </div>
   `;
 }
@@ -372,52 +385,58 @@ function renderProduct(p) {
   const categoryLabel = categoryLabels[p.category] || p.category || '—';
 
   const popularityHtml = boughtCount > 0
-    ? `<div class="product-detail__popularity">🔥 Купили ${boughtCount} раз</div>`
+    ? `<div class="product-info__brand" style="color:var(--accent); background:rgba(197,138,69,0.1); display:inline-block; padding:4px 12px; border-radius:20px; margin-bottom:12px; width:fit-content;">🔥 Купили ${boughtCount} раз</div>`
     : '';
 
   content.innerHTML = `
-    <div class="product-detail">
-      <div class="product-detail__image-wrap">
-        <button class="product-detail__fav ${isFav ? 'active' : ''}"
+    <div class="product-container">
+      <div class="product-image-wrap">
+        <button class="product-card__fav ${isFav ? 'active' : ''}"
                 id="productFavBtn"
                 aria-label="${isFav ? 'Убрать из избранного' : 'Добавить в избранное'}"
                 aria-pressed="${isFav ? 'true' : 'false'}">${isFav ? '❤' : '♡'}</button>
         <img src="${p.image}"
              alt="${p.name}"
-             class="product-detail__image"
-             onerror="this.src='https://i.ibb.co/VWRmsGHt/logo.png'">
+             onerror="this.src='assets/logo.png'">
       </div>
 
-      <div class="product-detail__info">
-        <div class="product-detail__brand">${p.brand}</div>
-        <h1 class="product-detail__name">${p.name}</h1>
+      <div class="product-info">
+        <div class="product-info__brand">${p.brand}</div>
+        <h1 class="product-info__title">${p.name}</h1>
         ${popularityHtml}
-        <div class="product-detail__price">${p.price}<span>BYN</span></div>
-        <span class="product-detail__category">${categoryLabel}</span>
+        <div class="product-info__price">${p.price} <span>BYN</span></div>
+        
+        <div class="product-info__desc">
+          Качественный товар от проверенного бренда. Отличный выбор для вашей Pod-системы. В наличии в Гомеле.
+        </div>
 
-        <div class="product-detail__actions">
-          <button class="product-detail__btn ${inCart ? 'product-detail__btn--in-cart' : 'product-detail__btn--primary'}"
+        <div class="product-info__actions">
+          <button class="btn ${inCart ? 'btn-secondary' : 'btn-primary'}"
                   id="productAddBtn"
                   ${inCart ? 'disabled' : ''}>
-            ${inCart ? '✓ В корзине' : 'В корзину'}
+            ${inCart ? '✓ В корзине' : 'Добавить в корзину'}
           </button>
-          <a href="index.html" class="product-detail__btn product-detail__btn--secondary" style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">
-            Продолжить покупки
+          <a href="index.html" class="btn btn-secondary" style="text-decoration:none;">
+            В каталог
           </a>
         </div>
 
-        <div class="product-detail__meta">
-          <div class="product-detail__meta-row">
-            <span class="product-detail__meta-label">Бренд</span>
-            <span class="product-detail__meta-value">${p.brand}</span>
+        <div class="product-info__meta">
+          <div class="product-meta-item">
+            <span>Бренд</span>
+            <strong>${p.brand}</strong>
           </div>
-          <div class="product-detail__meta-row">
-            <span class="product-detail__meta-label">Категория</span>
-            <span class="product-detail__meta-value">${categoryLabel}</span>
+          <div class="product-meta-item">
+            <span>Категория</span>
+            <strong>${categoryLabel}</strong>
           </div>
-          <div class="product-detail__meta-row">
-            <span class="product-detail__meta-label">Артикул</span>
-            <span class="product-detail__meta-value">#${String(p.id).padStart(4, '0')}</span>
+          <div class="product-meta-item">
+            <span>Артикул</span>
+            <strong>#${String(p.id).padStart(4, '0')}</strong>
+          </div>
+          <div class="product-meta-item">
+            <span>Наличие</span>
+            <strong style="color: #2ecc71;">В наличии</strong>
           </div>
         </div>
       </div>
@@ -507,14 +526,14 @@ function updateProductActions() {
   const addBtn = document.getElementById('productAddBtn');
   if (addBtn) {
     if (inCart) {
-      addBtn.classList.remove('product-detail__btn--primary');
-      addBtn.classList.add('product-detail__btn--in-cart');
+      addBtn.classList.remove('btn-primary');
+      addBtn.classList.add('btn-secondary');
       addBtn.textContent = '✓ В корзине';
       addBtn.disabled = true;
     } else {
-      addBtn.classList.add('product-detail__btn--primary');
-      addBtn.classList.remove('product-detail__btn--in-cart');
-      addBtn.textContent = 'В корзину';
+      addBtn.classList.add('btn-primary');
+      addBtn.classList.remove('btn-secondary');
+      addBtn.textContent = 'Добавить в корзину';
       addBtn.disabled = false;
     }
   }
@@ -530,24 +549,28 @@ async function loadProductStats() {
 }
 
 async function loadData() {
-  // Защитный таймер: если через 8 секунд ничего не отрендерилось — показать ошибку
+  // Защитный таймер: если через 6 секунд ничего не отрендерилось — показать ошибку
   const safetyTimeout = setTimeout(() => {
     if (!renderFinished) {
-      console.warn('Товар не отрендерился за 8 секунд');
+      console.warn('Товар не отрендерился за 6 секунд');
       renderNotFound('Страница загружается слишком долго. Проверьте интернет и попробуйте ещё раз.');
     }
-  }, 8000);
+  }, 6000);
 
   try {
+    console.log('Начинаем загрузку товаров...');
     const productsResp = await fetch(WORKER_URL + 'products');
     if (!productsResp.ok) throw new Error('Ошибка загрузки каталога: HTTP ' + productsResp.status);
 
     products = await productsResp.json();
     if (!Array.isArray(products)) throw new Error('Некорректный ответ сервера');
 
-    loadProductStats(); // без await — не критично, грузится параллельно
+    console.log('Товары загружены:', products.length);
+    loadProductStats();
 
     const productId = getIdFromUrl();
+    console.log('ID товара из URL:', productId);
+
     if (productId === null) {
       clearTimeout(safetyTimeout);
       renderNotFound('В ссылке не указан ID товара.');
@@ -566,6 +589,7 @@ async function loadData() {
     renderProduct(product);
     addToRecentlyViewed(productId);
     renderRecentlyViewed(productId);
+    console.log('Товар успешно отрендерен.');
   } catch (e) {
     clearTimeout(safetyTimeout);
     console.error('Не удалось загрузить данные:', e);
@@ -591,7 +615,7 @@ window.addEventListener('unhandledrejection', function (e) {
 });
 
 // =============================================
-// ===== ЗАПУСК (каждый шаг защищён) =====
+// ===== ЗАПУСК =====
 // =============================================
 try { initAgeGate(); } catch (e) { console.warn('initAgeGate failed:', e); }
 try { initScrollToTop(); } catch (e) { console.warn('initScrollToTop failed:', e); }

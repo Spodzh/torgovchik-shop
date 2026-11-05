@@ -1,14 +1,50 @@
-/* ===== ОБЩИЙ АДАПТИВ ===== */
+/* ===== RESPONSIVE FIXES / NOVEMBER ===== */
 @media (max-width: 768px) {
-    .nav--desktop { display: none; }
-    .burger { display: flex; }
-    .section-title { font-size: 26px; padding: 10px 18px; }
+    /* Модальные окна */
+    .profile-banner__name { left: 100px; font-size: 18px; }
+    .profile-avatar-wrap { width: 70px; height: 70px; bottom: -35px; left: 16px; }
+    .profile-avatar { font-size: 30px; }
+    .profile-stats-panel { gap: 12px; }
+    .profile-stats-block { padding: 12px 8px; }
+    .profile-stats-block__value { font-size: 20px; }
+    .profile-stats-block__label { font-size: 10px; }
+    .profile-stats-block__divider { display: none; }
+    
+    .referral-card { flex-direction: column; gap: 12px; text-align: center; }
+    .referral-copy-btn { width: 100%; }
 }
 
-@media (max-width: 600px) {
-    .header__inner { flex-wrap: wrap; gap: 8px; }
-    .hero { padding: 20px 0 40px; }
-    .about__grid { flex-direction: column; align-items: center; gap: 14px; }
-    .faq__list { gap: 8px; }
-    .contacts__simple { flex-direction: column; text-align: center; }
+@media (max-width: 480px) {
+    .age-gate-modal__content,
+    .login-modal__content,
+    .profile-modal__content,
+    .avatar-modal__content,
+    .banner-modal__content,
+    .order-modal__content,
+    .confirm-modal__content,
+    .announcement-modal__content,
+    .favorites-modal__content {
+        padding: 20px;
+        border-radius: 16px;
+    }
+
+    .login-modal__title, .profile-modal__heading h2 { font-size: 20px; }
+    .auth-submit { padding: 14px; }
+    
+    .profile-banner-wrap { height: 100px; }
+    .profile-banner__name { left: 80px; font-size: 16px; bottom: 8px; }
+    .profile-avatar-wrap { width: 60px; height: 60px; bottom: -30px; left: 12px; }
+    .profile-avatar { font-size: 24px; }
+    
+    .profile-stats-panel { flex-direction: column; gap: 8px; }
+    .profile-stats-block { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+    .profile-stats-block__icon { margin-bottom: 0; }
+    .profile-stats-block__value { font-size: 18px; }
+    .profile-stats-block__label { margin-top: 0; }
+    .profile-stats-block__divider { display: none; }
+    
+    .avatar-grid, .banner-grid { grid-template-columns: repeat(3, 1fr); }
+    .avatar-modal__buttons, .banner-modal__buttons { flex-direction: column; }
+    
+    .product-info__actions { flex-direction: column; }
 }

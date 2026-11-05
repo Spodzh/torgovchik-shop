@@ -1,5 +1,5 @@
 /* =============================================
-   ===== БАЗА / HALLOWEEN NIGHT =====
+   ===== БАЗА / NOVEMBER / FIRST FROST =====
    ============================================= */
 * {
     margin: 0;
@@ -10,45 +10,44 @@
 
 :root {
     /* Фоны */
-    --bg-main: #100D12;
-    --bg-section: #19131D;
-    --bg-card: #211923;
-    --bg-card-hover: #2B202D;
-    --bg-modal: #19131D;
-    --bg-footer: #0B080E;
+    --bg-main: #17191B;
+    --bg-section: #202326;
+    --bg-card: #292725;
+    --bg-card-hover: #33302C;
+    --bg-modal: #202326;
+    --bg-footer: #111315;
 
     /* Границы */
-    --border-soft: rgba(155, 93, 229, 0.15);
-    --border-medium: rgba(155, 93, 229, 0.35);
-    --border-orange: rgba(255, 118, 40, 0.3);
-    --border-modal: rgba(155, 93, 229, 0.25);
+    --border-soft: rgba(130, 149, 160, 0.15);
+    --border-medium: rgba(130, 149, 160, 0.35);
+    --border-orange: rgba(197, 138, 69, 0.3);
+    --border-modal: rgba(130, 149, 160, 0.25);
 
     /* Текст */
-    --text-primary: #F7F0F8;
-    --text-secondary: #B5A7BA;
-    --text-muted: #8A7A90;
-    --text-footer: #8A7A90;
+    --text-primary: #E4E7E5;
+    --text-secondary: #A7AAA8;
+    --text-muted: #7A7D7C;
+    --text-footer: #7A7D7C;
 
     /* Акценты */
-    --accent: #FF7628;
-    --accent-hover: #FFAA52;
-    --accent-deep: #D15A1A;
-    --purple: #9B5DE5;
-    --purple-glow: #C77DFF;
-    --price: #FFAA52;
+    --accent: #C58A45;
+    --accent-hover: #D9A05B;
+    --accent-deep: #94613C;
+    --cold-blue: #8295A0;
+    --price: #D9A05B;
 
     /* Градиенты */
-    --grad-accent: linear-gradient(135deg, #FF7628, #FFAA52);
-    --grad-purple: linear-gradient(135deg, #9B5DE5, #C77DFF);
-    --grad-header: rgba(16, 13, 18, 0.85);
-    --grad-card-hover: linear-gradient(180deg, rgba(43, 32, 45, 0) 0%, rgba(255, 118, 40, 0.05) 100%);
+    --grad-accent: linear-gradient(135deg, #C58A45, #94613C);
+    --grad-cold: linear-gradient(135deg, #8295A0, #6B7D88);
+    --grad-header: rgba(23, 25, 27, 0.85);
+    --grad-card-hover: linear-gradient(180deg, rgba(51, 48, 44, 0) 0%, rgba(197, 138, 69, 0.05) 100%);
 
     /* Тени */
-    --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.6);
-    --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 118, 40, 0.15);
-    --shadow-warm: 0 8px 30px rgba(255, 118, 40, 0.25);
-    --shadow-warm-hover: 0 12px 40px rgba(255, 118, 40, 0.4);
-    --shadow-purple: 0 8px 30px rgba(155, 93, 229, 0.2);
+    --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.4);
+    --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(197, 138, 69, 0.1);
+    --shadow-warm: 0 8px 30px rgba(197, 138, 69, 0.2);
+    --shadow-warm-hover: 0 12px 40px rgba(197, 138, 69, 0.35);
+    --shadow-cold: 0 8px 30px rgba(130, 149, 160, 0.15);
 
     /* Z-index слои */
     --z-mobile-menu: 90;
@@ -78,8 +77,8 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     background-image: 
-        radial-gradient(circle at 15% 50%, rgba(155, 93, 229, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 85% 30%, rgba(255, 118, 40, 0.03) 0%, transparent 50%);
+        radial-gradient(circle at 15% 50%, rgba(130, 149, 160, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 85% 30%, rgba(197, 138, 69, 0.03) 0%, transparent 50%);
 }
 
 :focus-visible {
@@ -128,7 +127,7 @@ input, textarea, select {
 
 .btn-primary {
     background: var(--grad-accent);
-    color: #100D12;
+    color: #17191B;
     box-shadow: var(--shadow-warm);
     position: relative;
     overflow: hidden;
@@ -138,7 +137,7 @@ input, textarea, select {
     content: '';
     position: absolute;
     top: 0; left: -100%; width: 50%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
     transform: skewX(-20deg);
     transition: 0.5s;
 }
@@ -152,7 +151,7 @@ input, textarea, select {
 @media (hover: hover) and (pointer: fine) {
     .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 40px rgba(255, 118, 40, 0.5);
+        box-shadow: 0 10px 40px rgba(197, 138, 69, 0.4);
     }
     .btn-primary:hover::after {
         left: 200%;
@@ -160,7 +159,7 @@ input, textarea, select {
     .btn-secondary:hover {
         background: var(--bg-card-hover);
         border-color: var(--accent);
-        box-shadow: 0 0 15px rgba(255, 118, 40, 0.2);
+        box-shadow: 0 0 15px rgba(197, 138, 69, 0.15);
     }
 }
 
@@ -190,16 +189,16 @@ input, textarea, select {
 }
 
 .section-title::before {
-    content: '🎃';
+    content: '🍂';
     position: absolute;
     left: -40px;
     top: 50%;
     transform: translateY(-50%);
     font-size: 24px;
-    opacity: 0.8;
+    opacity: 0.6;
 }
 
-/* ===== ГЕРОЙ (HALLOWEEN EDITION) ===== */
+/* ===== ГЕРОЙ (NOVEMBER / FIRST FROST) ===== */
 .hero {
     position: relative;
     padding: 60px 0 80px;
@@ -207,15 +206,14 @@ input, textarea, select {
     overflow: hidden;
 }
 
-/* Хэллоуинские эмодзи по углам секции */
 .hero__leaf {
     position: absolute;
     font-size: 80px;
-    opacity: 0.15;
+    opacity: 0.1;
     pointer-events: none;
     z-index: 0;
     user-select: none;
-    filter: drop-shadow(0 0 20px rgba(255, 118, 40, 0.4));
+    filter: drop-shadow(0 0 10px rgba(197, 138, 69, 0.2));
 }
 .hero__leaf--tl { top: 20px; left: 20px; transform: rotate(-20deg); }
 .hero__leaf--tr { top: 30px; right: 30px; transform: rotate(15deg); }
@@ -232,19 +230,19 @@ input, textarea, select {
     display: flex;
     align-items: center;
 
-    /* НОВАЯ КАРТИНКА ШАПКИ */
-    background-image: url('https://i.ibb.co/Z6559q3X/A-premium-vape-shop-interior-on-Halloween-night-cinematic-l.png');
+    /* НОВАЯ КАРТИНКА ШАПКИ (NOVEMBER) */
+    background-image: url('../assets/hero.png');
     background-size: cover;
     background-position: center right;
     background-repeat: no-repeat;
 
-    border: 1px solid var(--border-orange);
+    border: 1px solid var(--border-soft);
     box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.8),
-        0 0 50px rgba(255, 118, 40, 0.15);
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(130, 149, 160, 0.1);
 }
 
-/* Затемнение слева для читаемости текста (в тон фиолетово-черного фона) */
+/* Затемнение слева для читаемости текста */
 .hero__box::before {
     content: '';
     position: absolute;
@@ -252,14 +250,14 @@ input, textarea, select {
     z-index: 0;
     background: linear-gradient(
         90deg,
-        rgba(16, 13, 18, 0.95) 0%,
-        rgba(16, 13, 18, 0.85) 30%,
-        rgba(16, 13, 18, 0.6) 55%,
-        rgba(16, 13, 18, 0.15) 80%,
-        rgba(16, 13, 18, 0) 100%
+        rgba(23, 25, 27, 0.95) 0%,
+        rgba(23, 25, 27, 0.85) 30%,
+        rgba(23, 25, 27, 0.6) 55%,
+        rgba(23, 25, 27, 0.15) 80%,
+        rgba(23, 25, 27, 0) 100%
     );
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
     -webkit-mask-image: linear-gradient(
         90deg,
         #000 0%,
@@ -277,7 +275,7 @@ input, textarea, select {
     pointer-events: none;
 }
 
-/* Тёплое янтарное свечение за текстом */
+/* Мягкое холодное свечение за текстом */
 .hero__box::after {
     content: '';
     position: absolute;
@@ -287,7 +285,7 @@ input, textarea, select {
     height: 80%;
     background: radial-gradient(
         circle at center,
-        rgba(255, 118, 40, 0.15),
+        rgba(130, 149, 160, 0.15),
         transparent 70%
     );
     filter: blur(50px);
@@ -309,13 +307,13 @@ input, textarea, select {
     font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--accent);
-    border: 1px solid var(--accent);
+    color: var(--cold-blue);
+    border: 1px solid var(--cold-blue);
     padding: 6px 16px;
     border-radius: 40px;
     margin-bottom: 24px;
-    box-shadow: 0 0 15px rgba(255, 118, 40, 0.2);
-    background: rgba(255, 118, 40, 0.1);
+    box-shadow: 0 0 15px rgba(130, 149, 160, 0.15);
+    background: rgba(130, 149, 160, 0.05);
 }
 
 .hero__content h1 {
@@ -326,12 +324,12 @@ input, textarea, select {
     margin-bottom: 24px;
     color: var(--text-primary);
     letter-spacing: -0.5px;
-    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 
 .hero__content h1 .accent {
     color: var(--accent);
-    text-shadow: 0 0 30px rgba(255, 118, 40, 0.6);
+    text-shadow: 0 0 30px rgba(197, 138, 69, 0.4);
 }
 
 .hero__content p {
@@ -340,17 +338,7 @@ input, textarea, select {
     margin-bottom: 40px;
     line-height: 1.6;
     max-width: 450px;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
-}
-
-.hero__bottom-text {
-    margin-top: 40px;
-    font-size: 12px;
-    color: var(--text-muted);
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    font-weight: 600;
-    opacity: 0.6;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
 }
 
 /* ===== О НАС ===== */
@@ -384,7 +372,7 @@ input, textarea, select {
     align-items: flex-start;
 }
 
-.about__icon { font-size: 40px; line-height: 1; flex-shrink: 0; filter: drop-shadow(0 0 10px rgba(255,118,40,0.4)); }
+.about__icon { font-size: 40px; line-height: 1; flex-shrink: 0; filter: drop-shadow(0 0 10px rgba(197,138,69,0.3)); }
 .about__card h3 { font-family: 'Bitter', serif; font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
 .about__card p { font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
 
@@ -455,7 +443,7 @@ input, textarea, select {
 }
 
 .contacts__simple { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
-.contacts__icon { fill: var(--text-primary); transition: fill 0.2s; filter: drop-shadow(0 0 10px rgba(255,118,40,0.4)); }
+.contacts__icon { fill: var(--text-primary); transition: fill 0.2s; filter: drop-shadow(0 0 10px rgba(197,138,69,0.3)); }
 
 .contacts__btn {
     display: inline-block;
@@ -487,11 +475,11 @@ input, textarea, select {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--purple-glow), transparent);
+    background: linear-gradient(90deg, transparent, var(--cold-blue), transparent);
     opacity: 0.3;
 }
 
-.footer a { color: var(--text-secondary); text-decoration: none; border-bottom: 1px dashed rgba(181,167,186,0.3); transition: color 0.2s; }
+.footer a { color: var(--text-secondary); text-decoration: none; border-bottom: 1px dashed rgba(167,170,168,0.3); transition: color 0.2s; }
 
 /* ===== ХОВЕРЫ ===== */
 @media (hover: hover) and (pointer: fine) {
@@ -499,11 +487,11 @@ input, textarea, select {
         background: var(--bg-card-hover); 
         border-color: var(--border-orange); 
         transform: translateY(-4px); 
-        box-shadow: 0 12px 30px rgba(0,0,0,0.6), 0 0 20px rgba(255,118,40,0.15); 
+        box-shadow: 0 12px 30px rgba(0,0,0,0.4), 0 0 20px rgba(197,138,69,0.1); 
     }
     .faq__item:hover { border-color: var(--border-medium); }
     .contacts__icon:hover { fill: var(--accent); }
-    .contacts__btn:hover { background: rgba(255,118,40,0.1); box-shadow: 0 0 20px rgba(255,118,40,0.3); }
+    .contacts__btn:hover { background: rgba(197,138,69,0.1); box-shadow: 0 0 20px rgba(197,138,69,0.2); }
     .footer a:hover { color: var(--accent); }
 }
 
@@ -525,13 +513,11 @@ input, textarea, select {
     .section-title::before { left: -30px; font-size: 20px; }
 }
 
-/* ===== МОБИЛЬНЫЕ УСТРОЙСТВА (МАКСИМАЛЬНО КОМПАКТНО) ===== */
 @media (max-width: 768px) {
     .hero { padding: 10px 0 20px; }
 
     .hero__box {
         min-height: auto;
-        /* Сильно уменьшили нижний отступ, чтобы картинка была просто фоном внизу */
         padding: 20px 16px 130px; 
         display: block;
         background-position: center bottom;
@@ -542,10 +528,10 @@ input, textarea, select {
     .hero__box::before {
         background: linear-gradient(
             180deg,
-            rgba(16, 13, 18, 0.95) 0%,
-            rgba(16, 13, 18, 0.88) 35%,
-            rgba(16, 13, 18, 0.45) 65%,
-            rgba(16, 13, 18, 0.1) 100%
+            rgba(23, 25, 27, 0.95) 0%,
+            rgba(23, 25, 27, 0.88) 35%,
+            rgba(23, 25, 27, 0.45) 65%,
+            rgba(23, 25, 27, 0.1) 100%
         );
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
@@ -555,15 +541,13 @@ input, textarea, select {
 
     .hero__box::after { display: none; }
 
-    .hero__content { max-width: 100%; text-align: center; } /* Центрируем текст для мобилки */
+    .hero__content { max-width: 100%; text-align: center; }
     
-    /* СКРЫВАЕМ ЛИШНЕЕ НА МОБИЛКЕ */
     .hero__tag { display: none; }
-    .hero__bottom-text { display: none; }
     .hero__leaf { display: none; }
 
     .hero__content h1 {
-        font-size: 24px; /* Еще меньше шрифт */
+        font-size: 24px;
         line-height: 1.15;
         margin-bottom: 8px;
     }
@@ -583,7 +567,6 @@ input, textarea, select {
 }
 
 @media (max-width: 480px) {
-    /* Для самых маленьких экранов */
     .hero__box { padding: 16px 12px 100px; }
     .hero__content h1 { font-size: 22px; }
     .hero__content p { font-size: 12px; margin-bottom: 12px; }

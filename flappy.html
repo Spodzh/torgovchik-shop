@@ -4,13 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Flappy Slush 🧃</title>
+    <meta name="theme-color" content="#17191B" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@700;800&family=Manrope:wght@500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background-color: #100D12;
+            background-color: #17191B;
             overflow: hidden;
             font-family: 'Manrope', sans-serif;
             height: 100vh;
@@ -19,7 +20,7 @@
             align-items: center;
             touch-action: none;
         }
-        canvas { display: block; background-color: #100D12; box-shadow: 0 0 50px rgba(155, 93, 229, 0.3); }
+        canvas { display: block; background-color: #17191B; box-shadow: 0 0 50px rgba(197, 138, 69, 0.2); }
         
         .ui-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -27,27 +28,27 @@
         }
         .score-display {
             position: absolute; top: 40px; font-family: 'Bitter', serif; font-size: 72px; font-weight: 800;
-            color: #F7F0F8; text-shadow: 0 0 20px rgba(255, 118, 40, 0.8); pointer-events: none; z-index: 10;
+            color: #E4E7E5; text-shadow: 0 0 20px rgba(197, 138, 69, 0.6); pointer-events: none; z-index: 10;
         }
         .screen {
-            background: linear-gradient(180deg, rgba(33, 25, 35, 0.95), rgba(16, 13, 18, 0.95));
-            backdrop-filter: blur(15px); border: 2px solid rgba(255, 118, 40, 0.4);
+            background: linear-gradient(180deg, rgba(32, 35, 38, 0.95), rgba(23, 25, 27, 0.95));
+            backdrop-filter: blur(15px); border: 2px solid rgba(197, 138, 69, 0.4);
             border-radius: 24px; padding: 30px 40px; text-align: center; pointer-events: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 40px rgba(255, 118, 40, 0.2);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 40px rgba(197, 138, 69, 0.15);
             animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             max-width: 90%; width: 400px; z-index: 20;
         }
         .screen.hidden { display: none; }
         .screen h1 {
-            font-family: 'Bitter', serif; color: #FF7628; font-size: 42px; margin-bottom: 10px;
-            text-transform: uppercase; text-shadow: 0 2px 10px rgba(255, 118, 40, 0.4);
+            font-family: 'Bitter', serif; color: #C58A45; font-size: 42px; margin-bottom: 10px;
+            text-transform: uppercase; text-shadow: 0 2px 10px rgba(197, 138, 69, 0.3);
         }
-        .screen p { color: #B5A7BA; margin-bottom: 20px; font-size: 16px; line-height: 1.5; }
-        .screen .score-text { font-family: 'Bitter', serif; font-size: 36px; color: #F7F0F8; margin-bottom: 10px; }
+        .screen p { color: #A7AAA8; margin-bottom: 20px; font-size: 16px; line-height: 1.5; }
+        .screen .score-text { font-family: 'Bitter', serif; font-size: 36px; color: #E4E7E5; margin-bottom: 10px; }
         
         .new-record {
             display: none; font-family: 'Bitter', serif; font-size: 20px; font-weight: 800;
-            color: #FFD700; text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            color: #D9A05B; text-shadow: 0 0 15px rgba(217, 160, 91, 0.6);
             margin-bottom: 15px; animation: pulse 1s infinite alternate;
             align-items: center; justify-content: center; gap: 8px;
         }
@@ -55,25 +56,26 @@
         @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
 
         .btn-play {
-            background: linear-gradient(135deg, #FF7628, #FFAA52); color: #100D12;
+            background: linear-gradient(135deg, #C58A45, #94613C); color: #17191B;
             border: none; padding: 16px 40px; font-size: 20px; font-weight: 800;
             border-radius: 12px; cursor: pointer; text-transform: uppercase;
-            transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 8px 25px rgba(255, 118, 40, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 8px 25px rgba(197, 138, 69, 0.3);
             width: 100%; margin-bottom: 15px; display: block; text-decoration: none; line-height: 1.5;
         }
         .btn-play:active { transform: scale(0.95); }
-        .back-link { display: block; color: #8A7A90; font-size: 14px; text-decoration: none; cursor: pointer; }
-        .back-link:hover { color: #FFAA52; }
+        .btn-play:hover { box-shadow: 0 8px 35px rgba(197, 138, 69, 0.5); }
+        .back-link { display: block; color: #8295A0; font-size: 14px; text-decoration: none; cursor: pointer; }
+        .back-link:hover { color: #C58A45; }
         
         .leaderboard {
             background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; margin-bottom: 20px;
             max-height: 150px; overflow-y: auto; text-align: left;
         }
-        .leaderboard-title { color: #FFAA52; font-weight: 700; text-align: center; margin-bottom: 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
-        .leaderboard-row { display: flex; justify-content: space-between; color: #F7F0F8; font-size: 14px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .leaderboard-title { color: #8295A0; font-weight: 700; text-align: center; margin-bottom: 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .leaderboard-row { display: flex; justify-content: space-between; color: #E4E7E5; font-size: 14px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .leaderboard-row:last-child { border-bottom: none; }
-        .leaderboard-row span:first-child { color: #B5A7BA; }
-        .leaderboard-row span:last-child { font-weight: 700; color: #FF7628; }
+        .leaderboard-row span:first-child { color: #A7AAA8; }
+        .leaderboard-row span:last-child { font-weight: 700; color: #C58A45; }
 
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
@@ -97,7 +99,7 @@
             <p>Тапай по экрану, чтобы заправляться и летать.<br>Игра бесконечна. С каждым рубежом подики ускоряются!</p>
             <div class="leaderboard" id="leaderboardStart">
                 <div class="leaderboard-title">🏆 Топ игроков</div>
-                <div id="leaderboardListStart" style="color:#B5A7BA; font-size:14px; text-align:center;">Загрузка...</div>
+                <div id="leaderboardListStart" style="color:#A7AAA8; font-size:14px; text-align:center;">Загрузка...</div>
             </div>
             <button class="btn-play" id="startBtn">Играть</button>
             <a href="index.html" class="back-link">← Вернуться в магазин</a>
@@ -107,11 +109,11 @@
             <h1>Game Over</h1>
             <div class="new-record" id="newRecordBadge">👑 НОВЫЙ РЕКОРД! 👑</div>
             <div class="score-text">Счет: <span id="finalScore">0</span></div>
-            <div style="color: #FFAA52; margin-bottom: 20px; font-weight: 700;">Твой рекорд: <span id="highScore">0</span></div>
+            <div style="color: #C58A45; margin-bottom: 20px; font-weight: 700;">Твой рекорд: <span id="highScore">0</span></div>
             
             <div class="leaderboard" id="leaderboardGameOver">
                 <div class="leaderboard-title">🏆 Топ игроков</div>
-                <div id="leaderboardListGameOver" style="color:#B5A7BA; font-size:14px; text-align:center;">Загрузка...</div>
+                <div id="leaderboardListGameOver" style="color:#A7AAA8; font-size:14px; text-align:center;">Загрузка...</div>
             </div>
             
             <button class="btn-play" id="restartBtn">Ещё раз</button>
@@ -150,11 +152,11 @@
         let smokeParticles = [];
 
         const bgColors = {
-            night: ['#100D12', '#19131D'],
-            day: ['#87CEEB', '#E0F6FF'],
-            sunset: ['#FF7B54', '#FFD56B'],
+            night: ['#17191B', '#202326'],
+            day: ['#8295A0', '#E4E7E5'],
+            sunset: ['#94613C', '#C58A45'],
             autumn: ['#5E1F1F', '#D84315'],
-            morning: ['#FF9A9E', '#FECFEF']
+            morning: ['#A7AAA8', '#E4E7E5']
         };
         let currentPalette = bgColors.night;
 
@@ -168,36 +170,42 @@
             });
         }
 
-        let bird = { x: 50, y: 150, width: 0, height: 0, velocity: 0, rotation: 0 };
+        let bird = { x: 50, y: 150, width: 90, height: 90, velocity: 0, rotation: 0 };
         let pipes = [];
 
-        // Загрузка картинок
-        const imgJuice = new Image(); imgJuice.src = 'https://i.ibb.co/5y9C351/jija.png';
+        // Локальные картинки
+        const imgJuice = new Image(); imgJuice.src = 'assets/flappy/juice.png';
         
         const podImages = [
-            new Image(), // 0
-            new Image(), // 1
-            new Image()  // 2
+            new Image(), 
+            new Image(), 
+            new Image()  
         ];
-        podImages[0].src = 'https://i.ibb.co/hQfJKfH/pixil-frame-0.png';
-        podImages[1].src = 'https://i.ibb.co/1thdJ6qj/pixil-frame-0-1.png';
-        podImages[2].src = 'https://i.ibb.co/0jStL6X7/pixil-frame-0-2.png';
+        podImages[0].src = 'assets/flappy/pod1.png';
+        podImages[1].src = 'assets/flappy/pod2.png';
+        podImages[2].src = 'assets/flappy/pod3.png';
 
         let imagesLoaded = 0;
         function checkImages() {
             imagesLoaded++;
             if (imagesLoaded === 4) {
-                const ratio = imgJuice.height / imgJuice.width;
-                bird.width = 90; 
-                bird.height = 90 * ratio;
+                if (imgJuice.naturalWidth > 0) {
+                    const ratio = imgJuice.height / imgJuice.width;
+                    bird.width = 90; 
+                    bird.height = 90 * ratio;
+                }
                 resizeCanvas();
                 loop();
             }
         }
         imgJuice.onload = checkImages;
+        imgJuice.onerror = checkImages;
         podImages[0].onload = checkImages;
+        podImages[0].onerror = checkImages;
         podImages[1].onload = checkImages;
+        podImages[1].onerror = checkImages;
         podImages[2].onload = checkImages;
+        podImages[2].onerror = checkImages;
 
         const authScreen = document.getElementById('authScreen');
         const startScreen = document.getElementById('startScreen');
@@ -234,7 +242,7 @@
                         vx: (Math.random() - 0.5) * 6,
                         vy: Math.random() * 3 + 1,
                         life: 1,
-                        color: Math.random() > 0.5 ? 'rgba(255, 118, 40, 0.25)' : 'rgba(199, 125, 255, 0.25)',
+                        color: Math.random() > 0.5 ? 'rgba(197, 138, 69, 0.25)' : 'rgba(130, 149, 160, 0.25)',
                         size: Math.random() * 4 + 2
                     });
                 }
@@ -282,7 +290,7 @@
                 const data = await r.json();
                 let html = '';
                 if (data.length === 0) {
-                    html = '<div style="color:#B5A7BA; font-size:14px; text-align:center; padding:10px;">Пока пусто</div>';
+                    html = '<div style="color:#A7AAA8; font-size:14px; text-align:center; padding:10px;">Пока пусто</div>';
                 } else {
                     data.forEach((item, i) => {
                         html += `<div class="leaderboard-row"><span>${i+1}. ${item.telegram}</span><span>${item.score}</span></div>`;
@@ -291,8 +299,8 @@
                 document.getElementById('leaderboardListStart').innerHTML = html;
                 document.getElementById('leaderboardListGameOver').innerHTML = html;
             } catch (e) {
-                document.getElementById('leaderboardListStart').innerHTML = '<div style="color:#8A7A90; font-size:12px; text-align:center;">Не удалось загрузить</div>';
-                document.getElementById('leaderboardListGameOver').innerHTML = '<div style="color:#8A7A90; font-size:12px; text-align:center;">Не удалось загрузить</div>';
+                document.getElementById('leaderboardListStart').innerHTML = '<div style="color:#8295A0; font-size:12px; text-align:center;">Не удалось загрузить</div>';
+                document.getElementById('leaderboardListGameOver').innerHTML = '<div style="color:#8295A0; font-size:12px; text-align:center;">Не удалось загрузить</div>';
             }
         }
 
@@ -309,7 +317,7 @@
         }
 
         function triggerFireworks() {
-            const colors = ['#FF7628', '#FFAA52', '#9B5DE5', '#C77DFF', '#F7F0F8'];
+            const colors = ['#C58A45', '#D9A05B', '#8295A0', '#A7AAA8', '#E4E7E5'];
             for (let i = 0; i < 50; i++) {
                 birdParticles.push({
                     x: canvas.width / 2, y: canvas.height / 3,
@@ -383,13 +391,13 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             if (timeOfDay === 'night' || timeOfDay === 'autumn') {
-                ctx.shadowBlur = 50; ctx.shadowColor = '#FFAA52'; ctx.fillStyle = '#FFAA52';
+                ctx.shadowBlur = 50; ctx.shadowColor = '#C58A45'; ctx.fillStyle = '#C58A45';
                 ctx.beginPath(); ctx.arc(canvas.width * 0.8, 100, 40, 0, Math.PI * 2); ctx.fill();
             } else if (timeOfDay === 'day' || timeOfDay === 'morning') {
-                ctx.shadowBlur = 60; ctx.shadowColor = '#FFD700'; ctx.fillStyle = '#FFD700';
+                ctx.shadowBlur = 60; ctx.shadowColor = '#E4E7E5'; ctx.fillStyle = '#E4E7E5';
                 ctx.beginPath(); ctx.arc(canvas.width * 0.8, 100, 50, 0, Math.PI * 2); ctx.fill();
             } else {
-                ctx.shadowBlur = 50; ctx.shadowColor = '#FF4D00'; ctx.fillStyle = '#FF4D00';
+                ctx.shadowBlur = 50; ctx.shadowColor = '#94613C'; ctx.fillStyle = '#94613C';
                 ctx.beginPath(); ctx.arc(canvas.width * 0.8, canvas.height * 0.4, 80, 0, Math.PI * 2); ctx.fill();
             }
             ctx.shadowBlur = 0;
@@ -398,10 +406,10 @@
             for (let b of buildings) {
                 let x = (b.x - bgOffset) % 3000;
                 if (x < -100) x += 3000;
-                ctx.fillStyle = (timeOfDay === 'day' || timeOfDay === 'morning') ? '#2C3E50' : '#0A070C';
+                ctx.fillStyle = (timeOfDay === 'day' || timeOfDay === 'morning') ? '#292725' : '#111315';
                 ctx.fillRect(x, canvas.height - b.h, b.w, b.h);
                 if (timeOfDay !== 'day' && timeOfDay !== 'morning') {
-                    ctx.fillStyle = timeOfDay === 'sunset' ? 'rgba(255, 170, 82, 0.6)' : '#FFAA52';
+                    ctx.fillStyle = timeOfDay === 'sunset' ? 'rgba(197, 138, 69, 0.6)' : '#C58A45';
                     for (let wy = canvas.height - b.h + 10; wy < canvas.height - 15; wy += 20) {
                         for (let wx = x + 8; wx < x + b.w - 10; wx += 15) {
                             if ((wx + wy) % 4 !== 0) ctx.fillRect(wx, wy, 6, 8);
@@ -411,7 +419,7 @@
             }
 
             if (weather === 'rain' || weather === 'storm') {
-                ctx.strokeStyle = 'rgba(150, 200, 255, 0.5)'; ctx.lineWidth = 1.5;
+                ctx.strokeStyle = 'rgba(130, 149, 160, 0.5)'; ctx.lineWidth = 1.5;
                 for (let p of weatherParticles) {
                     ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - 5, p.y + p.length); ctx.stroke();
                     p.y += p.speed; p.x -= 2;
@@ -420,25 +428,25 @@
                 if (weather === 'storm') {
                     lightningTimer--;
                     if (lightningTimer <= 0 && Math.random() < 0.05) {
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                        ctx.fillStyle = 'rgba(228, 231, 229, 0.8)';
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
                         lightningTimer = 5;
                     }
                 }
             } else if (weather === 'snow') {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.fillStyle = 'rgba(228, 231, 229, 0.8)';
                 for (let p of weatherParticles) {
                     ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
                     p.y += p.speed; p.x += p.drift;
                     if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
                 }
             } else if (weather === 'fog') {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.fillStyle = 'rgba(228, 231, 229, 0.15)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             } else if (weather === 'leaves') {
                 for (let p of weatherParticles) {
                     ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
-                    ctx.fillStyle = Math.random() > 0.5 ? '#D84315' : '#FFAA52';
+                    ctx.fillStyle = Math.random() > 0.5 ? '#94613C' : '#C58A45';
                     ctx.beginPath(); ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2); ctx.fill();
                     ctx.restore();
                     p.y += p.speed; p.x += p.drift; p.rot += 0.02;
@@ -447,14 +455,12 @@
             }
         }
 
-        // --- ЗЕРКАЛЬНЫЕ ПОДИКИ С РАЗНЫМИ ЦВЕТАМИ ---
         function drawPipes() {
             pipes.forEach(pipe => {
                 const imgTop = pipe.imgTop;
                 const imgBottom = pipe.imgBottom;
                 
-                // --- ВЕРХНИЙ ПОДИК ---
-                let imgHTop = PIPE_WIDTH * (imgTop.height / imgTop.width);
+                let imgHTop = (imgTop.naturalWidth > 0) ? PIPE_WIDTH * (imgTop.height / imgTop.width) : PIPE_WIDTH;
                 let yTop = pipe.topHeight;
                 let flipTop = true; 
 
@@ -468,9 +474,19 @@
                     if (flipTop) {
                         ctx.translate(pipe.x, yTop);
                         ctx.scale(1, -1);
-                        ctx.drawImage(imgTop, 0, 0, PIPE_WIDTH, imgHTop);
+                        if (imgTop.naturalWidth > 0) {
+                            ctx.drawImage(imgTop, 0, 0, PIPE_WIDTH, imgHTop);
+                        } else {
+                            ctx.fillStyle = '#8295A0';
+                            ctx.fillRect(0, 0, PIPE_WIDTH, imgHTop);
+                        }
                     } else {
-                        ctx.drawImage(imgTop, pipe.x, yTop - imgHTop, PIPE_WIDTH, imgHTop);
+                        if (imgTop.naturalWidth > 0) {
+                            ctx.drawImage(imgTop, pipe.x, yTop - imgHTop, PIPE_WIDTH, imgHTop);
+                        } else {
+                            ctx.fillStyle = '#8295A0';
+                            ctx.fillRect(pipe.x, yTop - imgHTop, PIPE_WIDTH, imgHTop);
+                        }
                     }
                     ctx.restore();
                     yTop -= imgHTop;
@@ -478,8 +494,7 @@
                 }
                 ctx.restore();
 
-                // --- НИЖНИЙ ПОДИК ---
-                let imgHBottom = PIPE_WIDTH * (imgBottom.height / imgBottom.width);
+                let imgHBottom = (imgBottom.naturalWidth > 0) ? PIPE_WIDTH * (imgBottom.height / imgBottom.width) : PIPE_WIDTH;
                 let yBottom = pipe.topHeight + PIPE_GAP;
                 let flipBottom = false;
 
@@ -493,9 +508,19 @@
                     if (flipBottom) {
                         ctx.translate(pipe.x, yBottom + imgHBottom);
                         ctx.scale(1, -1);
-                        ctx.drawImage(imgBottom, 0, 0, PIPE_WIDTH, imgHBottom);
+                        if (imgBottom.naturalWidth > 0) {
+                            ctx.drawImage(imgBottom, 0, 0, PIPE_WIDTH, imgHBottom);
+                        } else {
+                            ctx.fillStyle = '#8295A0';
+                            ctx.fillRect(0, 0, PIPE_WIDTH, imgHBottom);
+                        }
                     } else {
-                        ctx.drawImage(imgBottom, pipe.x, yBottom, PIPE_WIDTH, imgHBottom);
+                        if (imgBottom.naturalWidth > 0) {
+                            ctx.drawImage(imgBottom, pipe.x, yBottom, PIPE_WIDTH, imgHBottom);
+                        } else {
+                            ctx.fillStyle = '#8295A0';
+                            ctx.fillRect(pipe.x, yBottom, PIPE_WIDTH, imgHBottom);
+                        }
                     }
                     ctx.restore();
                     yBottom += imgHBottom;
@@ -512,7 +537,14 @@
             if (angle < -0.5) angle = -0.5;
             if (angle > 1.5) angle = 1.5;
             ctx.rotate(angle);
-            ctx.drawImage(imgJuice, -bird.width/2, -bird.height/2, bird.width, bird.height);
+            if (imgJuice.naturalWidth > 0) {
+                ctx.drawImage(imgJuice, -bird.width/2, -bird.height/2, bird.width, bird.height);
+            } else {
+                ctx.fillStyle = '#C58A45';
+                ctx.beginPath();
+                ctx.arc(0, 0, bird.width/2, 0, Math.PI * 2);
+                ctx.fill();
+            }
             ctx.restore();
         }
 
@@ -531,7 +563,12 @@
                 if (p.life <= 0) { pipePieces.splice(i, 1); continue; }
                 ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
                 ctx.globalAlpha = p.life;
-                ctx.drawImage(p.img, -p.w/2, -p.h/2, p.w, p.h);
+                if (p.img.naturalWidth > 0) {
+                    ctx.drawImage(p.img, -p.w/2, -p.h/2, p.w, p.h);
+                } else {
+                    ctx.fillStyle = '#8295A0';
+                    ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+                }
                 ctx.restore();
             }
 
@@ -547,7 +584,7 @@
                     continue;
                 }
                 
-                ctx.fillStyle = `rgba(220, 220, 220, ${s.life * 0.5})`;
+                ctx.fillStyle = `rgba(167, 170, 168, ${s.life * 0.5})`;
                 ctx.beginPath();
                 ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -563,7 +600,6 @@
                 if (maxHeight < minHeight) maxHeight = minHeight + 50;
                 let topHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
                 
-                // Выбираем случайную картинку для ВЕРХНЕГО и НИЖНЕГО подика независимо
                 let topImgIndex = Math.floor(Math.random() * podImages.length);
                 let bottomImgIndex = Math.floor(Math.random() * podImages.length);
                 

@@ -6,24 +6,24 @@
 
     <title>Товар — Torgovchik</title>
     <meta name="description" content="Подробная карточка товара в магазине Torgovchik." />
-    <meta name="theme-color" content="#1C1715" />
+    <meta name="theme-color" content="#17191B" />
     <meta name="robots" content="index, follow" />
 
-    <link rel="icon" type="image/png" href="https://i.ibb.co/VWRmsGHt/logo.png" />
-    <link rel="apple-touch-icon" href="https://i.ibb.co/VWRmsGHt/logo.png" />
+    <link rel="icon" type="image/png" href="assets/logo.png" />
+    <link rel="apple-touch-icon" href="assets/logo.png" />
 
     <meta property="og:type" content="product" />
     <meta property="og:site_name" content="Torgovchik" />
     <meta property="og:title" id="ogTitle" content="Товар — Torgovchik" />
     <meta property="og:description" id="ogDescription" content="Подробная карточка товара в магазине Torgovchik." />
-    <meta property="og:image" id="ogImage" content="https://i.ibb.co/VWRmsGHt/logo.png" />
+    <meta property="og:image" id="ogImage" content="assets/logo.png" />
     <meta property="og:locale" content="ru_RU" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://i.ibb.co" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Подключаем все стили -->
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/header.css" />
     <link rel="stylesheet" href="css/catalog.css" />
@@ -62,10 +62,11 @@
         </div>
     </div>
 
+    <!-- ШАПКА -->
     <header class="header">
         <div class="container header__inner">
             <a href="index.html" class="logo" aria-label="Torgovchik — на главную">
-                <img src="https://i.ibb.co/VWRmsGHt/logo.png" alt="Torgovchik" class="logo__image">
+                <img src="assets/logo.png" alt="Torgovchik" class="logo__image">
             </a>
 
             <nav class="nav nav--desktop" aria-label="Категории товаров">
@@ -93,14 +94,18 @@
         </div>
     </header>
 
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
     <main>
         <section class="product-page" id="productPage">
             <div class="container">
+                <!-- Кнопка "Назад в каталог" -->
                 <div class="product-breadcrumbs">
                     <a href="index.html" class="product-breadcrumbs__link">← Назад в каталог</a>
                 </div>
 
+                <!-- Контейнер, в который JS рендерит карточку товара -->
                 <div id="productContent">
+                    <!-- Скелетон загрузки (показывается, пока грузится товар) -->
                     <div class="product-skeleton">
                         <div class="product-skeleton__image skeleton"></div>
                         <div class="product-skeleton__info">
@@ -115,6 +120,7 @@
             </div>
         </section>
 
+        <!-- Секция "Недавно просмотренные" (скрыта по умолчанию) -->
         <section class="recently-viewed" id="recentlyViewedSection" style="display: none;">
             <div class="container">
                 <h2 class="section-title">Недавно просмотренные</h2>
@@ -123,6 +129,7 @@
         </section>
     </main>
 
+    <!-- ПОДВАЛ -->
     <footer class="footer">
         <div class="container">
             <p>© 2026 Torgovchik. Все права защищены.</p>
@@ -135,8 +142,10 @@
     <!-- Кнопка "Наверх" -->
     <button class="scroll-to-top" id="scrollToTop" aria-label="Наверх" type="button">↑</button>
 
+    <!-- Контейнер для уведомлений -->
     <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
 
+    <!-- ПОДКЛЮЧЕНИЕ СКРИПТОВ -->
     <script src="js/utils.js"></script>
     <script src="js/product.js"></script>
 </body>

@@ -9,26 +9,26 @@ const RECENTLY_VIEWED_MAX = 12;
 // ===== ДОСТУПНЫЕ АВАТАРКИ =====
 // =============================================
 const AVATARS = [
-    { id: 1,  image: 'https://i.ibb.co/vvmQyYqG/image.png' },
-    { id: 2,  image: 'https://i.ibb.co/XZ99y2Y4/image.png' },
-    { id: 3,  image: 'https://i.ibb.co/j9c7vSW0/image.png' },
-    { id: 4,  image: 'https://i.ibb.co/KxwDPKRc/image.png' },
-    { id: 5,  image: 'https://i.ibb.co/0pX5p3SJ/image.png' },
-    { id: 6,  image: 'https://i.ibb.co/JRRrkvYc/image.png' },
-    { id: 7,  image: 'https://i.ibb.co/H64GB86/image.png' },
-    { id: 8,  image: 'https://i.ibb.co/tw8HBvBr/image.png' },
-    { id: 9,  image: 'https://i.ibb.co/NdVVyhNS/image.png' },
-    { id: 10, image: 'https://i.ibb.co/C3CFsxGm/image.png' },
-    { id: 11, image: 'https://i.ibb.co/8gYmjq4V/image.png' },
-    { id: 12, image: 'https://i.ibb.co/1J4y8QQV/image.png' },
-    { id: 13, image: 'https://i.ibb.co/SXPrTVTR/image.png' },
-    { id: 14, image: 'https://i.ibb.co/SwSFWgTR/image.png' },
-    { id: 15, image: 'https://i.ibb.co/g11MxGY/image.png' },
-    { id: 16, image: 'https://i.ibb.co/ccmPQ6Tz/image.png' },
-    { id: 17, image: 'https://i.ibb.co/jkCdhV3P/image.png' },
-    { id: 18, image: 'https://i.ibb.co/Y49QDG0S/image.png' },
-    { id: 19, image: 'https://i.ibb.co/k6GxF5ks/image.png' },
-    { id: 20, image: 'https://i.ibb.co/Nz2SQ4w/image.png' }
+    { id: 1,  image: 'assets/avatars/1.png' },
+    { id: 2,  image: 'assets/avatars/2.png' },
+    { id: 3,  image: 'assets/avatars/3.png' },
+    { id: 4,  image: 'assets/avatars/4.png' },
+    { id: 5,  image: 'assets/avatars/5.png' },
+    { id: 6,  image: 'assets/avatars/6.png' },
+    { id: 7,  image: 'assets/avatars/7.png' },
+    { id: 8,  image: 'assets/avatars/8.png' },
+    { id: 9,  image: 'assets/avatars/9.png' },
+    { id: 10, image: 'assets/avatars/10.png' },
+    { id: 11, image: 'assets/avatars/11.png' },
+    { id: 12, image: 'assets/avatars/12.png' },
+    { id: 13, image: 'assets/avatars/13.png' },
+    { id: 14, image: 'assets/avatars/14.png' },
+    { id: 15, image: 'assets/avatars/15.png' },
+    { id: 16, image: 'assets/avatars/16.png' },
+    { id: 17, image: 'assets/avatars/17.png' },
+    { id: 18, image: 'assets/avatars/18.png' },
+    { id: 19, image: 'assets/avatars/19.png' },
+    { id: 20, image: 'assets/avatars/20.png' }
 ];
 
 const DEFAULT_AVATAR_ID = 6;
@@ -37,10 +37,10 @@ const DEFAULT_AVATAR_ID = 6;
 // ===== ШАПКИ ПРОФИЛЯ =====
 // =============================================
 const BANNERS = [
-    { id: 1, image: 'https://i.ibb.co/FbQzf5tN/image.png' },
-    { id: 2, image: 'https://i.ibb.co/rRHB6BV4/image.png' },
-    { id: 3, image: 'https://i.ibb.co/wNB7K5VH/image.png' },
-    { id: 4, image: 'https://i.ibb.co/W4Dm8kq9/image.png' }
+    { id: 1, image: 'assets/banners/1.png' },
+    { id: 2, image: 'assets/banners/2.png' },
+    { id: 3, image: 'assets/banners/3.png' },
+    { id: 4, image: 'assets/banners/4.png' }
 ];
 
 // =============================================
@@ -75,6 +75,24 @@ let retryTimer = null;
 let retryCountdown = 0;
 
 // =============================================
+// ===== УНИВЕРСАЛЬНЫЕ ФУНКЦИИ ДЛЯ МОДАЛОК =====
+// =============================================
+function showModal(modal) {
+  if (!modal) return;
+  modal.classList.add('open', 'show');
+  document.body.style.overflow = 'hidden';
+}
+
+function hideModal(modal) {
+  if (!modal) return;
+  modal.classList.remove('open', 'show');
+  const anyOpen = document.querySelector(
+    '.login-modal.open, .profile-modal.open, .avatar-modal.open, .banner-modal.open, .order-modal.open, .announcement-modal.open, .favorites-modal.open, .confirm-modal.open, .age-gate-modal.open'
+  );
+  if (!anyOpen) document.body.style.overflow = '';
+}
+
+// =============================================
 // ===== 18+ ВРАТА =====
 // =============================================
 function initAgeGate() {
@@ -83,25 +101,23 @@ function initAgeGate() {
   if (!modal) return;
 
   if (isVerified) {
-    modal.classList.remove('open');
+    hideModal(modal);
     return;
   }
 
-  modal.classList.add('open');
-  document.body.style.overflow = 'hidden';
+  showModal(modal);
 
   const question = document.getElementById('ageGateQuestion');
   const deny = document.getElementById('ageGateDeny');
 
   document.getElementById('ageGateYes').addEventListener('click', () => {
     localStorage.setItem('torgovchik_age_verified', 'true');
-    modal.classList.remove('open');
-    document.body.style.overflow = '';
+    hideModal(modal);
   });
 
   document.getElementById('ageGateNo').addEventListener('click', () => {
     question.style.display = 'none';
-    deny.classList.add('open');
+    deny.classList.add('open', 'show');
   });
 }
 
@@ -145,10 +161,10 @@ function showConfirm(options) {
     
     okBtn.className = 'confirm-modal__btn ' + (options.danger ? 'confirm-modal__btn--danger' : 'confirm-modal__btn--primary');
 
-    modal.classList.add('open');
+    showModal(modal);
 
     const closeAndResolve = (result) => {
-      modal.classList.remove('open');
+      hideModal(modal);
       okBtn.removeEventListener('click', onOk);
       cancelBtn.removeEventListener('click', onCancel);
       modal.removeEventListener('click', onOverlay);
@@ -168,11 +184,11 @@ function showConfirm(options) {
 }
 
 // =============================================
-// ===== УТИЛИТЫ МОДАЛОК =====
+// ===== УТИЛИТЫ МОДАЛОК (для setupModal) =====
 // =============================================
 function updateBodyOverflow() {
   const anyOpen = document.querySelector(
-    '.login-modal.open, .profile-modal.open, .avatar-modal.open, .banner-modal.open, .order-modal.open, .announcement-modal.open, .favorites-modal.open, .confirm-modal.open'
+    '.login-modal.open, .profile-modal.open, .avatar-modal.open, .banner-modal.open, .order-modal.open, .announcement-modal.open, .favorites-modal.open, .confirm-modal.open, .age-gate-modal.open'
   );
   document.body.style.overflow = anyOpen ? 'hidden' : '';
 }
@@ -182,8 +198,7 @@ function setupModal(modalId, onClose) {
   if (!modal) return null;
 
   const closeFn = () => {
-    modal.classList.remove('open');
-    updateBodyOverflow();
+    hideModal(modal);
     if (typeof onClose === 'function') onClose();
   };
 
@@ -196,7 +211,7 @@ function setupModal(modalId, onClose) {
   let wasOpen = false;
 
   modal.addEventListener('keydown', (e) => {
-    if (!modal.classList.contains('open')) return;
+    if (!modal.classList.contains('open') && !modal.classList.contains('show')) return;
     if (e.key === 'Escape') { e.preventDefault(); closeFn(); return; }
 
     if (e.key === 'Tab') {
@@ -213,7 +228,7 @@ function setupModal(modalId, onClose) {
   modal.addEventListener('click', (e) => { if (e.target === modal) closeFn(); });
 
   const observer = new MutationObserver(() => {
-    const isOpen = modal.classList.contains('open');
+    const isOpen = modal.classList.contains('open') || modal.classList.contains('show');
     if (isOpen && !wasOpen) {
       lastFocused = document.activeElement;
       updateBodyOverflow();
@@ -240,40 +255,50 @@ function setupModal(modalId, onClose) {
 const toastContainer = document.getElementById('toastContainer');
 
 function showToast(message, type, action) {
-  type = type || 'success';
+  type = type || 'info';
   const toast = document.createElement('div');
-  toast.className = 'toast' + (action ? ' toast--action' : '');
+  toast.className = `toast toast--${type}`;
   toast.setAttribute('role', 'status');
   
-  const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
-  
-  let html = `
-    <div class="toast__body">
-      <span class="toast-icon">${icon}</span>
-      <span class="toast-message">${message}</span>
-    </div>
+  let icon = 'ℹ️';
+  if (type === 'success') icon = '✅';
+  if (type === 'error') icon = '❌';
+
+  toast.innerHTML = `
+    <span class="toast__icon">${icon}</span>
+    <span class="toast__message">${message}</span>
   `;
-  
-  toast.innerHTML = html;
 
   if (action) {
     const btn = document.createElement('button');
     btn.className = 'toast__action';
     btn.textContent = action.text;
+    btn.style.cssText = 'background:var(--accent); color:#17191B; border:none; padding:4px 10px; border-radius:4px; font-weight:bold; margin-left:10px; cursor:pointer; font-size:12px;';
     btn.addEventListener('click', () => {
       action.onClick();
-      toast.classList.add('hide');
+      toast.classList.add('hiding');
       setTimeout(() => toast.remove(), 300);
     });
     toast.appendChild(btn);
   }
 
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'toast__close';
+  closeBtn.innerHTML = '✕';
+  closeBtn.addEventListener('click', () => {
+    toast.classList.add('hiding');
+    setTimeout(() => toast.remove(), 300);
+  });
+  toast.appendChild(closeBtn);
+
   toastContainer.appendChild(toast);
   
   const timeout = setTimeout(() => {
-    toast.classList.add('hide');
-    setTimeout(() => toast.remove(), 300);
-  }, action ? 5000 : 3000);
+    if (toast.parentNode) {
+      toast.classList.add('hiding');
+      setTimeout(() => toast.remove(), 300);
+    }
+  }, action ? 5000 : 3500);
 
   if (action) {
     toast.addEventListener('mouseenter', () => clearTimeout(timeout), { once: true });
@@ -442,7 +467,7 @@ function renderRecentlyViewedOnIndex() {
   section.style.display = 'block';
   grid.innerHTML = items.map(p => `
     <a href="product.html?id=${p.id}" class="recently-viewed__card">
-      <img src="${p.image}" alt="${p.name}" class="recently-viewed__image" loading="lazy" onerror="this.src='https://i.ibb.co/VWRmsGHt/logo.png'">
+      <img src="${p.image}" alt="${p.name}" class="recently-viewed__image" loading="lazy" onerror="this.src='assets/logo.png'">
       <div class="recently-viewed__name">${p.name}</div>
       <div class="recently-viewed__brand">${p.brand}</div>
       <div class="recently-viewed__price">${p.price} BYN</div>
@@ -480,9 +505,9 @@ function toggleFavorite(productId) {
   refreshFavoriteIcons();
 
   if (result.added) {
-    showToast(`❤️ ${product ? product.name : 'Товар'} добавлен в избранное`, 'success');
+    showToast(`${product ? product.name : 'Товар'} добавлен в избранное`, 'success');
   } else {
-    showToast(`💔 ${product ? product.name : 'Товар'} убран из избранного`, 'info');
+    showToast(`${product ? product.name : 'Товар'} убран из избранного`, 'info');
   }
 }
 
@@ -525,9 +550,9 @@ function renderFavoritesModal() {
   if (favProducts.length === 0) {
     grid.innerHTML = `
       <div class="favorites-empty">
-        <div class="favorites-empty__icon">💔</div>
-        <div class="favorites-empty__title">Пока ничего нет</div>
-        <div class="favorites-empty__text">Добавляйте товары сердечком — они появятся здесь</div>
+        <div class="favorites-empty__icon" style="font-size:48px; margin-bottom:16px;">💔</div>
+        <div class="favorites-empty__title" style="font-family:'Bitter', serif; font-size:20px; margin-bottom:8px;">Пока ничего нет</div>
+        <div class="favorites-empty__text" style="color:var(--text-secondary); margin-bottom:20px;">Добавляйте товары сердечком — они появятся здесь</div>
         <button class="btn btn-primary favorites-empty__btn" id="favoritesGoCatalog">В каталог</button>
       </div>
     `;
@@ -545,7 +570,7 @@ function renderFavoritesModal() {
     <div class="favorites-card" data-id="${p.id}">
       <button class="favorites-card__fav" data-id="${p.id}" aria-label="Убрать из избранного" aria-pressed="true">❤</button>
       <a href="product.html?id=${p.id}" class="favorites-card__link" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1;">
-        <img src="${p.image}" alt="${p.name}" class="favorites-card__image" loading="lazy" onerror="this.src='https://i.ibb.co/VWRmsGHt/logo.png'">
+        <img src="${p.image}" alt="${p.name}" class="favorites-card__image" loading="lazy" onerror="this.src='assets/logo.png'">
         <div class="favorites-card__name">${p.name}</div>
         <div class="favorites-card__brand">${p.brand}</div>
         <div class="favorites-card__price">${p.price} BYN</div>
@@ -571,7 +596,7 @@ function renderFavoritesModal() {
 
 function openFavoritesModal() {
   renderFavoritesModal();
-  document.getElementById('favoritesModal').classList.add('open');
+  showModal(document.getElementById('favoritesModal'));
 }
 
 // =============================================
@@ -612,7 +637,7 @@ function showAnnouncement(data, seenKey) {
   if (data.text) { text.textContent = data.text; text.style.display = 'block'; }
   else { text.textContent = ''; text.style.display = 'none'; }
 
-  modal.classList.add('open');
+  showModal(modal);
   localStorage.setItem(seenKey, '1');
 }
 
@@ -629,7 +654,7 @@ async function loadUserProfile(telegram) {
     return data;
   } catch (error) {
     console.error('Ошибка загрузки профиля:', error);
-    showToast('⚠️ Не удалось загрузить профиль', 'error');
+    showToast('Не удалось загрузить профиль', 'error');
     return null;
   }
 }
@@ -680,22 +705,22 @@ function updateProfileUI() {
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) {
       referralDiv.innerHTML = `
-        <div class="profile-referral-card">
-          <div class="profile-referral-card__header">
+        <div class="profile-referral-card" style="display:flex; flex-direction:column; gap:12px; width:100%;">
+          <div class="profile-referral-card__header" style="display:flex; align-items:center; gap:8px; color:var(--cold-blue); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px;">
             <span class="profile-referral-card__icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
               </svg>
             </span>
             <span class="profile-referral-card__title">Реферальная ссылка</span>
           </div>
-          <div class="profile-referral-card__body">
-            <span class="profile-referral-card__link">${referralLink}</span>
-            <button class="profile-referral-card__copy" id="copyReferralBtn">Копировать</button>
+          <div class="profile-referral-card__body" style="display:flex; gap:8px;">
+            <span class="profile-referral-card__link" style="flex:1; background:var(--bg-main); padding:10px; border-radius:8px; font-size:12px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${referralLink}</span>
+            <button class="profile-referral-card__copy" id="copyReferralBtn" style="background:var(--accent); color:#17191B; border:none; padding:0 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size:12px;">Копировать</button>
           </div>
-          <div class="profile-referral-card__footer">
-            👥 Приглашено: <strong>${currentUser.referralCount || 0}</strong> человек
+          <div class="profile-referral-card__footer" style="font-size:12px; color:var(--text-secondary);">
+            👥 Приглашено: <strong style="color:var(--accent);">${currentUser.referralCount || 0}</strong> человек
           </div>
         </div>
       `;
@@ -706,12 +731,12 @@ function updateProfileUI() {
           navigator.clipboard.writeText(referralLink).then(() => {
             this.textContent = '✓ Скопировано';
             this.classList.add('copied');
-            showToast('🔗 Реферальная ссылка скопирована!', 'success');
+            showToast('Реферальная ссылка скопирована!', 'success');
             setTimeout(() => {
               this.textContent = 'Копировать';
               this.classList.remove('copied');
             }, 2000);
-          }).catch(() => showToast('⚠️ Не удалось скопировать', 'error'));
+          }).catch(() => showToast('Не удалось скопировать', 'error'));
         });
       }
     }
@@ -725,20 +750,20 @@ function updateProfileUI() {
         const date = new Date(order.date).toLocaleDateString('ru-RU', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
         const total = order.total || 0;
         html += `
-          <div class="order-card ${status}">
-            <div class="order-header">
+          <div class="order-card ${status}" style="background:var(--bg-main); border:1px solid var(--border-soft); border-radius:10px; padding:12px 16px; margin-bottom:12px;">
+            <div class="order-header" style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-bottom:4px;">
               <span>Заказ #${order.id ? order.id.slice(-6) : '—'}</span>
-              <span class="order-total">${Number(total).toFixed(2)} BYN</span>
+              <span class="order-total" style="color:var(--price);">${Number(total).toFixed(2)} BYN</span>
             </div>
-            <div class="order-date">${date}</div>
-            <span class="order-status ${status}">${statusLabel}</span>
-            ${order.tickets ? `&nbsp;<span style="color:#E7A04A; font-size:13px;">🎟️ ${order.tickets} бил.</span>` : ''}
+            <div class="order-date" style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">${date}</div>
+            <span class="order-status ${status}" style="font-size:11px; padding:4px 8px; border-radius:4px; font-weight:700; background:rgba(255,255,255,0.05);">${statusLabel}</span>
+            ${order.tickets ? `&nbsp;<span style="color:#E7A04A; font-size:12px;">🎟️ ${order.tickets} бил.</span>` : ''}
           </div>
         `;
       });
       ordersDiv.innerHTML = html;
     } else {
-      ordersDiv.innerHTML = `<div class="orders-empty"><div class="orders-empty__icon">📦</div><div class="orders-empty__title">Пока здесь пусто</div></div>`;
+      ordersDiv.innerHTML = `<div class="orders-empty" style="text-align:center; padding:20px; color:var(--text-muted);"><div class="orders-empty__icon" style="font-size:32px; margin-bottom:10px;">📦</div><div class="orders-empty__title">Пока здесь пусто</div></div>`;
     }
   } else {
     userBtn.innerHTML = '👤 Войти';
@@ -749,7 +774,7 @@ function updateProfileUI() {
     const profileBanner = document.getElementById('profileHeader');
     if (profileBanner) profileBanner.style.backgroundImage = '';
     const ordersDiv = document.getElementById('profileOrders');
-    if (ordersDiv) ordersDiv.innerHTML = `<div class="orders-empty"><div class="orders-empty__icon">📦</div><div class="orders-empty__title">Пока здесь пусто</div></div>`;
+    if (ordersDiv) ordersDiv.innerHTML = `<div class="orders-empty" style="text-align:center; padding:20px; color:var(--text-muted);"><div class="orders-empty__icon" style="font-size:32px; margin-bottom:10px;">📦</div><div class="orders-empty__title">Пока здесь пусто</div></div>`;
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) referralDiv.innerHTML = '';
   }
@@ -761,22 +786,22 @@ function updateProfileUI() {
 function openAvatarModal() {
   pendingAvatarId = (currentUser && currentUser.avatar) ? currentUser.avatar : DEFAULT_AVATAR_ID;
   renderAvatarGrid();
-  document.getElementById('avatarModal').classList.add('open');
+  showModal(document.getElementById('avatarModal'));
 }
 
 function renderAvatarGrid() {
   const grid = document.getElementById('avatarGrid');
   grid.innerHTML = AVATARS.map(a => `
-    <div class="avatar-option ${pendingAvatarId === a.id ? 'selected' : ''}" data-avatar-id="${a.id}" title="Аватарка ${a.id}" role="button" tabindex="0" aria-label="Аватарка ${a.id}" aria-pressed="${pendingAvatarId === a.id ? 'true' : 'false'}">
-      <img src="${a.image}" alt="Аватарка ${a.id}" loading="lazy">
+    <div class="avatar-item ${pendingAvatarId === a.id ? 'active' : ''}" data-avatar-id="${a.id}" title="Аватарка ${a.id}" role="button" tabindex="0" aria-label="Аватарка ${a.id}" aria-pressed="${pendingAvatarId === a.id ? 'true' : 'false'}">
+      <img src="${a.image}" alt="Аватарка ${a.id}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" loading="lazy">
     </div>
   `).join('');
 
-  grid.querySelectorAll('.avatar-option').forEach(el => {
+  grid.querySelectorAll('.avatar-item').forEach(el => {
     const select = () => {
       pendingAvatarId = parseInt(el.dataset.avatarId);
-      grid.querySelectorAll('.avatar-option').forEach(o => { o.classList.remove('selected'); o.setAttribute('aria-pressed', 'false'); });
-      el.classList.add('selected');
+      grid.querySelectorAll('.avatar-item').forEach(o => { o.classList.remove('active'); o.setAttribute('aria-pressed', 'false'); });
+      el.classList.add('active');
       el.setAttribute('aria-pressed', 'true');
     };
     el.addEventListener('click', select);
@@ -785,8 +810,8 @@ function renderAvatarGrid() {
 }
 
 async function saveAvatar() {
-  if (!currentUser || !currentUser.telegram) return showToast('⚠️ Войдите в профиль', 'error');
-  if (!pendingAvatarId) return showToast('⚠️ Выберите аватарку', 'error');
+  if (!currentUser || !currentUser.telegram) return showToast('Войдите в профиль', 'error');
+  if (!pendingAvatarId) return showToast('Выберите аватарку', 'error');
   const saveBtn = document.getElementById('avatarSaveBtn');
   saveBtn.disabled = true; saveBtn.textContent = 'Сохранение...';
   try {
@@ -798,9 +823,9 @@ async function saveAvatar() {
     if (!response.ok) throw new Error(data.error || 'Ошибка сохранения');
     currentUser.avatar = pendingAvatarId;
     updateProfileUI(); avatarModalCtrl.closeFn();
-    showToast('✅ Аватарка обновлена!', 'success');
+    showToast('Аватарка обновлена!', 'success');
   } catch (err) {
-    showToast(`❌ ${err.message}`, 'error');
+    showToast(`${err.message}`, 'error');
   } finally {
     saveBtn.disabled = false; saveBtn.textContent = 'Сохранить';
   }
@@ -812,20 +837,20 @@ async function saveAvatar() {
 function openBannerModal() {
   pendingBannerId = (currentUser && currentUser.banner) ? currentUser.banner : null;
   renderBannerGrid();
-  document.getElementById('bannerModal').classList.add('open');
+  showModal(document.getElementById('bannerModal'));
 }
 
 function renderBannerGrid() {
   const grid = document.getElementById('bannerGrid');
   grid.innerHTML = BANNERS.map(b => `
-    <div class="banner-option ${pendingBannerId === b.id ? 'selected' : ''}" data-banner-id="${b.id}" style="background-image: url('${b.image}');" title="Шапка ${b.id}" role="button" tabindex="0" aria-label="Шапка ${b.id}" aria-pressed="${pendingBannerId === b.id ? 'true' : 'false'}"></div>
+    <div class="banner-item ${pendingBannerId === b.id ? 'active' : ''}" data-banner-id="${b.id}" style="background-image: url('${b.image}'); background-size: cover; background-position: center;" title="Шапка ${b.id}" role="button" tabindex="0" aria-label="Шапка ${b.id}" aria-pressed="${pendingBannerId === b.id ? 'true' : 'false'}"></div>
   `).join('');
 
-  grid.querySelectorAll('.banner-option').forEach(el => {
+  grid.querySelectorAll('.banner-item').forEach(el => {
     const select = () => {
       pendingBannerId = parseInt(el.dataset.bannerId);
-      grid.querySelectorAll('.banner-option').forEach(o => { o.classList.remove('selected'); o.setAttribute('aria-pressed', 'false'); });
-      el.classList.add('selected'); el.setAttribute('aria-pressed', 'true');
+      grid.querySelectorAll('.banner-item').forEach(o => { o.classList.remove('active'); o.setAttribute('aria-pressed', 'false'); });
+      el.classList.add('active'); el.setAttribute('aria-pressed', 'true');
     };
     el.addEventListener('click', select);
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(); } });
@@ -833,7 +858,7 @@ function renderBannerGrid() {
 }
 
 async function saveBanner() {
-  if (!currentUser || !currentUser.telegram) return showToast('⚠️ Войдите в профиль', 'error');
+  if (!currentUser || !currentUser.telegram) return showToast('Войдите в профиль', 'error');
   const saveBtn = document.getElementById('bannerSaveBtn');
   saveBtn.disabled = true; saveBtn.textContent = 'Сохранение...';
   try {
@@ -845,9 +870,9 @@ async function saveBanner() {
     if (!response.ok) throw new Error(data.error || 'Ошибка сохранения');
     currentUser.banner = pendingBannerId;
     updateProfileUI(); bannerModalCtrl.closeFn();
-    showToast(pendingBannerId ? '✅ Шапка обновлена!' : '✅ Шапка убрана', 'success');
+    showToast(pendingBannerId ? 'Шапка обновлена!' : 'Шапка убрана', 'success');
   } catch (err) {
-    showToast(`❌ ${err.message}`, 'error');
+    showToast(`${err.message}`, 'error');
   } finally {
     saveBtn.disabled = false; saveBtn.textContent = 'Сохранить';
   }
@@ -855,7 +880,7 @@ async function saveBanner() {
 
 function removeBanner() {
   pendingBannerId = null;
-  document.querySelectorAll('.banner-option').forEach(o => { o.classList.remove('selected'); o.setAttribute('aria-pressed', 'false'); });
+  document.querySelectorAll('.banner-item').forEach(o => { o.classList.remove('active'); o.setAttribute('aria-pressed', 'false'); });
 }
 
 // =============================================
@@ -879,14 +904,14 @@ function switchAuthTab(tab) {
     title.textContent = 'Создать аккаунт';
     subtitle.textContent = 'Зарегистрируйтесь, чтобы получать билетики';
     submitText.textContent = 'Зарегистрироваться';
-    forgot.classList.add('hidden');
+    if (forgot) forgot.style.display = 'none';
     passwordInput.setAttribute('autocomplete', 'new-password');
     if (consentWrap) consentWrap.style.display = 'block';
   } else {
     title.textContent = 'С возвращением';
     subtitle.textContent = 'Войдите, чтобы продолжить покупки';
     submitText.textContent = 'Войти';
-    forgot.classList.remove('hidden');
+    if (forgot) forgot.style.display = 'block';
     passwordInput.setAttribute('autocomplete', 'current-password');
     if (consentWrap) consentWrap.style.display = 'none';
   }
@@ -944,7 +969,7 @@ async function login() {
     localStorage.setItem('user_telegram', username);
     currentUser = data; updateProfileUI();
     loginModalCtrl.closeFn();
-    showToast(`✅ Добро пожаловать, ${username}!`, 'success');
+    showToast(`Добро пожаловать, ${username}!`, 'success');
     resetAuthForm();
   } catch (err) {
     showFieldError('loginPassword', 'passwordError', err.message || 'Ошибка сети');
@@ -956,7 +981,6 @@ async function login() {
 async function register() {
   clearAuthErrors();
   
-  // --- ПРОВЕРКА ЧЕКБОКСА ---
   const consentCheckbox = document.getElementById('authConsent');
   if (consentCheckbox && !consentCheckbox.checked) {
     const err = document.getElementById('consentError');
@@ -993,7 +1017,7 @@ async function register() {
       return;
     }
 
-    showToast('✅ Регистрация успешна! Теперь войдите.', 'success');
+    showToast('Регистрация успешна! Теперь войдите.', 'success');
     localStorage.removeItem('referralCode');
     await login();
   } catch (err) {
@@ -1095,7 +1119,7 @@ function addToCart(productId, event) {
     text: 'Открыть корзину',
     onClick: () => {
       openCart();
-      document.querySelectorAll('.toast').forEach(t => t.classList.add('hide'));
+      document.querySelectorAll('.toast').forEach(t => t.classList.add('hiding'));
     }
   });
 }
@@ -1132,46 +1156,52 @@ async function clearCart() {
   discountPercent = 0;
   saveCartToStorage();
   updateCartUI();
-  showToast('🧹 Корзина очищена', 'info');
+  showToast('Корзина очищена', 'info');
 }
 
 function getCartTotal() {
   return Utils.calculateCartTotal(cart, discountPercent);
 }
 
-// ИСПРАВЛЕНИЕ №1: Добавлен бренд в корзину
 function updateCartUI() {
   const totalItems = Utils.countCartItems(cart);
-  cartCount.textContent = totalItems;
+  if (cartCount) cartCount.textContent = totalItems;
 
   const clearBtn = document.getElementById('clearCartBtn');
-  if (clearBtn) clearBtn.style.display = cart.length > 0 ? 'inline-block' : 'none';
+  if (clearBtn) clearBtn.style.display = cart.length > 0 ? 'block' : 'none';
 
   if (cart.length === 0) {
-    cartItems.innerHTML = '<p class="cart-empty">Корзина пуста</p>';
-    cartTotal.textContent = '0.00';
+    if (cartItems) cartItems.innerHTML = `
+      <div class="cart-empty">
+          <p>Корзина пуста</p>
+          <span>Добавьте товары из каталога</span>
+      </div>
+    `;
+    if (cartTotal) cartTotal.textContent = '0.00';
     return;
   }
 
-  cartItems.innerHTML = cart.map(item => `
-    <div class="cart-item">
-      <div class="cart-item__info">
-        <span class="cart-item__name">
-          <span style="display:block; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">${item.brand}</span>
-          ${item.name}
-        </span>
-        <span class="cart-item__price">${item.price} BYN</span>
+  if (cartItems) {
+    cartItems.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div class="cart-item__info">
+          <span class="cart-item__name">
+            <span style="display:block; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">${item.brand}</span>
+            ${item.name}
+          </span>
+          <span class="cart-item__price">${item.price} BYN</span>
+        </div>
+        <div class="cart-item__controls">
+          <button class="cart-qty-btn" onclick="changeQuantity(${item.id}, -1)" aria-label="Уменьшить количество">−</button>
+          <span class="cart-qty-val">${item.quantity}</span>
+          <button class="cart-qty-btn" onclick="changeQuantity(${item.id}, 1)" aria-label="Увеличить количество">+</button>
+          <button class="cart-item__remove" onclick="removeFromCart(${item.id})" aria-label="Удалить товар">✕</button>
+        </div>
       </div>
-      <div class="cart-item__controls">
-        <button class="cart-qty-btn" onclick="changeQuantity(${item.id}, -1)" aria-label="Уменьшить количество">−</button>
-        <span class="cart-qty-val">${item.quantity}</span>
-        <button class="cart-qty-btn" onclick="changeQuantity(${item.id}, 1)" aria-label="Увеличить количество">+</button>
-        <button class="cart-item__remove" onclick="removeFromCart(${item.id})" aria-label="Удалить товар">✕</button>
-      </div>
-    </div>
-  `).join('');
+    `).join('');
+  }
 
-  cartTotal.textContent = getCartTotal();
+  if (cartTotal) cartTotal.textContent = getCartTotal();
 }
 
 function openCart() {
@@ -1195,35 +1225,31 @@ const promoMessage = document.getElementById('promoMessage');
 
 function applyPromo() {
   const code = promoInput.value.trim().toUpperCase();
-  if (!code) { promoMessage.textContent = '⚠️ Введите промокод'; promoMessage.style.color = '#ff7777'; return; }
-  if (appliedPromo === code) { promoMessage.textContent = 'ℹ️ Этот промокод уже применён'; promoMessage.style.color = '#B9A99A'; return; }
+  if (!code) { promoMessage.textContent = 'Введите промокод'; promoMessage.style.color = '#e74c3c'; return; }
+  if (appliedPromo === code) { promoMessage.textContent = 'Этот промокод уже применён'; promoMessage.style.color = 'var(--text-secondary)'; return; }
   const promo = promocodes.find(p => p.code === code);
   if (promo) {
     discountPercent = promo.discount;
     appliedPromo = code;
-    promoMessage.textContent = `✅ Промокод "${code}" применён! Скидка ${discountPercent}%`;
-    promoMessage.style.color = '#8aff8a';
+    promoMessage.textContent = `Промокод "${code}" применён! Скидка ${discountPercent}%`;
+    promoMessage.style.color = '#2ecc71';
     promoInput.disabled = true; applyPromoBtn.disabled = true;
-    updateCartUI(); showToast(`✅ Промокод "${code}" применён!`, 'success');
+    updateCartUI(); showToast(`Промокод "${code}" применён!`, 'success');
   } else {
-    promoMessage.textContent = `❌ Промокод "${code}" не найден`;
-    promoMessage.style.color = '#ff7777';
+    promoMessage.textContent = `Промокод "${code}" не найден`;
+    promoMessage.style.color = '#e74c3c';
   }
 }
 
 // =============================================
 // ===== ФИЛЬТРЫ =====
 // =============================================
-// ИСПРАВЛЕНИЕ №2: Сортировка брендов по новизне (по убыванию ID товаров)
 function initFilters(category) {
   const container = document.getElementById('filterContainer');
   if (!container) return;
   const catProducts = products.filter(p => p.category === category);
-  
-  // Собираем уникальные бренды
   const brands = [...new Set(catProducts.map(p => p.brand))];
   
-  // Сортируем бренды так, чтобы те, у которых есть товары с большим ID (новинки), были первыми
   brands.sort((a, b) => {
     const maxIdA = Math.max(...catProducts.filter(p => p.brand === a).map(p => p.id));
     const maxIdB = Math.max(...catProducts.filter(p => p.brand === b).map(p => p.id));
@@ -1273,7 +1299,7 @@ function renderProducts(category, filter = 'Все') {
       <div class="product-card" data-id="${p.id}">
         <button class="product-card__fav ${fav ? 'active' : ''}" data-id="${p.id}" aria-label="${fav ? 'Убрать из избранного' : 'Добавить в избранное'}" aria-pressed="${fav ? 'true' : 'false'}">${fav ? '❤' : '♡'}</button>
         <a href="product.html?id=${p.id}" class="product-card__link" aria-label="Открыть ${p.name}">
-          <img src="${p.image}" alt="${p.name}" class="product-card__image" loading="lazy" onerror="this.src='https://i.ibb.co/VWRmsGHt/logo.png'">
+          <img src="${p.image}" alt="${p.name}" class="product-card__image" loading="lazy" onerror="this.src='assets/logo.png'">
           ${popularity}
           <div class="product-card__name">${p.name}</div>
           <div class="product-card__brand">${p.brand}</div>
@@ -1338,9 +1364,9 @@ document.getElementById('favoritesModalClose').addEventListener('click', () => f
 
 document.getElementById('userBtn').addEventListener('click', () => {
   if (currentUser && currentUser.telegram) {
-    document.getElementById('profileModal').classList.add('open'); updateProfileUI();
+    showModal(document.getElementById('profileModal')); updateProfileUI();
   } else {
-    resetAuthForm(); document.getElementById('loginModal').classList.add('open');
+    resetAuthForm(); showModal(document.getElementById('loginModal'));
   }
 });
 
@@ -1361,11 +1387,11 @@ document.querySelectorAll('.auth-field input').forEach(input => {
   input.addEventListener('input', () => { input.closest('.auth-field').classList.remove('error'); input.removeAttribute('aria-invalid'); });
 });
 
-document.getElementById('forgotPasswordLink').addEventListener('click', (e) => { e.preventDefault(); showToast('📩 Напишите в наш Telegram — поможем восстановить пароль', 'info'); });
+document.getElementById('forgotPasswordLink').addEventListener('click', (e) => { e.preventDefault(); showToast('Напишите в наш Telegram — поможем восстановить пароль', 'info'); });
 
 document.getElementById('profileLogout').addEventListener('click', () => {
   localStorage.removeItem('user_telegram'); currentUser = null; updateProfileUI();
-  profileModalCtrl.closeFn(); showToast('👋 Вы вышли из профиля', 'info');
+  profileModalCtrl.closeFn(); showToast('Вы вышли из профиля', 'info');
 });
 
 document.getElementById('avatarEditBtn').addEventListener('click', openAvatarModal);
@@ -1390,32 +1416,30 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
   if (cart.length === 0) return showToast('Корзина пуста. Добавьте товары.', 'error');
   if (currentUser && currentUser.telegram) document.getElementById('orderTelegram').value = '@' + currentUser.telegram;
   orderIdempotencyKey = null;
-  document.getElementById('orderModal').classList.add('open');
+  showModal(document.getElementById('orderModal'));
   orderMessage.style.display = 'none'; orderMessage.textContent = '';
 });
 
 orderForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   
-  // --- ПРОВЕРКА ЧЕКБОКСА ---
   const orderConsent = document.getElementById('orderConsent');
   if (orderConsent && !orderConsent.checked) {
     orderMessage.style.display = 'block';
-    orderMessage.textContent = '⚠️ Необходимо согласие на обработку персональных данных.';
-    orderMessage.style.color = '#ff7777';
+    orderMessage.textContent = 'Необходимо согласие на обработку персональных данных.';
+    orderMessage.style.color = '#e74c3c';
     return;
   }
   
   const name = document.getElementById('orderName').value.trim();
   const telegramRaw = document.getElementById('orderTelegram').value.trim();
-  const address = document.getElementById('orderAddress').value.trim();
   const comment = document.getElementById('orderComment').value.trim();
 
-  if (!name) { orderMessage.style.display = 'block'; orderMessage.textContent = '⚠️ Пожалуйста, укажите имя.'; orderMessage.style.color = '#ff7777'; return; }
+  if (!name) { orderMessage.style.display = 'block'; orderMessage.textContent = 'Пожалуйста, укажите имя.'; orderMessage.style.color = '#e74c3c'; return; }
   
   const telegramClean = Utils.normalizeTelegramUsername(telegramRaw);
   const telegramErr = Utils.validateTelegramUsername(telegramClean);
-  if (telegramErr) { orderMessage.style.display = 'block'; orderMessage.textContent = '⚠️ ' + telegramErr; orderMessage.style.color = '#ff7777'; return; }
+  if (telegramErr) { orderMessage.style.display = 'block'; orderMessage.textContent = telegramErr; orderMessage.style.color = '#e74c3c'; return; }
   
   const telegramForServer = '@' + telegramClean;
   const submitBtn = document.getElementById('orderSubmit');
@@ -1424,7 +1448,7 @@ orderForm.addEventListener('submit', async (e) => {
   if (!orderIdempotencyKey) orderIdempotencyKey = Utils.generateUUID();
 
   const orderData = {
-    name, telegram: telegramForServer, address, comment, items: cart,
+    name, telegram: telegramForServer, comment, items: cart,
     subtotal: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
     total: getCartTotal(), promo: appliedPromo, discount: discountPercent, idempotencyKey: orderIdempotencyKey
   };
@@ -1433,18 +1457,18 @@ orderForm.addEventListener('submit', async (e) => {
     const response = await fetch(WORKER_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order: orderData }) });
     if (!response.ok) { const errData = await response.json(); throw new Error(errData.error || 'Ошибка отправки заказа'); }
 
-    orderMessage.style.display = 'block'; orderMessage.textContent = '✅ Заказ успешно отправлен! Мы свяжемся с вами в Telegram.'; orderMessage.style.color = '#8aff8a';
+    orderMessage.style.display = 'block'; orderMessage.textContent = 'Заказ успешно отправлен! Мы свяжемся с вами в Telegram.'; orderMessage.style.color = '#2ecc71';
 
     setTimeout(() => {
       cart = []; appliedPromo = null; discountPercent = 0; orderIdempotencyKey = null;
       saveCartToStorage(); updateCartUI(); closeCart(); orderModalCtrl.closeFn(); orderForm.reset();
       orderMessage.style.display = 'none'; promoInput.value = ''; promoInput.disabled = false;
       applyPromoBtn.disabled = false; promoMessage.textContent = '';
-      showToast('✅ Заказ оформлен! Спасибо!', 'success');
+      showToast('Заказ оформлен! Спасибо!', 'success');
       if (currentUser && currentUser.telegram) loadUserProfile(currentUser.telegram);
     }, 2000);
   } catch (error) {
-    orderMessage.style.display = 'block'; orderMessage.textContent = `⚠️ Ошибка: ${error.message || 'Неизвестная ошибка'}. Попробуйте позже.`; orderMessage.style.color = '#ff7777';
+    orderMessage.style.display = 'block'; orderMessage.textContent = `Ошибка: ${error.message || 'Неизвестная ошибка'}. Попробуйте позже.`; orderMessage.style.color = '#e74c3c';
   } finally {
     submitBtn.disabled = false; submitBtn.textContent = 'Отправить заказ';
   }
@@ -1459,23 +1483,30 @@ promoInput.addEventListener('keypress', e => { if (e.key === 'Enter') applyPromo
 const burger = document.getElementById('burgerBtn');
 const mobileMenu = document.getElementById('mobileMenu');
 
-burger.setAttribute('aria-expanded', 'false');
-burger.addEventListener('click', () => {
-  const isOpen = burger.classList.toggle('active');
-  mobileMenu.classList.toggle('open');
-  burger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-});
+if (burger) {
+  burger.setAttribute('aria-expanded', 'false');
+  burger.addEventListener('click', () => {
+    const isOpen = burger.classList.toggle('active');
+    mobileMenu.classList.toggle('open');
+    burger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
 
-document.addEventListener('click', e => {
-  if (!e.target.closest('.header__inner')) {
-    burger.classList.remove('active'); mobileMenu.classList.remove('open'); burger.setAttribute('aria-expanded', 'false');
-  }
-});
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.header__inner')) {
+      burger.classList.remove('active'); mobileMenu.classList.remove('open'); burger.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
 
 categoryBtns.forEach(btn => btn.addEventListener('click', () => switchCategory(btn.dataset.category)));
 categoryBtnsMobile.forEach(btn => {
   btn.addEventListener('click', () => {
-    switchCategory(btn.dataset.category); burger.classList.remove('active'); mobileMenu.classList.remove('open'); burger.setAttribute('aria-expanded', 'false');
+    switchCategory(btn.dataset.category); 
+    if (burger) {
+      burger.classList.remove('active'); 
+      mobileMenu.classList.remove('open'); 
+      burger.setAttribute('aria-expanded', 'false');
+    }
   });
 });
 
@@ -1520,20 +1551,15 @@ const secretBtn = document.getElementById('secretGameBtn');
 if (secretBtn) {
   secretBtn.addEventListener('click', () => {
     secretClickCount++;
-    
-    // Немного подсвечиваем кнопку при клике
     secretBtn.style.opacity = '0.5';
-    
     if (secretClickTimeout) clearTimeout(secretClickTimeout);
 
     if (secretClickCount >= 3) {
-      // Перекидываем в игру
       window.location.href = 'flappy.html';
     } else {
-      // Если не успел кликнуть 3 раза за 2 секунды, счетчик сбрасывается
       secretClickTimeout = setTimeout(() => {
         secretClickCount = 0;
-        secretBtn.style.opacity = '0.05';
+        secretBtn.style.opacity = '1';
       }, 2000);
     }
   });
