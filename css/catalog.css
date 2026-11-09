@@ -288,6 +288,13 @@
     }
     .product-card:hover::before { opacity: 1; }
     .product-card:hover .product-card__image { transform: scale(1.05); }
+    .product-card:hover .product-card__btn {
+        background: rgba(197, 138, 69, 0.14);
+        border-color: var(--accent);
+        color: var(--accent);
+        box-shadow: 0 0 16px rgba(197, 138, 69, 0.16);
+        transform: translateY(-2px);
+    }
     .product-card__fav:hover { transform: scale(1.1); background: rgba(130, 149, 160, 0.2); border-color: var(--cold-blue); }
     .product-card__btn:hover { background: var(--accent); color: #17191B; box-shadow: 0 0 20px rgba(197, 138, 69, 0.3); }
     .recently-viewed__card:hover { border-color: var(--border-orange); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
