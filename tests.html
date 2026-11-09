@@ -325,6 +325,37 @@
             ]);
 
             // =========================================
+            // formatPrice
+            // =========================================
+            runGroup('formatPrice', [
+                { name: '12.3 → "12.30"', fn: () => assert(U.formatPrice(12.3) === '12.30', '"12.30"') },
+                { name: '15 → "15.00"', fn: () => assert(U.formatPrice(15) === '15.00', '"15.00"') },
+                { name: '0 → "0.00"', fn: () => assert(U.formatPrice(0) === '0.00', '"0.00"') },
+                { name: 'строка "15.5" → "15.50"', fn: () => assert(U.formatPrice('15.5') === '15.50', '"15.50"') },
+                { name: 'NaN → "0.00"', fn: () => assert(U.formatPrice(NaN) === '0.00', '"0.00"') },
+                { name: 'null → "0.00"', fn: () => assert(U.formatPrice(null) === '0.00', '"0.00"') },
+                { name: 'undefined → "0.00"', fn: () => assert(U.formatPrice(undefined) === '0.00', '"0.00"') },
+                { name: 'отрицательное -2.5 → "-2.50"', fn: () => assert(U.formatPrice(-2.5) === '-2.50', '"-2.50"') },
+            ]);
+
+            // =========================================
+            // escapeHtml
+            // =========================================
+            runGroup('escapeHtml', [
+                { name: 'скрипт-инъекция', fn: () => assert(U.escapeHtml('<script>alert(1)<\/script>') === '&lt;script&gt;alert(1)&lt;/script&gt;', 'экранировано') },
+                { name: '< и >', fn: () => assert(U.escapeHtml('<b>') === '&lt;b&gt;', '&lt;b&gt;') },
+                { name: 'кавычка двойная', fn: () => assert(U.escapeHtml('a"b') === 'a&quot;b', 'a&quot;b') },
+                { name: 'кавычка одинарная', fn: () => assert(U.escapeHtml("a'b") === 'a&#39;b', 'a&#39;b') },
+                { name: 'амперсанд', fn: () => assert(U.escapeHtml('a&b') === 'a&amp;b', 'a&amp;b') },
+                { name: '& в примере-комбо', fn: () => assert(U.escapeHtml('<img src=x onerror=&"\'') === '&lt;img src=x onerror=&amp;&quot;&#39;', 'экранировано') },
+                { name: 'обычный текст не трогает', fn: () => assert(U.escapeHtml('Холодная жидкость 30ml') === 'Холодная жидкость 30ml', 'без изменений') },
+                { name: 'число → строка', fn: () => assert(U.escapeHtml(15) === '15', '"15"') },
+                { name: 'null → пустая строка', fn: () => assert(U.escapeHtml(null) === '', 'пустая') },
+                { name: 'undefined → пустая строка', fn: () => assert(U.escapeHtml(undefined) === '', 'пустая') },
+                { name: 'повторный escape не открывает инъекцию', fn: () => assert(U.escapeHtml(U.escapeHtml('5 < 6')) === '5 &amp;lt; 6', '"5 &amp;lt; 6"') },
+            ]);
+
+            // =========================================
             // calculateCartTotal
             // =========================================
             runGroup('calculateCartTotal', [

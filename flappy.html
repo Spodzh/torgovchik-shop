@@ -124,7 +124,18 @@
     <script>
         const WORKER_URL = 'https://torgovchik-bot.ernest-chanel.workers.dev/';
         const currentTelegram = localStorage.getItem('user_telegram');
-        
+
+        // Экранирование для innerHTML в лидерборде (страница самостоятельная, без utils.js)
+        function escapeHtml(raw) {
+            if (typeof raw !== 'string' && typeof raw !== 'number') return '';
+            return String(raw)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
@@ -293,7 +304,7 @@
                     html = '<div style="color:#A7AAA8; font-size:14px; text-align:center; padding:10px;">Пока пусто</div>';
                 } else {
                     data.forEach((item, i) => {
-                        html += `<div class="leaderboard-row"><span>${i+1}. ${item.telegram}</span><span>${item.score}</span></div>`;
+                        html += `<div class="leaderboard-row"><span>${i+1}. ${escapeHtml(item.telegram)}</span><span>${escapeHtml(item.score)}</span></div>`;
                     });
                 }
                 document.getElementById('leaderboardListStart').innerHTML = html;
