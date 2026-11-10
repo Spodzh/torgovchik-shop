@@ -12,9 +12,40 @@
     
     .referral-card { flex-direction: column; gap: 12px; text-align: center; }
     .referral-copy-btn { width: 100%; }
+
+    /* Длинный фон (портретный jpg): на телефоне cover относительно
+       всей высоты документа растягивает картинку в 5-6 раз.
+       Вместо этого показываем её вверху в естественной пропорции
+       (ширина 100%, высота ~ один экран), ниже — тёмный фолбэк */
+    body {
+        background-size: auto, 100% auto, auto, auto;
+        background-position: top center, top center, top left, top right;
+    }
+
+    /* Стеклянные карточки: blur 16-24px тормозит на телефонах —
+       ослабляем примерно вдвое (фон-фолбэк остаётся из base.css) */
+    .header,
+    .mobile-menu { backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%); }
+    .product-card,
+    .catalog__filters { backdrop-filter: blur(10px) saturate(140%); -webkit-backdrop-filter: blur(10px) saturate(140%); }
+    .about__card { backdrop-filter: blur(10px) saturate(140%); -webkit-backdrop-filter: blur(10px) saturate(140%); }
+    .faq__item { backdrop-filter: blur(9px) saturate(140%); -webkit-backdrop-filter: blur(9px) saturate(140%); }
+    .recently-viewed__card { backdrop-filter: blur(8px) saturate(130%); -webkit-backdrop-filter: blur(8px) saturate(130%); }
+    .cart-panel { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+
+    /* Hero: фиксируем минимальную высоту, чтобы при коротком контенте
+       полоса картинки (background-position: bottom) не поднималась
+       под текст и кнопку */
+    .hero__box {
+        min-height: 400px;
+        background-size: cover;
+        background-position: center bottom;
+    }
 }
 
 @media (max-width: 480px) {
+    .hero__box { min-height: 360px; }
+
     .age-gate-modal__content,
     .login-modal__content,
     .profile-modal__content,
