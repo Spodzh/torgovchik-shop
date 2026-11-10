@@ -1,7 +1,7 @@
-/* ===== КАТАЛОГ / NOVEMBER / FIRST FROST ===== */
+/* ===== КАТАЛОГ / NOIR EDITORIAL ===== */
 .catalog {
-    padding: 60px 0 80px;
-    background: var(--bg-main);
+    padding: 72px 0 96px;
+    background: transparent;
     position: relative;
 }
 
@@ -14,23 +14,35 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 12px;
-    margin-bottom: 40px;
+    margin-bottom: 48px;
     background: var(--bg-card);
     padding: 16px 24px;
-    border-radius: 16px;
+    border-radius: 20px;
     border: 1px solid var(--border-soft);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        inset 0 0 26px rgba(130, 149, 160, 0.05),
+        0 1px 2px rgba(0, 0, 0, 0.4),
+        0 12px 36px rgba(0, 0, 0, 0.3);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .catalog__filters {
+        background: rgba(41, 39, 37, 0.55);
+        backdrop-filter: blur(18px) saturate(150%);
+        -webkit-backdrop-filter: blur(18px) saturate(150%);
+    }
 }
 
 .filter-btn {
     background: transparent;
     border: 1px solid var(--border-soft);
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 10px 22px;
+    border-radius: 999px;
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
-    transition: all 0.25s;
+    transition: all 0.35s var(--ease-smooth);
     white-space: nowrap;
     color: var(--text-secondary);
     font-family: 'Manrope', sans-serif;
@@ -48,34 +60,68 @@
 .catalog__grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 24px;
+    gap: 28px;
 }
 
 /* ===== КАРТОЧКА ТОВАРА ===== */
 .product-card {
     position: relative;
     background: var(--bg-card);
-    border: 1px solid var(--border-soft);
-    border-radius: 16px;
-    padding: 20px 16px 16px;
-    text-align: center;
-    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    border: 1px solid rgba(130, 149, 160, 0.18);
+    border-radius: 20px;
+    padding: 24px 20px 16px;
+    text-align: left;
+    transition: transform 0.35s var(--ease-smooth), border-color 0.35s var(--ease-smooth), box-shadow 0.35s var(--ease-smooth);
     display: flex;
     flex-direction: column;
-    box-shadow: var(--shadow-card);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        inset 0 0 30px rgba(130, 149, 160, 0.055),
+        0 1px 2px rgba(0, 0, 0, 0.4),
+        0 14px 40px rgba(0, 0, 0, 0.4);
     user-select: none;
     overflow: hidden;
 }
 
+/* Стеклянная поверхность поверх плавающих аур страницы */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .product-card {
+        background: rgba(41, 39, 37, 0.55);
+        backdrop-filter: blur(18px) saturate(150%);
+        -webkit-backdrop-filter: blur(18px) saturate(150%);
+    }
+}
+
+/* Spotlight: подсветка следует за курсором (--mx/--my обновляет script.js) */
 .product-card::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0; height: 100%;
-    background: var(--grad-card-hover);
+    inset: 0;
+    background: radial-gradient(
+        340px circle at var(--mx, 50%) var(--my, 20%),
+        rgba(217, 160, 91, 0.14) 0%,
+        transparent 70%
+    );
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.4s var(--ease-smooth);
     pointer-events: none;
     z-index: 0;
+}
+
+/* Editorial-акцент: янтарная линия, проявляющаяся слева */
+.product-card::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 30%;
+    bottom: 30%;
+    width: 2px;
+    background: linear-gradient(180deg, transparent, var(--accent) 50%, transparent);
+    transform: scaleY(0);
+    transform-origin: center;
+    transition: transform 0.45s var(--ease-smooth);
+    pointer-events: none;
+    z-index: 2;
 }
 
 .product-card__link {
@@ -92,8 +138,8 @@
     position: absolute;
     top: 12px;
     right: 12px;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: rgba(23, 25, 27, 0.7);
     backdrop-filter: blur(4px);
@@ -117,53 +163,80 @@
 
 .product-card__image {
     width: 100%;
-    max-width: 160px;
+    max-width: 170px;
     height: auto;
     aspect-ratio: 1 / 1;
     object-fit: contain;
-    margin: 0 auto 16px;
+    margin: 0 auto 18px;
     display: block;
-    border-radius: 12px;
-    background: radial-gradient(circle, rgba(197, 138, 69, 0.05) 0%, transparent 70%);
+    border-radius: 14px;
+    /* «Пьедестал»: мягкое тёплое свечение снизу, как витринная подсветка */
+    background:
+        radial-gradient(circle at 50% 35%, rgba(217, 160, 91, 0.07) 0%, transparent 70%),
+        linear-gradient(180deg, rgba(197, 138, 69, 0) 55%, rgba(197, 138, 69, 0.13) 100%);
     padding: 12px;
     pointer-events: none;
-    transition: transform 0.25s ease;
+    transition: transform 0.45s var(--ease-smooth), filter 0.45s var(--ease-smooth);
 }
 
 .product-card__name {
-    font-weight: 700;
-    font-size: 17px;
+    font-weight: 600;
+    font-size: 16px;
     color: var(--text-primary);
     margin-bottom: 6px;
     line-height: 1.3;
+    overflow-wrap: anywhere;
 }
 
-.product-card__brand { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+/* Лейбл бренда: тонкий, разряженный — люксовая типографика */
+.product-card__brand {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(130, 149, 160, 0.18);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
 
 .product-card__price {
-    font-family: 'Bitter', serif;
-    font-weight: 800;
-    font-size: 22px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 19px;
     color: var(--price);
-    margin-bottom: 16px;
+    margin: 14px 0 14px;
+    line-height: 1.1;
 }
 
+/* Кнопка «В корзину»: editorial-текст с рисующейся линией подчёркивания */
 .product-card__btn {
     background: transparent;
-    border: 1px solid var(--accent);
-    border-radius: 8px;
+    border: none;
     padding: 12px 0;
-    font-weight: 700;
+    font-weight: 600;
     font-size: 14px;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: color 0.35s var(--ease-smooth);
     color: var(--accent);
     width: 100%;
     margin-top: auto;
     font-family: 'Manrope', sans-serif;
     z-index: 2;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.3px;
+    position: relative;
+}
+
+.product-card__btn::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 4px;
+    height: 1px;
+    background: rgba(217, 160, 91, 0.35);
+    transform: scaleX(0.3);
+    transform-origin: left;
+    transition: transform 0.4s var(--ease-smooth), background 0.35s var(--ease-smooth);
 }
 
 .product-card__popularity {
@@ -225,8 +298,10 @@
 }
 
 .placeholder h3 {
-    font-family: 'Bitter', serif;
-    font-size: 28px;
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
     margin-bottom: 12px;
     color: var(--text-primary);
 }
@@ -235,8 +310,8 @@
 
 /* ===== НЕДАВНО ПРОСМОТРЕННЫЕ ===== */
 .recently-viewed {
-    padding: 60px 0;
-    background: var(--bg-section);
+    padding: 72px 0;
+    background: transparent;
     border-top: 1px solid var(--border-soft);
     text-align: center;
 }
@@ -252,14 +327,22 @@
 .recently-viewed__card {
     background: var(--bg-card);
     border: 1px solid var(--border-soft);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 16px 12px;
     text-decoration: none;
     color: inherit;
-    transition: all 0.25s;
+    transition: all 0.35s var(--ease-smooth);
     display: flex;
     flex-direction: column;
     text-align: center;
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .recently-viewed__card {
+        background: rgba(41, 39, 37, 0.55);
+        backdrop-filter: blur(14px) saturate(140%);
+        -webkit-backdrop-filter: blur(14px) saturate(140%);
+    }
 }
 
 .recently-viewed__image {
@@ -276,55 +359,59 @@
 
 .recently-viewed__name { font-weight: 700; font-size: 14px; color: var(--text-primary); margin-bottom: 4px; line-height: 1.3; }
 .recently-viewed__brand { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
-.recently-viewed__price { font-family: 'Bitter', serif; font-weight: 700; font-size: 18px; color: var(--price); }
+.recently-viewed__price { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: var(--price); }
 
 /* ===== ХОВЕРЫ ===== */
 @media (hover: hover) and (pointer: fine) {
     .filter-btn:hover { border-color: var(--border-medium); color: var(--text-primary); background: rgba(255,255,255,0.03); }
     .product-card:hover {
-        transform: translateY(-6px);
-        border-color: var(--border-orange);
-        box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 25px rgba(197, 138, 69, 0.1);
+        transform: translateY(-4px);
+        border-color: rgba(217, 160, 91, 0.35);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.07),
+            0 2px 4px rgba(0, 0, 0, 0.4),
+            0 24px 56px rgba(0, 0, 0, 0.5),
+            0 0 40px rgba(197, 138, 69, 0.08);
     }
     .product-card:hover::before { opacity: 1; }
-    .product-card:hover .product-card__image { transform: scale(1.05); }
-    .product-card:hover .product-card__btn {
-        background: rgba(197, 138, 69, 0.14);
-        border-color: var(--accent);
-        color: var(--accent);
-        box-shadow: 0 0 16px rgba(197, 138, 69, 0.16);
-        transform: translateY(-2px);
+    .product-card:hover::after { transform: scaleY(1); }
+    /* Бутик-ховер: товар «вылетает» из витринной подсветки */
+    .product-card:hover .product-card__image {
+        transform: translateY(-6px) scale(1.07);
+        filter: brightness(1.06) drop-shadow(0 22px 22px rgba(0, 0, 0, 0.45));
     }
     .product-card__fav:hover { transform: scale(1.1); background: rgba(130, 149, 160, 0.2); border-color: var(--cold-blue); }
-    .product-card__btn:hover { background: var(--accent); color: #17191B; box-shadow: 0 0 20px rgba(197, 138, 69, 0.3); }
-    .recently-viewed__card:hover { border-color: var(--border-orange); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+    .product-card__btn:hover { color: #E8C79B; }
+    .product-card__btn:hover::after { transform: scaleX(1); background: #E8C79B; }
+    .recently-viewed__card:hover { border-color: rgba(217, 160, 91, 0.3); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
 }
 
 /* ===== АДАПТИВ ===== */
 @media (max-width: 768px) {
-    .catalog { padding: 40px 0 60px; }
-    .catalog__grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    .product-card { padding: 16px 12px 12px; }
-    .product-card__image { max-width: 120px; }
+    .catalog { padding: 48px 0 64px; }
+    .catalog__grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .product-card { padding: 16px 12px 12px; border-radius: 16px; }
+    .product-card__image { max-width: 120px; margin-bottom: 12px; }
     .product-card__name { font-size: 15px; }
-    .product-card__price { font-size: 18px; }
+    .product-card__brand { padding-bottom: 8px; }
+    .product-card__price { font-size: 20px; margin: 10px 0; }
 }
 
 @media (max-width: 480px) {
     .catalog__grid { gap: 10px; }
-    .product-card { border-radius: 12px; padding: 14px 10px 10px; }
+    .product-card { border-radius: 14px; padding: 14px 10px 10px; }
     .product-card__image { max-width: 100px; margin-bottom: 10px; }
     .product-card__name { font-size: 14px; }
-    .product-card__brand { font-size: 11px; margin-bottom: 8px; }
-    .product-card__price { font-size: 16px; margin-bottom: 10px; }
-    .product-card__btn { font-size: 12px; padding: 10px 0; border-radius: 6px; }
-    .product-card__fav { width: 32px; height: 32px; font-size: 16px; top: 8px; right: 8px; }
-    .catalog__filters { gap: 8px; padding: 12px; border-radius: 12px; }
-    .filter-btn { font-size: 12px; padding: 8px 14px; border-radius: 6px; }
-    
+    .product-card__brand { font-size: 10px; letter-spacing: 1.5px; }
+    .product-card__price { font-size: 18px; }
+    .product-card__btn { font-size: 13px; padding: 10px 0; }
+    .product-card__fav { width: 44px; height: 44px; font-size: 16px; top: 8px; right: 8px; }
+    .catalog__filters { gap: 8px; padding: 12px; border-radius: 16px; }
+    .filter-btn { font-size: 12px; padding: 8px 14px; }
+
     .recently-viewed__grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .recently-viewed__card { padding: 12px 8px; }
+    .recently-viewed__card { padding: 12px 8px; border-radius: 14px; }
     .recently-viewed__image { max-width: 80px; }
     .recently-viewed__name { font-size: 13px; }
-    .recently-viewed__price { font-size: 15px; }
+    .recently-viewed__price { font-size: 16px; }
 }

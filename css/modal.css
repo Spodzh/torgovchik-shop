@@ -83,13 +83,13 @@
 .announcement-modal__close,
 .favorites-modal__close {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: 12px;
+    right: 12px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-soft);
     color: var(--text-secondary);
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -98,6 +98,37 @@
     transition: all 0.2s;
     font-size: 18px;
     z-index: 10;
+}
+
+/* В длинных (скроллящихся) модалках крестик прилипает к верху окна */
+.order-modal__close,
+.favorites-modal__close {
+    position: sticky;
+    float: right;
+    top: 0;
+    /* компенсация: кнопка встаёт туда же, где была absolute (в зону padding 32px) */
+    margin: -20px -20px 8px 20px;
+}
+
+/* Мелкие интерактивные элементы: визуальный размер сохраняем,
+   зону нажатия расширяем прозрачной обводкой до ~44px */
+.toast__close,
+.favorites-card__fav,
+.auth-field__eye,
+.avatar-edit-btn,
+.banner-edit-btn {
+    position: relative;
+}
+
+.toast__close::before,
+.favorites-card__fav::before,
+.auth-field__eye::before,
+.avatar-edit-btn::before,
+.banner-edit-btn::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: inherit;
 }
 
 /* ===== 18+ ===== */
@@ -111,12 +142,16 @@
 .age-gate-modal__btn--yes { background: var(--grad-accent); color: #17191B; box-shadow: var(--shadow-warm); }
 .age-gate-modal__btn--no { background: transparent; border: 1px solid var(--border-medium); color: var(--text-secondary); }
 .age-gate-modal__deny { display: none; text-align: center; }
+/* JS добавляет 'show' на __deny при клике «Мне меньше 18» (script.js / product.js) */
+.age-gate-modal__deny.show,
+.age-gate-modal__deny.open { display: block; }
 .age-gate-modal__deny-icon { font-size: 48px; display: block; margin-bottom: 16px; }
 .age-gate-modal__deny-title { font-family: 'Bitter', serif; font-size: 24px; color: #e74c3c; margin-bottom: 12px; }
 .age-gate-modal__deny-text { font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
 
 /* ===== АВТОРИЗАЦИЯ ===== */
-.login-modal__content { max-width: 400px; overflow: hidden; }
+/* overflow-x обрезает декоративный лист, overflow-y даёт скролл при выросшем контенте */
+.login-modal__content { max-width: 400px; overflow-y: auto; overflow-x: hidden; }
 .login-modal__leaf { position: absolute; top: -10px; right: -10px; font-size: 100px; opacity: 0.05; pointer-events: none; transform: rotate(15deg); }
 .login-modal__brand { font-family: 'Bitter', serif; font-size: 14px; font-weight: 800; color: var(--accent); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 8px; }
 .login-modal__title { font-family: 'Bitter', serif; font-size: 28px; color: var(--text-primary); margin-bottom: 8px; }
@@ -230,7 +265,7 @@
 .form-group { margin-bottom: 16px; }
 .form-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 .form-group input, .form-group textarea { width: 100%; padding: 14px 16px; background: var(--bg-main); border: 1px solid var(--border-soft); border-radius: 8px; color: var(--text-primary); font-size: 15px; font-family: 'Manrope', sans-serif; transition: border-color 0.2s; }
-.form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); }
+.form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(197, 138, 69, 0.15); }
 .form-hint { display: block; font-size: 12px; color: var(--text-muted); margin-top: 6px; }
 .order-modal__content .btn[type="submit"] { width: 100%; padding: 16px; font-size: 16px; margin-top: 10px; }
 
@@ -248,9 +283,9 @@
 .announcement-modal__content { max-width: 440px; text-align: center; padding: 0; overflow: hidden; }
 .announcement-modal__badge { display: inline-flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; color: var(--cold-blue); text-transform: uppercase; letter-spacing: 1px; margin: 24px 0 16px; }
 .announcement-modal__badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cold-blue); box-shadow: 0 0 8px var(--cold-blue); }
-.announcement-modal__title { font-family: 'Bitter', serif; font-size: 22px; padding: 0 24px; margin-bottom: 16px; }
+.announcement-modal__title { font-family: 'Bitter', serif; font-size: 22px; padding: 0 24px; margin-bottom: 16px; overflow-wrap: anywhere; }
 .announcement-modal__image { width: 100%; max-height: 250px; object-fit: cover; margin-bottom: 16px; display: none; }
-.announcement-modal__image:not([src=""]):not([src=""]) { display: block; }
+.announcement-modal__image:not([src=""]):not([src]) { display: block; }
 .announcement-modal__text { font-size: 15px; color: var(--text-secondary); padding: 0 24px; margin-bottom: 24px; line-height: 1.6; }
 .announcement-modal__ok { width: calc(100% - 48px); margin: 0 24px 24px; padding: 14px; font-size: 15px; }
 
@@ -294,7 +329,7 @@
 .favorites-card__fav:hover { transform: scale(1.2); background: rgba(130,149,160,0.1); }
 
 .favorites-card__image { width: 80px; height: 80px; object-fit: contain; margin-bottom: 12px; }
-.favorites-card__name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; line-height: 1.2; }
+.favorites-card__name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; line-height: 1.2; overflow-wrap: anywhere; }
 .favorites-card__brand { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 .favorites-card__price { font-family: 'Bitter', serif; font-size: 16px; font-weight: 700; color: var(--price); margin-bottom: 12px; }
 

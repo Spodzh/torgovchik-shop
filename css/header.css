@@ -1,15 +1,47 @@
 /* ===== ШАПКА / NOVEMBER / FIRST FROST ===== */
 .header {
     background: var(--grad-header);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
     border-bottom: 1px solid var(--border-soft);
     padding: 6px 0;
     position: sticky;
     top: 0;
     z-index: var(--z-header);
     padding-top: max(6px, env(safe-area-inset-top));
-    transition: all 0.3s ease;
+    transition: all 0.35s var(--ease-smooth);
+    /* Иней: едва заметный холодный ореол внутри стеклянной шапки */
+    box-shadow: inset 0 0 28px rgba(130, 149, 160, 0.05);
+}
+
+/* Стеклянный блик по верхней кромке шапки */
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.25) 25%,
+        rgba(255, 255, 255, 0.08) 60%,
+        transparent 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Fallback для слабых устройств: нет backdrop-filter —
+   даём шапке почти непрозрачный плотный фон */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .header {
+        background: rgba(23, 25, 27, 0.96);
+    }
+    .mobile-menu {
+        background: rgba(23, 25, 27, 0.99);
+    }
 }
 
 .header__inner {
@@ -49,7 +81,7 @@
     padding: 10px 16px;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.35s var(--ease-smooth);
     font-family: 'Manrope', sans-serif;
     position: relative;
     overflow: hidden;
@@ -90,7 +122,7 @@
     cursor: pointer;
     padding: 10px;
     margin: -10px;
-    z-index: calc(var(--z-header) + 10);
+    z-index: var(--z-burger);
 }
 
 .burger span {
@@ -113,13 +145,16 @@
     top: calc(100% + 6px);
     left: 0;
     width: 100%;
-    background: rgba(23, 25, 27, 0.98);
-    backdrop-filter: blur(16px);
+    background: rgba(23, 25, 27, 0.92);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
     padding: 20px 24px;
     border-bottom: 1px solid var(--border-medium);
     z-index: var(--z-mobile-menu);
     border-radius: 0 0 16px 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    box-shadow:
+        inset 0 0 28px rgba(130, 149, 160, 0.05),
+        0 16px 40px rgba(0, 0, 0, 0.6);
 }
 
 .mobile-menu.open { display: block; }
@@ -151,7 +186,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    transition: all 0.25s ease;
+    transition: all 0.35s var(--ease-smooth);
     color: var(--text-primary);
     font-weight: 600;
     font-size: 14px;
@@ -185,7 +220,7 @@
     padding: 10px 12px;
     border-radius: 12px;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.35s var(--ease-smooth);
     font-family: 'Manrope', sans-serif;
     display: flex;
     align-items: center;
@@ -195,6 +230,13 @@
 }
 
 .user-btn.logged-in { color: var(--text-primary); }
+
+/* Длинный telegram-username не растягивает шапку */
+.user-btn__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
 
 .user-btn__avatar {
     width: 28px;
@@ -265,12 +307,12 @@
     .user-btn { padding: 6px 8px; gap: 6px; min-width: 44px; justify-content: center; border-radius: 50%; }
     .user-btn__avatar { width: 24px; height: 24px; }
     .user-btn__name, .user-btn__tickets { display: none; }
-    .cart-btn, .favorites-btn { font-size: 13px; padding: 8px 12px; min-height: 40px; border-radius: 10px; }
+    .cart-btn, .favorites-btn { font-size: 13px; padding: 8px 12px; min-height: 44px; border-radius: 10px; }
     .logo-tooltip { font-size: 13px; padding: 8px 16px; white-space: normal; max-width: 200px; text-align: center; }
 }
 
 @media (max-width: 375px) {
     .logo__image { height: 34px; }
-    .cart-btn, .favorites-btn { padding: 6px 10px; min-height: 36px; gap: 4px; }
+    .cart-btn, .favorites-btn { padding: 6px 10px; min-height: 44px; gap: 4px; }
     .cart-badge, .favorites-badge { font-size: 11px; line-height: 18px; padding: 0 6px; min-width: 18px; }
 }

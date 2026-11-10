@@ -6,6 +6,17 @@
     padding: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+    /* Глобальная плавность: этот дефолт имеет нулевую специфичность,
+       поэтому собственные transition компонентов его спокойно перекрывают */
+    transition:
+        background 0.35s var(--ease-smooth),
+        background-color 0.35s var(--ease-smooth),
+        color 0.35s var(--ease-smooth),
+        border-color 0.35s var(--ease-smooth),
+        box-shadow 0.35s var(--ease-smooth),
+        transform 0.35s var(--ease-smooth),
+        opacity 0.35s var(--ease-smooth),
+        filter 0.35s var(--ease-smooth);
 }
 
 :root {
@@ -39,8 +50,12 @@
     /* Градиенты */
     --grad-accent: linear-gradient(135deg, #C58A45, #94613C);
     --grad-cold: linear-gradient(135deg, #8295A0, #6B7D88);
-    --grad-header: rgba(23, 25, 27, 0.85);
+    --grad-header: rgba(23, 25, 27, 0.68);
     --grad-card-hover: linear-gradient(180deg, rgba(51, 48, 44, 0) 0%, rgba(197, 138, 69, 0.05) 100%);
+    --grad-ivory: linear-gradient(135deg, #F7F1E6 0%, #E9DCC8 100%);
+
+    /* Типографика: Unbounded — «элитный гаджет», Manrope — текст */
+    --font-display: 'Unbounded', 'Manrope', sans-serif;
 
     /* Тени */
     --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.4);
@@ -52,14 +67,18 @@
     /* Z-index слои */
     --z-mobile-menu: 90;
     --z-header: 100;
+    --z-burger: 110;
     --z-overlay: 150;
     --z-cart: 200;
     --z-modal: 250;
     --z-toast: 300;
-    --z-announcement: 500;
+    --z-scroll-top: 900;
     --z-tooltip: 1000;
 
     --header-height: 64px;
+
+    /* Движение (Glass Noir) */
+    --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html {
@@ -70,15 +89,74 @@ html {
 
 body {
     font-family: 'Manrope', sans-serif;
-    background: var(--bg-main);
+    background-color: var(--bg-main);
     color: var(--text-primary);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
     overflow-x: hidden;
-    background-image: 
-        radial-gradient(circle at 15% 50%, rgba(130, 149, 160, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 85% 30%, rgba(197, 138, 69, 0.03) 0%, transparent 50%);
+    /* ===== АТМОСФЕРНЫЙ ФОН (Поздняя осень / Первый иней) =====
+       Слои (сверху вниз): тёмный оверлей для читаемости → длинная
+       вертикальная картинка → мягкие пятна-фолбэк.
+       ВАЖНО: attachment по умолчанию = scroll, картинка ПРОКРУЧИВАЕТСЯ
+       вместе с сайтом, никакого background-attachment: fixed.
+       Если картинка не загрузится — остаётся цвет + пятна. */
+    background-image:
+        linear-gradient(
+            180deg,
+            rgba(19, 21, 23, 0.84) 0%,
+            rgba(20, 22, 24, 0.76) 40%,
+            rgba(16, 18, 20, 0.86) 100%
+        ),
+        url('../assets/bg-long-autumn.jpg'),
+        radial-gradient(circle at 15% 50%, rgba(130, 149, 160, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 85% 30%, rgba(197, 138, 69, 0.04) 0%, transparent 50%);
+    background-repeat: no-repeat;
+    background-position: top center;
+    /* Оверлей тянется на весь документ, картинка — cover относительно
+       scrollable-области (вся высота сайта, без искажений и повторов) */
+    background-size: auto, cover, auto, auto;
+}
+
+/* Слой 2: плавающие ауры (Glass Noir).
+   Анимируется только transform — не вызывает repaint, мягкость
+   даёт градиент вместо дорогого filter: blur на большой области */
+body::before,
+body::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    will-change: transform;
+}
+
+body::before {
+    top: -18%;
+    left: -12%;
+    width: 60vmax;
+    height: 60vmax;
+    background: radial-gradient(circle at center, rgba(197, 138, 69, 0.08) 0%, transparent 62%);
+    animation: aura-drift-warm 28s ease-in-out infinite alternate;
+}
+
+body::after {
+    bottom: -20%;
+    right: -10%;
+    width: 55vmax;
+    height: 55vmax;
+    background: radial-gradient(circle at center, rgba(130, 149, 160, 0.07) 0%, transparent 62%);
+    animation: aura-drift-cold 36s ease-in-out infinite alternate;
+}
+
+@keyframes aura-drift-warm {
+    from { transform: translate3d(0, 0, 0) scale(1); }
+    to   { transform: translate3d(7vw, 9vh, 0) scale(1.18); }
+}
+
+@keyframes aura-drift-cold {
+    from { transform: translate3d(0, 0, 0) scale(1.12); }
+    to   { transform: translate3d(-9vw, -7vh, 0) scale(1); }
 }
 
 :focus-visible {
@@ -112,74 +190,70 @@ input, textarea, select {
 /* ===== КНОПКИ ===== */
 .btn {
     display: inline-block;
-    padding: 16px 36px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 16px;
+    padding: 17px 40px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 15px;
     text-decoration: none;
     border: none;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: background 0.35s var(--ease-smooth), color 0.35s var(--ease-smooth), box-shadow 0.35s var(--ease-smooth), transform 0.35s var(--ease-smooth);
     font-family: 'Manrope', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.4px;
 }
 
+/* Первичная кнопка: слоновья кость на тёмном — люксовый контраст */
 .btn-primary {
-    background: var(--grad-accent);
-    color: #17191B;
-    box-shadow: var(--shadow-warm);
+    background: var(--grad-ivory);
+    color: #1A1815;
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.5),
+        0 12px 36px rgba(197, 138, 69, 0.22);
     position: relative;
     overflow: hidden;
 }
 
-.btn-primary::after {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%; width: 50%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transform: skewX(-20deg);
-    transition: 0.5s;
-}
-
 .btn-secondary {
-    background: var(--bg-card);
+    background: rgba(255, 255, 255, 0.05);
     color: var(--text-primary);
-    border: 1px solid var(--border-medium);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 @media (hover: hover) and (pointer: fine) {
     .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 40px rgba(197, 138, 69, 0.4);
-    }
-    .btn-primary:hover::after {
-        left: 200%;
+        transform: translateY(-2px) scale(1.02);
+        box-shadow:
+            0 2px 4px rgba(0, 0, 0, 0.5),
+            0 18px 48px rgba(197, 138, 69, 0.35);
     }
     .btn-secondary:hover {
-        background: var(--bg-card-hover);
+        background: rgba(255, 255, 255, 0.08);
         border-color: var(--accent);
-        box-shadow: 0 0 15px rgba(197, 138, 69, 0.15);
+        box-shadow: 0 6px 24px rgba(197, 138, 69, 0.15);
     }
 }
 
 .btn-primary .btn-arrow {
     display: inline-block;
     margin-left: 12px;
-    transition: transform 0.3s ease;
-    font-size: 20px;
+    transition: transform 0.35s var(--ease-smooth);
+    font-size: 19px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover .btn-arrow { transform: translateX(4px); }
 }
 
 /* ===== ЗАГОЛОВКИ ===== */
 .section-title {
-    font-family: 'Bitter', serif;
-    font-size: 36px;
-    font-weight: 800;
-    margin-bottom: 36px;
+    font-family: var(--font-display);
+    font-size: clamp(24px, 3vw, 38px);
+    font-weight: 500;
+    margin-bottom: 40px;
     text-align: center;
     color: var(--text-primary);
-    text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: -0.01em;
     position: relative;
     display: block;
     width: max-content;
@@ -188,45 +262,26 @@ input, textarea, select {
     margin-right: auto;
 }
 
-.section-title::before {
-    content: '🍂';
-    position: absolute;
-    left: -40px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 24px;
-    opacity: 0.6;
-}
-
-/* ===== ГЕРОЙ (NOVEMBER / FIRST FROST) ===== */
+/* ===== ГЕРОЙ (NOIR EDITORIAL POSTER, КОМПАКТНЫЙ) ===== */
 .hero {
     position: relative;
-    padding: 60px 0 80px;
-    background: var(--bg-main);
+    padding: 56px 0 72px;
+    background: transparent;
     overflow: hidden;
 }
 
+/* Дешёвое декоративное барахло (листья) убрано */
 .hero__leaf {
-    position: absolute;
-    font-size: 80px;
-    opacity: 0.1;
-    pointer-events: none;
-    z-index: 0;
-    user-select: none;
-    filter: drop-shadow(0 0 10px rgba(197, 138, 69, 0.2));
+    display: none;
 }
-.hero__leaf--tl { top: 20px; left: 20px; transform: rotate(-20deg); }
-.hero__leaf--tr { top: 30px; right: 30px; transform: rotate(15deg); }
-.hero__leaf--bl { bottom: 20px; left: 40px; transform: rotate(25deg); }
-.hero__leaf--br { bottom: 25px; right: 20px; transform: rotate(-15deg); }
 
 .hero__box {
     position: relative;
     z-index: 1;
-    border-radius: 24px;
+    border-radius: 28px;
     overflow: hidden;
-    min-height: 500px;
-    padding: 80px 60px;
+    min-height: clamp(400px, 60vh, 560px);
+    padding: 56px 56px;
     display: flex;
     align-items: center;
 
@@ -236,10 +291,11 @@ input, textarea, select {
     background-position: center right;
     background-repeat: no-repeat;
 
-    border: 1px solid var(--border-soft);
+    border: none;
     box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.6),
-        0 0 40px rgba(130, 149, 160, 0.1);
+        0 1px 2px rgba(0, 0, 0, 0.5),
+        0 30px 80px rgba(0, 0, 0, 0.65),
+        0 60px 140px rgba(0, 0, 0, 0.35);
 }
 
 /* Затемнение слева для читаемости текста */
@@ -300,51 +356,68 @@ input, textarea, select {
     text-align: left;
 }
 
+/* Эпиграф: тонкая типографская строка вместо бейджа-таблетки */
 .hero__tag {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
     font-family: 'Manrope', sans-serif;
     font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 3px;
+    font-weight: 600;
+    letter-spacing: 4px;
     text-transform: uppercase;
     color: var(--cold-blue);
-    border: 1px solid var(--cold-blue);
-    padding: 6px 16px;
-    border-radius: 40px;
-    margin-bottom: 24px;
-    box-shadow: 0 0 15px rgba(130, 149, 160, 0.15);
-    background: rgba(130, 149, 160, 0.05);
+    margin-bottom: 28px;
+}
+
+.hero__tag::before {
+    content: '';
+    display: inline-block;
+    width: 36px;
+    height: 1px;
+    background: var(--accent);
 }
 
 .hero__content h1 {
-    font-family: 'Bitter', serif;
-    font-size: 56px;
-    font-weight: 800;
-    line-height: 1.1;
+    font-family: var(--font-display);
+    font-size: clamp(30px, 4.2vw, 56px);
+    font-weight: 500;
+    line-height: 1.12;
     margin-bottom: 24px;
     color: var(--text-primary);
-    letter-spacing: -0.5px;
-    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    letter-spacing: -0.01em;
+    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.55);
 }
 
 .hero__content h1 .accent {
+    /* Градиентное золото по буквам (фолбэк — сплошной янтарный цвет) */
     color: var(--accent);
-    text-shadow: 0 0 30px rgba(197, 138, 69, 0.4);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    .hero__content h1 .accent {
+        background: linear-gradient(115deg, #E8C79B 0%, #D9A05B 45%, #B07C42 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        text-shadow: none;
+    }
 }
 
 .hero__content p {
-    font-size: 18px;
+    font-size: clamp(17px, 1.6vw, 20px);
     color: var(--text-secondary);
-    margin-bottom: 40px;
-    line-height: 1.6;
-    max-width: 450px;
+    margin-bottom: 44px;
+    line-height: 1.7;
+    max-width: 460px;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
 }
 
 /* ===== О НАС ===== */
 .about {
-    padding: 80px 0;
-    background: var(--bg-section);
+    padding: 96px 0;
+    background: transparent;
     border-top: 1px solid var(--border-soft);
     border-bottom: 1px solid var(--border-soft);
     position: relative;
@@ -361,23 +434,37 @@ input, textarea, select {
 .about__card {
     background: var(--bg-card);
     border: 1px solid var(--border-soft);
-    border-radius: 16px;
-    padding: 32px 24px;
+    border-radius: 20px;
+    padding: 32px 28px;
     max-width: 340px;
     flex: 1 1 260px;
     text-align: left;
-    transition: all 0.3s ease;
     display: flex;
     gap: 18px;
     align-items: flex-start;
+    transition: background 0.35s var(--ease-smooth), border-color 0.35s var(--ease-smooth), transform 0.35s var(--ease-smooth), box-shadow 0.35s var(--ease-smooth);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        inset 0 0 26px rgba(130, 149, 160, 0.06),
+        0 1px 2px rgba(0, 0, 0, 0.4),
+        0 12px 36px rgba(0, 0, 0, 0.35);
 }
 
-.about__icon { font-size: 40px; line-height: 1; flex-shrink: 0; filter: drop-shadow(0 0 10px rgba(197,138,69,0.3)); }
-.about__card h3 { font-family: 'Bitter', serif; font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
-.about__card p { font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
+/* Fallback: если blur недоступен, карточки остаются плотными */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .about__card {
+        background: rgba(41, 39, 37, 0.55);
+        backdrop-filter: blur(18px) saturate(150%);
+        -webkit-backdrop-filter: blur(18px) saturate(150%);
+    }
+}
+
+.about__icon { font-size: 40px; line-height: 1; flex-shrink: 0; filter: drop-shadow(0 0 12px rgba(197,138,69,0.4)); }
+.about__card h3 { font-family: var(--font-display); font-size: 17px; font-weight: 500; color: var(--text-primary); margin-bottom: 8px; letter-spacing: 0; }
+.about__card p { font-size: 15px; color: var(--text-secondary); line-height: 1.65; }
 
 /* ===== FAQ ===== */
-.faq { padding: 80px 0; background: var(--bg-main); text-align: center; }
+.faq { padding: 96px 0; background: transparent; text-align: center; }
 
 .faq__list {
     max-width: 800px;
@@ -391,9 +478,20 @@ input, textarea, select {
 .faq__item {
     background: var(--bg-card);
     border: 1px solid var(--border-soft);
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
-    transition: all 0.25s;
+    transition: border-color 0.35s var(--ease-smooth), box-shadow 0.35s var(--ease-smooth);
+    box-shadow:
+        inset 0 0 24px rgba(130, 149, 160, 0.06),
+        0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .faq__item {
+        background: rgba(41, 39, 37, 0.55);
+        backdrop-filter: blur(16px) saturate(150%);
+        -webkit-backdrop-filter: blur(16px) saturate(150%);
+    }
 }
 
 .faq__question {
@@ -407,7 +505,6 @@ input, textarea, select {
     align-items: center;
     user-select: none;
     transition: color 0.2s;
-    outline: none;
 }
 
 .faq__question::after {
@@ -436,28 +533,27 @@ input, textarea, select {
 
 /* ===== КОНТАКТЫ ===== */
 .contacts {
-    padding: 80px 0;
-    background: var(--bg-section);
+    padding: 96px 0;
+    background: transparent;
     border-top: 1px solid var(--border-soft);
     text-align: center;
 }
 
 .contacts__simple { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
-.contacts__icon { fill: var(--text-primary); transition: fill 0.2s; filter: drop-shadow(0 0 10px rgba(197,138,69,0.3)); }
+.contacts__icon { fill: var(--text-primary); transition: fill 0.35s var(--ease-smooth); filter: drop-shadow(0 0 10px rgba(197,138,69,0.3)); }
 
 .contacts__btn {
     display: inline-block;
     background: transparent;
     color: var(--accent);
-    padding: 14px 36px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 16px;
+    padding: 15px 40px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 15px;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: background 0.35s var(--ease-smooth), color 0.35s var(--ease-smooth), box-shadow 0.35s var(--ease-smooth);
     border: 1px solid var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.3px;
 }
 
 /* ===== ФУТЕР ===== */
@@ -475,11 +571,11 @@ input, textarea, select {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--cold-blue), transparent);
-    opacity: 0.3;
+    background: linear-gradient(90deg, transparent, var(--cold-blue), var(--accent), transparent);
+    opacity: 0.4;
 }
 
-.footer a { color: var(--text-secondary); text-decoration: none; border-bottom: 1px dashed rgba(167,170,168,0.3); transition: color 0.2s; }
+.footer a { color: var(--text-secondary); text-decoration: none; border-bottom: 1px dashed rgba(167,170,168,0.3); transition: color 0.2s, border-color 0.2s; }
 
 /* ===== ХОВЕРЫ ===== */
 @media (hover: hover) and (pointer: fine) {
@@ -489,28 +585,22 @@ input, textarea, select {
         transform: translateY(-4px); 
         box-shadow: 0 12px 30px rgba(0,0,0,0.4), 0 0 20px rgba(197,138,69,0.1); 
     }
-    .faq__item:hover { border-color: var(--border-medium); }
+    .faq__item:hover {
+        border-color: var(--border-orange);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
     .contacts__icon:hover { fill: var(--accent); }
-    .contacts__btn:hover { background: rgba(197,138,69,0.1); box-shadow: 0 0 20px rgba(197,138,69,0.2); }
-    .footer a:hover { color: var(--accent); }
+    .contacts__btn:hover { background: rgba(197,138,69,0.1); box-shadow: 0 0 20px rgba(197,138,69,0.2); color: var(--accent-hover); }
+    .footer a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 }
 
 /* ===== АДАПТИВ ===== */
-@media (max-width: 1024px) {
-    .hero__content h1 { font-size: 48px; }
-}
-
 @media (max-width: 900px) {
     .hero__box {
-        min-height: 450px;
-        padding: 60px 40px 60px;
+        min-height: 360px;
+        padding: 44px 40px;
         background-position: center bottom;
     }
-    .hero__content h1 { font-size: 40px; }
-    .hero__leaf { font-size: 60px; }
-
-    .section-title { font-size: 28px; }
-    .section-title::before { left: -30px; font-size: 20px; }
 }
 
 @media (max-width: 768px) {
@@ -518,11 +608,11 @@ input, textarea, select {
 
     .hero__box {
         min-height: auto;
-        padding: 20px 16px 130px; 
+        padding: 20px 16px 110px;
         display: block;
         background-position: center bottom;
         background-size: cover;
-        border-radius: 16px;
+        border-radius: 20px;
     }
 
     .hero__box::before {
@@ -542,35 +632,35 @@ input, textarea, select {
     .hero__box::after { display: none; }
 
     .hero__content { max-width: 100%; text-align: center; }
-    
+
     .hero__tag { display: none; }
     .hero__leaf { display: none; }
 
     .hero__content h1 {
         font-size: 24px;
-        line-height: 1.15;
-        margin-bottom: 8px;
+        line-height: 1.2;
+        margin-bottom: 10px;
     }
 
     .hero__content p {
         font-size: 13px;
-        margin-bottom: 16px;
+        margin-bottom: 18px;
         line-height: 1.5;
         margin-left: auto;
         margin-right: auto;
     }
-    
+
     .hero__btn {
-        padding: 10px 20px;
-        font-size: 12px;
+        padding: 12px 26px;
+        font-size: 13px;
     }
 }
 
 @media (max-width: 480px) {
-    .hero__box { padding: 16px 12px 100px; }
-    .hero__content h1 { font-size: 22px; }
-    .hero__content p { font-size: 12px; margin-bottom: 12px; }
-    .hero__btn { padding: 10px 16px; font-size: 11px; }
+    .hero__box { padding: 20px 12px 105px; }
+    .hero__content h1 { font-size: 20px; }
+    .hero__content p { font-size: 12px; margin-bottom: 14px; }
+    .hero__btn { padding: 11px 20px; font-size: 12px; }
 }
 
 @media (max-width: 600px) {
@@ -580,8 +670,7 @@ input, textarea, select {
     .faq__question { font-size: 15px; padding: 16px 20px; }
     .faq__answer { font-size: 14px; }
     .contacts__btn { font-size: 14px; padding: 12px 24px; width: 100%; }
-    
-    .section-title::before { display: none; }
+    .section-title { margin-bottom: 32px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
