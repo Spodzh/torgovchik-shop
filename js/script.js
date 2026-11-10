@@ -4,6 +4,8 @@
 const WORKER_URL = 'https://torgovchik-bot.ernest-chanel.workers.dev/';
 const RECENTLY_VIEWED_KEY = 'torgovchik_recently_viewed';
 const RECENTLY_VIEWED_MAX = 12;
+const PROMO_KEY = 'torgovchik_promo';
+const USER_CACHE_KEY = 'torgovchik_user_cache';
 
 // =============================================
 // ===== ДОСТУПНЫЕ АВАТАРКИ =====
@@ -34,14 +36,17 @@ const AVATARS = [
 const DEFAULT_AVATAR_ID = 6;
 
 // =============================================
-// ===== ШАПКИ ПРОФИЛЯ =====
+// ===== ШАПКИ ПРОФИЛЯ (чистый CSS, без картинок) =====
+// skin — класс из modal.css (секция «CSS-ШАПКИ ПРОФИЛЯ»),
+// вешается и на шапку профиля, и на превью в сетке выбора
 // =============================================
 const BANNERS = [
-    { id: 1, image: 'assets/banners/1.png' },
-    { id: 2, image: 'assets/banners/2.png' },
-    { id: 3, image: 'assets/banners/3.png' },
-    { id: 4, image: 'assets/banners/4.png' }
+    { id: 1, name: 'Amber Glow', skin: 'banner-skin-amber' },
+    { id: 2, name: 'Frost Blue', skin: 'banner-skin-frost' },
+    { id: 3, name: 'Deep Noir', skin: 'banner-skin-noir' },
+    { id: 4, name: 'Geometry', skin: 'banner-skin-geo' }
 ];
+const BANNER_SKINS = BANNERS.map(b => b.skin);
 
 // =============================================
 // ===== ФРАЗЫ НА ЛОГОТИПЕ =====
@@ -72,6 +77,7 @@ let currentCategory = 'liquids';
 let orderIdempotencyKey = null;
 
 let retryTimer = null;
+let retryInterval = null;
 let retryCountdown = 0;
 
 // =============================================
@@ -80,12 +86,14 @@ let retryCountdown = 0;
 function showModal(modal) {
   if (!modal) return;
   modal.classList.add('open', 'show');
+  modal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
 }
 
 function hideModal(modal) {
   if (!modal) return;
   modal.classList.remove('open', 'show');
+  modal.setAttribute('aria-hidden', 'true');
   const anyOpen = document.querySelector(
     '.login-modal.open, .profile-modal.open, .avatar-modal.open, .banner-modal.open, .order-modal.open, .announcement-modal.open, .favorites-modal.open, .confirm-modal.open, .age-gate-modal.open'
   );
@@ -162,12 +170,15 @@ function showConfirm(options) {
     okBtn.className = 'confirm-modal__btn ' + (options.danger ? 'confirm-modal__btn--danger' : 'confirm-modal__btn--primary');
 
     showModal(modal);
+    okBtn.focus();
 
     const closeAndResolve = (result) => {
       hideModal(modal);
       okBtn.removeEventListener('click', onOk);
       cancelBtn.removeEventListener('click', onCancel);
       modal.removeEventListener('click', onOverlay);
+      modal.removeEventListener('keydown', onKeydown);
+      document.removeEventListener('keydown', onKeydown);
       resolve(result);
     };
 
@@ -176,10 +187,23 @@ function showConfirm(options) {
     const onOverlay = (e) => {
       if (e.target === modal) closeAndResolve(false);
     };
+    // Esc закрывает, Tab циркулирует внутри модалки
+    const onKeydown = (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); closeAndResolve(false); return; }
+      if (e.key === 'Tab') {
+        const focusable = getModalFocusable(modal);
+        if (focusable.length === 0) { e.preventDefault(); return; }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    };
 
     okBtn.addEventListener('click', onOk);
     cancelBtn.addEventListener('click', onCancel);
     modal.addEventListener('click', onOverlay);
+    document.addEventListener('keydown', onKeydown);
   });
 }
 
@@ -193,29 +217,34 @@ function updateBodyOverflow() {
   document.body.style.overflow = anyOpen ? 'hidden' : '';
 }
 
-function setupModal(modalId, onClose) {
+// Поиск фокусируемых элементов внутри модалки (используется setupModal и showConfirm)
+function getModalFocusable(modal) {
+  return Array.from(modal.querySelectorAll(
+    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  )).filter(el => el.offsetParent !== null);
+}
+
+function setupModal(modalId, onClose, opts) {
   const modal = document.getElementById(modalId);
   if (!modal) return null;
+  const options = opts || {};
+  const dismissible = options.dismissible !== false;
 
   const closeFn = () => {
     hideModal(modal);
     if (typeof onClose === 'function') onClose();
   };
 
-  const getFocusable = () =>
-    modal.querySelectorAll(
-      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    );
-
   let lastFocused = null;
   let wasOpen = false;
 
   modal.addEventListener('keydown', (e) => {
     if (!modal.classList.contains('open') && !modal.classList.contains('show')) return;
-    if (e.key === 'Escape') { e.preventDefault(); closeFn(); return; }
+    // Возрастные ворота нельзя закрыть по Esc/клику вне окна (юридическое требование)
+    if (dismissible && e.key === 'Escape') { e.preventDefault(); closeFn(); return; }
 
     if (e.key === 'Tab') {
-      const focusable = Array.from(getFocusable()).filter(el => el.offsetParent !== null);
+      const focusable = getModalFocusable(modal);
       if (focusable.length === 0) { e.preventDefault(); return; }
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
@@ -225,7 +254,9 @@ function setupModal(modalId, onClose) {
     }
   });
 
-  modal.addEventListener('click', (e) => { if (e.target === modal) closeFn(); });
+  modal.addEventListener('click', (e) => {
+    if (dismissible && e.target === modal) closeFn();
+  });
 
   const observer = new MutationObserver(() => {
     const isOpen = modal.classList.contains('open') || modal.classList.contains('show');
@@ -233,7 +264,7 @@ function setupModal(modalId, onClose) {
       lastFocused = document.activeElement;
       updateBodyOverflow();
       setTimeout(() => {
-        const focusable = Array.from(getFocusable()).filter(el => el.offsetParent !== null);
+        const focusable = getModalFocusable(modal);
         if (focusable.length) focusable[0].focus();
       }, 60);
     } else if (!isOpen && wasOpen) {
@@ -264,10 +295,15 @@ function showToast(message, type, action) {
   if (type === 'success') icon = '✅';
   if (type === 'error') icon = '❌';
 
-  toast.innerHTML = `
-    <span class="toast__icon">${icon}</span>
-    <span class="toast__message">${message}</span>
-  `;
+  const iconEl = document.createElement('span');
+  iconEl.className = 'toast__icon';
+  iconEl.textContent = icon;
+  const msgEl = document.createElement('span');
+  msgEl.className = 'toast__message';
+  // textContent — message может содержать текст ошибки с сервера
+  msgEl.textContent = message;
+  toast.appendChild(iconEl);
+  toast.appendChild(msgEl);
 
   if (action) {
     const btn = document.createElement('button');
@@ -342,33 +378,36 @@ function renderCatalogError() {
 
 function manualRetry() {
   clearTimeout(retryTimer);
+  if (retryInterval) { clearInterval(retryInterval); retryInterval = null; }
   retryTimer = null;
   loadProducts();
 }
 
 function startAutoRetry() {
   if (retryTimer) clearTimeout(retryTimer);
+  if (retryInterval) clearInterval(retryInterval);
+  retryTimer = null;
+  retryInterval = null;
   retryCountdown = 5;
   
   const notice = document.getElementById('retryNotice');
   const counter = document.getElementById('retryCountdown');
   if (notice) notice.style.display = 'block';
-
-  const tick = () => {
-    retryCountdown--;
-    if (counter) counter.textContent = retryCountdown;
-    
-    if (retryCountdown <= 0) {
-      clearInterval(interval);
-      loadProducts();
-    }
-  };
-
   if (counter) counter.textContent = retryCountdown;
-  const interval = setInterval(tick, 1000);
-  
+
+  // Интервал только для отсчёта на экране; единственный реальный вызов — по таймеру ниже
+  retryInterval = setInterval(() => {
+    if (retryCountdown > 0) {
+      retryCountdown--;
+      if (counter) counter.textContent = retryCountdown;
+    } else {
+      clearInterval(retryInterval);
+      retryInterval = null;
+    }
+  }, 1000);
+
   retryTimer = setTimeout(() => {
-    clearInterval(interval);
+    if (retryInterval) { clearInterval(retryInterval); retryInterval = null; }
     loadProducts();
   }, 5000);
 }
@@ -389,6 +428,10 @@ async function loadProducts() {
     clearTimeout(retryTimer);
     retryTimer = null;
   }
+  if (retryInterval) {
+    clearInterval(retryInterval);
+    retryInterval = null;
+  }
   
   renderSkeletonCatalog();
   
@@ -402,7 +445,7 @@ async function loadProducts() {
     
     switchCategory(currentCategory);
     renderRecentlyViewedOnIndex();
-    loadCartFromStorage();
+    loadCartFromStorage(true);
     
   } catch (error) {
     console.error('Ошибка загрузки товаров:', error);
@@ -420,6 +463,33 @@ async function loadPromocodes() {
     console.error('Ошибка загрузки промокодов:', error);
     promocodes = [];
   }
+  restorePromo();
+}
+
+// Восстановление промокода между сессиями: код хранится в localStorage,
+// скидка заново сверяется со списком с сервера (удалили/изменили — сбросится)
+function restorePromo() {
+  const saved = localStorage.getItem(PROMO_KEY);
+  if (!saved) return;
+  const promo = promocodes.find(p => p.code === saved);
+  if (promo) {
+    appliedPromo = promo.code;
+    discountPercent = promo.discount;
+    if (promoInput) promoInput.value = promo.code;
+    if (promoInput) promoInput.disabled = true;
+    if (applyPromoBtn) applyPromoBtn.disabled = true;
+    if (promoMessage) {
+      promoMessage.textContent = `Промокод "${promo.code}" применён! Скидка ${discountPercent}%`;
+      promoMessage.style.color = '#2ecc71';
+    }
+  } else {
+    localStorage.removeItem(PROMO_KEY);
+  }
+}
+
+function persistPromo(code) {
+  if (code) localStorage.setItem(PROMO_KEY, code);
+  else localStorage.removeItem(PROMO_KEY);
 }
 
 // =============================================
@@ -466,11 +536,11 @@ function renderRecentlyViewedOnIndex() {
 
   section.style.display = 'block';
   grid.innerHTML = items.map(p => `
-    <a href="product.html?id=${p.id}" class="recently-viewed__card">
-      <img src="${p.image}" alt="${p.name}" class="recently-viewed__image" loading="lazy" onerror="this.src='assets/logo.png'">
-      <div class="recently-viewed__name">${p.name}</div>
-      <div class="recently-viewed__brand">${p.brand}</div>
-      <div class="recently-viewed__price">${p.price} BYN</div>
+    <a href="product.html?id=${encodeURIComponent(String(p.id))}" class="recently-viewed__card">
+      <img src="${Utils.escapeHtml(p.image)}" alt="${Utils.escapeHtml(p.name)}" class="recently-viewed__image" loading="lazy" onerror="this.src='assets/logo.png'">
+      <div class="recently-viewed__name">${Utils.escapeHtml(p.name)}</div>
+      <div class="recently-viewed__brand">${Utils.escapeHtml(p.brand)}</div>
+      <div class="recently-viewed__price">${Utils.escapeHtml(p.price)} BYN</div>
     </a>
   `).join('');
 }
@@ -567,15 +637,15 @@ function renderFavoritesModal() {
   }
 
   grid.innerHTML = favProducts.map(p => `
-    <div class="favorites-card" data-id="${p.id}">
-      <button class="favorites-card__fav" data-id="${p.id}" aria-label="Убрать из избранного" aria-pressed="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-      <a href="product.html?id=${p.id}" class="favorites-card__link" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1;">
-        <img src="${p.image}" alt="${p.name}" class="favorites-card__image" loading="lazy" onerror="this.src='assets/logo.png'">
-        <div class="favorites-card__name">${p.name}</div>
-        <div class="favorites-card__brand">${p.brand}</div>
-        <div class="favorites-card__price">${p.price} BYN</div>
+    <div class="favorites-card" data-id="${Utils.escapeHtml(p.id)}">
+      <button class="favorites-card__fav" data-id="${Utils.escapeHtml(p.id)}" aria-label="Убрать из избранного" aria-pressed="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+      <a href="product.html?id=${encodeURIComponent(String(p.id))}" class="favorites-card__link" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; flex:1;">
+        <img src="${Utils.escapeHtml(p.image)}" alt="${Utils.escapeHtml(p.name)}" class="favorites-card__image" loading="lazy" onerror="this.src='assets/logo.png'">
+        <div class="favorites-card__name">${Utils.escapeHtml(p.name)}</div>
+        <div class="favorites-card__brand">${Utils.escapeHtml(p.brand)}</div>
+        <div class="favorites-card__price">${Utils.escapeHtml(p.price)} BYN</div>
       </a>
-      <button class="favorites-card__btn" data-id="${p.id}">В корзину</button>
+      <button class="favorites-card__btn" data-id="${Utils.escapeHtml(p.id)}">В корзину</button>
     </div>
   `).join('');
 
@@ -644,6 +714,23 @@ function showAnnouncement(data, seenKey) {
 // =============================================
 // ===== ПРОФИЛЬ =====
 // =============================================
+// ===== СНАПШОТ ПОЛЬЗОВАТЕЛЯ (анти-FOUC) =====
+// Мини-кэш для мгновенной отрисовки кнопки профиля до первого кадра:
+// его читает inline-скрипт в <head> и сразу после хедера (index/product).
+// Обновляется при каждом updateProfileUI, чистится при выходе.
+// =============================================
+function saveUserSnapshot(user) {
+  try {
+    if (!user || !user.telegram) { localStorage.removeItem(USER_CACHE_KEY); return; }
+    localStorage.setItem(USER_CACHE_KEY, JSON.stringify({
+      telegram: user.telegram,
+      avatarId: user.avatar || DEFAULT_AVATAR_ID,
+      bannerId: user.banner || null,
+      tickets: user.totalTickets || 0
+    }));
+  } catch (e) { /* приватный режим / переполнение — не критично */ }
+}
+
 async function loadUserProfile(telegram) {
   try {
     const response = await fetch(WORKER_URL + 'user/' + encodeURIComponent(telegram));
@@ -683,8 +770,8 @@ function updateProfileUI() {
 
     userBtn.innerHTML = `
       <span class="user-btn__avatar"></span>
-      <span class="user-btn__name">${currentUser.telegram}</span>
-      <span class="user-btn__tickets"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 2px;"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v14"/></svg>${tickets}</span>
+      <span class="user-btn__name">${Utils.escapeHtml(currentUser.telegram)}</span>
+      <span class="user-btn__tickets"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 2px;"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v14"/></svg>${Utils.escapeHtml(tickets)}</span>
     `;
     applyAvatar(userBtn.querySelector('.user-btn__avatar'), avatarId, currentUser.telegram);
 
@@ -696,9 +783,9 @@ function updateProfileUI() {
 
     const profileBanner = document.getElementById('profileHeader');
     if (profileBanner) {
+      profileBanner.classList.remove(...BANNER_SKINS);
       const banner = BANNERS.find(b => b.id === currentUser.banner);
-      if (banner) profileBanner.style.backgroundImage = `url('${banner.image}')`;
-      else profileBanner.style.backgroundImage = '';
+      if (banner) profileBanner.classList.add(banner.skin);
     }
 
     const referralLink = `${window.location.origin}${window.location.pathname}?ref=${currentUser.telegram}`;
@@ -716,11 +803,11 @@ function updateProfileUI() {
             <span class="profile-referral-card__title">Реферальная ссылка</span>
           </div>
           <div class="profile-referral-card__body" style="display:flex; gap:8px;">
-            <span class="profile-referral-card__link" style="flex:1; background:var(--bg-main); padding:10px; border-radius:8px; font-size:12px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${referralLink}</span>
+            <span class="profile-referral-card__link" style="flex:1; background:var(--bg-main); padding:10px; border-radius:8px; font-size:12px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${Utils.escapeHtml(referralLink)}</span>
             <button class="profile-referral-card__copy" id="copyReferralBtn" style="background:var(--accent); color:#17191B; border:none; padding:0 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size:12px;">Копировать</button>
           </div>
           <div class="profile-referral-card__footer" style="font-size:12px; color:var(--text-secondary);">
-            👥 Приглашено: <strong style="color:var(--accent);">${currentUser.referralCount || 0}</strong> человек
+            👥 Приглашено: <strong style="color:var(--accent);">${Utils.escapeHtml(currentUser.referralCount || 0)}</strong> человек
           </div>
         </div>
       `;
@@ -752,8 +839,8 @@ function updateProfileUI() {
         html += `
           <div class="order-card ${status}" style="background:var(--bg-main); border:1px solid var(--border-soft); border-radius:10px; padding:12px 16px; margin-bottom:12px;">
             <div class="order-header" style="display:flex; justify-content:space-between; font-size:14px; font-weight:600; margin-bottom:4px;">
-              <span>Заказ #${order.id ? order.id.slice(-6) : '—'}</span>
-              <span class="order-total" style="color:var(--price);">${Number(total).toFixed(2)} BYN</span>
+              <span>Заказ #${order.id ? Utils.escapeHtml(String(order.id).slice(-6)) : '—'}</span>
+              <span class="order-total" style="color:var(--price);">${Utils.formatPrice(total)} BYN</span>
             </div>
             <div class="order-date" style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">${date}</div>
             <span class="order-status ${status}" style="font-size:11px; padding:4px 8px; border-radius:4px; font-weight:700; background:rgba(255,255,255,0.05);">${statusLabel}</span>
@@ -772,7 +859,7 @@ function updateProfileUI() {
     document.getElementById('profileOrdersCount').textContent = '0';
     applyAvatar(document.getElementById('profileAvatar'), null, null);
     const profileBanner = document.getElementById('profileHeader');
-    if (profileBanner) profileBanner.style.backgroundImage = '';
+    if (profileBanner) profileBanner.classList.remove(...BANNER_SKINS);
     const ordersDiv = document.getElementById('profileOrders');
     if (ordersDiv) ordersDiv.innerHTML = `<div class="orders-empty" style="text-align:center; padding:20px; color:var(--text-muted);"><div class="orders-empty__icon" style="font-size:32px; margin-bottom:10px;">📦</div><div class="orders-empty__title">Пока здесь пусто</div></div>`;
     const referralDiv = document.getElementById('profileReferral');
@@ -843,7 +930,9 @@ function openBannerModal() {
 function renderBannerGrid() {
   const grid = document.getElementById('bannerGrid');
   grid.innerHTML = BANNERS.map(b => `
-    <div class="banner-item ${pendingBannerId === b.id ? 'active' : ''}" data-banner-id="${b.id}" style="background-image: url('${b.image}'); background-size: cover; background-position: center;" title="Шапка ${b.id}" role="button" tabindex="0" aria-label="Шапка ${b.id}" aria-pressed="${pendingBannerId === b.id ? 'true' : 'false'}"></div>
+    <div class="banner-item ${b.skin} ${pendingBannerId === b.id ? 'active' : ''}" data-banner-id="${b.id}" title="Шапка «${b.name}»" role="button" tabindex="0" aria-label="Шапка «${b.name}»" aria-pressed="${pendingBannerId === b.id ? 'true' : 'false'}">
+      <span class="banner-item__label">${Utils.escapeHtml(b.name)}</span>
+    </div>
   `).join('');
 
   grid.querySelectorAll('.banner-item').forEach(el => {
@@ -1041,21 +1130,29 @@ const cartItems = document.getElementById('cartItems');
 const cartTotal = document.getElementById('cartTotal');
 const overlay = document.getElementById('overlay');
 
-function loadCartFromStorage() {
+// syncWithProducts=true: подменить цены товаров свежими данными каталога
+// (вызывается после загрузки products). false: только восстановить корзину для бейджа.
+function loadCartFromStorage(syncWithProducts) {
   try {
     const saved = localStorage.getItem('torgovchik_cart');
     if (saved) {
       cart = JSON.parse(saved);
-      cart = cart.map(item => {
-        const actual = products.find(p => p.id === item.id);
-        return actual ? { ...actual, quantity: item.quantity } : item;
-      });
-      updateCartUI();
+      if (Array.isArray(cart)) {
+        if (syncWithProducts) {
+          cart = cart.map(item => {
+            const actual = products.find(p => p.id === item.id);
+            return actual ? { ...actual, quantity: item.quantity } : item;
+          });
+        }
+      } else {
+        cart = [];
+      }
     }
   } catch (e) {
     console.error('Ошибка загрузки корзины:', e);
     cart = [];
   }
+  updateCartUI();
 }
 
 function saveCartToStorage() {
@@ -1154,6 +1251,7 @@ async function clearCart() {
   cart = [];
   appliedPromo = null;
   discountPercent = 0;
+  persistPromo(null);
   saveCartToStorage();
   updateCartUI();
   showToast('Корзина очищена', 'info');
@@ -1177,31 +1275,36 @@ function updateCartUI() {
           <span>Добавьте товары из каталога</span>
       </div>
     `;
-    if (cartTotal) cartTotal.textContent = '0.00';
+    if (cartTotal) cartTotal.textContent = Utils.formatPrice(0);
     return;
   }
 
   if (cartItems) {
-    cartItems.innerHTML = cart.map(item => `
+    cartItems.innerHTML = cart.map(item => {
+      // id только число: onclick-атрибут не должен интерполировать произвольные данные
+      const iid = parseInt(item.id, 10);
+      if (isNaN(iid)) return '';
+      return `
       <div class="cart-item">
         <div class="cart-item__info">
           <span class="cart-item__name">
-            <span style="display:block; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">${item.brand}</span>
-            ${item.name}
+            <span style="display:block; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">${Utils.escapeHtml(item.brand)}</span>
+            ${Utils.escapeHtml(item.name)}
           </span>
-          <span class="cart-item__price">${item.price} BYN</span>
+          <span class="cart-item__price">${Utils.escapeHtml(item.price)} BYN</span>
         </div>
         <div class="cart-item__controls">
-          <button class="cart-qty-btn" onclick="changeQuantity(${item.id}, -1)" aria-label="Уменьшить количество">−</button>
+          <button class="cart-qty-btn" onclick="changeQuantity(${iid}, -1)" aria-label="Уменьшить количество">−</button>
           <span class="cart-qty-val">${item.quantity}</span>
-          <button class="cart-qty-btn" onclick="changeQuantity(${item.id}, 1)" aria-label="Увеличить количество">+</button>
-          <button class="cart-item__remove" onclick="removeFromCart(${item.id})" aria-label="Удалить товар"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          <button class="cart-qty-btn" onclick="changeQuantity(${iid}, 1)" aria-label="Увеличить количество">+</button>
+          <button class="cart-item__remove" onclick="removeFromCart(${iid})" aria-label="Удалить товар"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
-  if (cartTotal) cartTotal.textContent = getCartTotal();
+  if (cartTotal) cartTotal.textContent = Utils.formatPrice(getCartTotal());
 }
 
 function openCart() {
@@ -1231,6 +1334,7 @@ function applyPromo() {
   if (promo) {
     discountPercent = promo.discount;
     appliedPromo = code;
+    persistPromo(code);
     promoMessage.textContent = `Промокод "${code}" применён! Скидка ${discountPercent}%`;
     promoMessage.style.color = '#2ecc71';
     promoInput.disabled = true; applyPromoBtn.disabled = true;
@@ -1294,18 +1398,22 @@ function renderProducts(category, filter = 'Все') {
     const fav = Utils.isFavorite(favorites, p.id);
     const count = productStats[p.id] || 0;
     const popularity = count > 0 ? `<div class="product-card__popularity">Купили ${count} раз</div>` : '';
-    
+    // id только числовой: защищает onclick\\/href от инъекций через API
+    const pid = parseInt(p.id, 10);
+    if (isNaN(pid)) return '';
+    const nameEsc = Utils.escapeHtml(p.name);
+
     return `
-      <div class="product-card" data-id="${p.id}">
-        <button class="product-card__fav ${fav ? 'active' : ''}" data-id="${p.id}" aria-label="${fav ? 'Убрать из избранного' : 'Добавить в избранное'}" aria-pressed="${fav ? 'true' : 'false'}">${fav ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'}</button>
-        <a href="product.html?id=${p.id}" class="product-card__link" aria-label="Открыть ${p.name}">
-          <img src="${p.image}" alt="${p.name}" class="product-card__image" loading="lazy" onerror="this.src='assets/logo.png'">
+      <div class="product-card" data-id="${pid}">
+        <button class="product-card__fav ${fav ? 'active' : ''}" data-id="${pid}" aria-label="${fav ? 'Убрать из избранного' : 'Добавить в избранное'}" aria-pressed="${fav ? 'true' : 'false'}">${fav ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'}</button>
+        <a href="product.html?id=${pid}" class="product-card__link" aria-label="Открыть ${nameEsc}">
+          <img src="${Utils.escapeHtml(p.image)}" alt="${nameEsc}" class="product-card__image" loading="lazy" onerror="this.src='assets/logo.png'">
           ${popularity}
-          <div class="product-card__name">${p.name}</div>
-          <div class="product-card__brand">${p.brand}</div>
-          <div class="product-card__price">${p.price} BYN</div>
+          <div class="product-card__name">${nameEsc}</div>
+          <div class="product-card__brand">${Utils.escapeHtml(p.brand)}</div>
+          <div class="product-card__price">${Utils.escapeHtml(p.price)} BYN</div>
         </a>
-        <button class="product-card__btn" onclick="addToCart(${p.id}, event)" aria-label="Добавить ${p.name} в корзину">В корзину</button>
+        <button class="product-card__btn" onclick="addToCart(${pid}, event)" aria-label="Добавить ${nameEsc} в корзину">В корзину</button>
       </div>
     `;
   }).join('');
@@ -1344,6 +1452,8 @@ function switchCategory(category) {
 // =============================================
 // ===== ИНИЦИАЛИЗАЦИЯ МОДАЛОК =====
 // =============================================
+// Возрастные ворота: закрытие только по кнопкам внутри, без Esc и бэкдропа
+const ageGateCtrl = setupModal('ageGateModal', null, { dismissible: false });
 const loginModalCtrl = setupModal('loginModal');
 const profileModalCtrl = setupModal('profileModal');
 const avatarModalCtrl = setupModal('avatarModal', () => { pendingAvatarId = null; });
@@ -1461,6 +1571,7 @@ orderForm.addEventListener('submit', async (e) => {
 
     setTimeout(() => {
       cart = []; appliedPromo = null; discountPercent = 0; orderIdempotencyKey = null;
+      persistPromo(null);
       saveCartToStorage(); updateCartUI(); closeCart(); orderModalCtrl.closeFn(); orderForm.reset();
       orderMessage.style.display = 'none'; promoInput.value = ''; promoInput.disabled = false;
       applyPromoBtn.disabled = false; promoMessage.textContent = '';
@@ -1566,12 +1677,128 @@ if (secretBtn) {
 }
 
 // =============================================
+// ===== АТМОСФЕРА: ИСКРЫ И СНЕЖИНКИ =====
+// =============================================
+// «Поздняя осень / Первый иней»: редкие тёплые искры поднимаются,
+// холодные снежинки оседают. Прекомпилированные спрайты (градиент
+// рисуется один раз), DPR <= 2, пауза на скрытой вкладке.
+(function () {
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var canvas = document.createElement('canvas');
+  canvas.setAttribute('aria-hidden', 'true');
+  canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:-1;';
+  document.body.appendChild(canvas);
+  var ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  var dpr = 1, w = 0, h = 0, particles = [], rafId = null, lastT = 0, sizeDirty = true;
+
+  // Спрайт: радиальный градиент одного цвета (тёплая искра / холодная снежинка)
+  function makeSprite(r, g, b) {
+    var s = document.createElement('canvas');
+    s.width = s.height = 28;
+    var c = s.getContext('2d');
+    var grad = c.createRadialGradient(14, 14, 0, 14, 14, 14);
+    grad.addColorStop(0, 'rgba(' + r + ',' + g + ',' + b + ',0.85)');
+    grad.addColorStop(0.45, 'rgba(' + r + ',' + g + ',' + b + ',0.25)');
+    grad.addColorStop(1, 'rgba(' + r + ',' + g + ',' + b + ',0)');
+    c.fillStyle = grad;
+    c.fillRect(0, 0, 28, 28);
+    return s;
+  }
+  var sparkSprite = makeSprite(217, 160, 91);
+  var snowSprite = makeSprite(150, 175, 196);
+
+  function spawn(spawnAnywhere) {
+    var isSnow = Math.random() < 0.62;
+    return {
+      type: isSnow ? snowSprite : sparkSprite,
+      x: Math.random() * w,
+      y: spawnAnywhere ? Math.random() * h : (isSnow ? -16 : h + 16),
+      size: 5 + Math.random() * 9,
+      baseAlpha: 0.14 + Math.random() * 0.3,
+      phase: Math.random() * Math.PI * 2,
+      twinkle: 0.5 + Math.random() * 1.4,
+      // скорость px/c; снег падает, искры поднимаются
+      vy: isSnow ? 10 + Math.random() * 16 : -(7 + Math.random() * 12),
+      vx: isSnow ? (Math.random() - 0.5) * 7 : (Math.random() - 0.5) * 5
+    };
+  }
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var target = Math.min(Math.round((w * h) / 30000), 36); // редко — только атмосфера
+    particles.length = 0;
+    for (var i = 0; i < target; i++) particles.push(spawn(true));
+  }
+
+  function tick(t) {
+    rafId = null;
+    if (sizeDirty) { resize(); sizeDirty = false; }
+    if (!lastT) lastT = t;
+    var dt = Math.min((t - lastT) / 1000, 0.05); // прыжки фокуса вкладки не сносит частицы в отрыв
+    lastT = t;
+
+    ctx.clearRect(0, 0, w, h);
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      p.y += p.vy * dt;
+      p.x += p.vx * dt + Math.sin(p.phase += p.twinkle * dt) * 6 * dt;
+      // перерождение за кадром экрана
+      if (p.y < -20 || p.y > h + 20) {
+        particles[i] = spawn(false);
+        continue;
+      }
+      ctx.globalAlpha = p.baseAlpha * (0.7 + 0.3 * Math.sin(p.phase * 2.1));
+      var s = p.size;
+      ctx.drawImage(p.type, p.x - s / 2, p.y - s / 2, s, s);
+    }
+    ctx.globalAlpha = 1;
+    rafId = requestAnimationFrame(tick);
+  }
+
+  window.addEventListener('resize', function () { sizeDirty = true; }, { passive: true });
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    } else if (!rafId) {
+      lastT = 0;
+      rafId = requestAnimationFrame(tick);
+    }
+  });
+
+  resize();
+  rafId = requestAnimationFrame(tick);
+})();
+
+// =============================================
+// ===== СПOTLIGHT КАРТОЧЕК (Glass Noir) =====
+// =============================================
+// Обновляет --mx/--my для подсветки, следующей за курсором.
+// Делегирование — работает и для динамически созданных карточек.
+document.addEventListener('pointermove', function (e) {
+    var card = e.target.closest ? e.target.closest('.product-card') : null;
+    if (!card || card.classList.contains('product-card--skeleton')) return;
+    var rect = card.getBoundingClientRect();
+    card.style.setProperty('--mx', (e.clientX - rect.left) + 'px');
+    card.style.setProperty('--my', (e.clientY - rect.top) + 'px');
+}, { passive: true });
+
+// =============================================
 // ===== ЗАПУСК =====
 // =============================================
 initAgeGate();
 initScrollToTop();
 checkReferral();
 loadFavoritesFromStorage();
+loadCartFromStorage(false);
 loadProducts().then(() => {
   initProfile();
   checkAnnouncement();
