@@ -31,10 +31,15 @@ function showToast(message, type, action) {
   if (type === 'success') icon = '✅';
   if (type === 'error') icon = '❌';
 
-  toast.innerHTML = `
-    <span class="toast__icon">${icon}</span>
-    <span class="toast__message">${message}</span>
-  `;
+  const iconEl = document.createElement('span');
+  iconEl.className = 'toast__icon';
+  iconEl.textContent = icon;
+  const msgEl = document.createElement('span');
+  msgEl.className = 'toast__message';
+  // textContent — message может содержать текст ошибки с сервера
+  msgEl.textContent = message;
+  toast.appendChild(iconEl);
+  toast.appendChild(msgEl);
 
   if (action) {
     const btn = document.createElement('button');
@@ -79,14 +84,22 @@ function initAgeGate() {
   const modal = document.getElementById('ageGateModal');
   if (!modal) return;
 
+  const closeModal = () => {
+    modal.classList.remove('open', 'show');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  };
+
   const isVerified = localStorage.getItem('torgovchik_age_verified') === 'true';
   if (isVerified) {
-    modal.classList.remove('open', 'show');
-    document.body.style.overflow = '';
+    closeModal();
     return;
   }
 
+  // Ворота нельзя закрыть по Esc/клику вне окна (юридическое требование) —
+  // поэтому без setupModal: только фокус-ловушка по Tab.
   modal.classList.add('open', 'show');
+  modal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
 
   const question = document.getElementById('ageGateQuestion');
@@ -94,11 +107,23 @@ function initAgeGate() {
   const yesBtn = document.getElementById('ageGateYes');
   const noBtn = document.getElementById('ageGateNo');
 
+  modal.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); return; }
+    if (e.key === 'Tab') {
+      const focusable = Array.from(modal.querySelectorAll('button')).filter(el => el.offsetParent !== null);
+      if (focusable.length === 0) { e.preventDefault(); return; }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+
   if (yesBtn) {
+    yesBtn.focus();
     yesBtn.addEventListener('click', () => {
       localStorage.setItem('torgovchik_age_verified', 'true');
-      modal.classList.remove('open', 'show');
-      document.body.style.overflow = '';
+      closeModal();
     });
   }
 
@@ -319,11 +344,11 @@ function renderRecentlyViewed(currentProductId) {
 
   section.style.display = 'block';
   grid.innerHTML = items.map(p => `
-    <a href="product.html?id=${p.id}" class="recently-viewed__card">
-      <img src="${p.image}" alt="${p.name}" class="recently-viewed__image" loading="lazy" onerror="this.src='assets/logo.png'">
-      <div class="recently-viewed__name">${p.name}</div>
-      <div class="recently-viewed__brand">${p.brand}</div>
-      <div class="recently-viewed__price">${p.price} BYN</div>
+    <a href="product.html?id=${encodeURIComponent(String(p.id))}" class="recently-viewed__card">
+      <img src="${Utils.escapeHtml(p.image)}" alt="${Utils.escapeHtml(p.name)}" class="recently-viewed__image" loading="lazy" onerror="this.src='assets/logo.png'">
+      <div class="recently-viewed__name">${Utils.escapeHtml(p.name)}</div>
+      <div class="recently-viewed__brand">${Utils.escapeHtml(p.brand)}</div>
+      <div class="recently-viewed__price">${Utils.escapeHtml(p.price)} BYN</div>
     </a>
   `).join('');
 }
@@ -384,8 +409,14 @@ function renderProduct(p) {
   };
   const categoryLabel = categoryLabels[p.category] || p.category || '—';
 
+  const nameEsc = Utils.escapeHtml(p.name);
+  const brandEsc = Utils.escapeHtml(p.brand);
+  const categoryEsc = Utils.escapeHtml(categoryLabel);
+  const priceEsc = Utils.escapeHtml(Utils.formatPrice(p.price));
+  const sku = '#' + String(parseInt(p.id, 10) || 0).padStart(4, '0');
+
   const popularityHtml = boughtCount > 0
-    ? `<div class="product-info__brand" style="color:var(--accent); background:rgba(197,138,69,0.1); display:inline-block; padding:4px 12px; border-radius:20px; margin-bottom:12px; width:fit-content;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Купили ${boughtCount} раз</div>`
+    ? `<div class="product-info__brand" style="color:var(--accent); background:rgba(197,138,69,0.1); display:inline-block; padding:4px 12px; border-radius:20px; margin-bottom:12px; width:fit-content;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Купили ${parseInt(boughtCount, 10) || 0} раз</div>`
     : '';
 
   content.innerHTML = `
@@ -395,16 +426,16 @@ function renderProduct(p) {
                 id="productFavBtn"
                 aria-label="${isFav ? 'Убрать из избранного' : 'Добавить в избранное'}"
                 aria-pressed="${isFav ? 'true' : 'false'}">${isFav ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'}</button>
-        <img src="${p.image}"
-             alt="${p.name}"
+        <img src="${Utils.escapeHtml(p.image)}"
+             alt="${nameEsc}"
              onerror="this.src='assets/logo.png'">
       </div>
 
       <div class="product-info">
-        <div class="product-info__brand">${p.brand}</div>
-        <h1 class="product-info__title">${p.name}</h1>
+        <div class="product-info__brand">${brandEsc}</div>
+        <h1 class="product-info__title">${nameEsc}</h1>
         ${popularityHtml}
-        <div class="product-info__price">${p.price} <span>BYN</span></div>
+        <div class="product-info__price">${priceEsc} <span>BYN</span></div>
         
         <div class="product-info__desc">
           Качественный товар от проверенного бренда. Отличный выбор для вашей Pod-системы. В наличии в Гомеле.
@@ -424,15 +455,15 @@ function renderProduct(p) {
         <div class="product-info__meta">
           <div class="product-meta-item">
             <span>Бренд</span>
-            <strong>${p.brand}</strong>
+            <strong>${brandEsc}</strong>
           </div>
           <div class="product-meta-item">
             <span>Категория</span>
-            <strong>${categoryLabel}</strong>
+            <strong>${categoryEsc}</strong>
           </div>
           <div class="product-meta-item">
             <span>Артикул</span>
-            <strong>#${String(p.id).padStart(4, '0')}</strong>
+            <strong>${Utils.escapeHtml(sku)}</strong>
           </div>
           <div class="product-meta-item">
             <span>Наличие</span>
@@ -566,7 +597,7 @@ async function loadData() {
     if (!Array.isArray(products)) throw new Error('Некорректный ответ сервера');
 
     console.log('Товары загружены:', products.length);
-    loadProductStats();
+    await loadProductStats();
 
     const productId = getIdFromUrl();
     console.log('ID товара из URL:', productId);

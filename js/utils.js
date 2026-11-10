@@ -23,6 +23,18 @@
     return trimmed.startsWith('@') ? trimmed.slice(1) : trimmed;
   }
 
+  // Экранирование пользовательских/серверных данных перед вставкой в innerHTML
+  // (текстовые узлы и значения атрибутов в двойных/одинарных кавычках)
+  function escapeHtml(raw) {
+    if (typeof raw !== 'string' && typeof raw !== 'number') return '';
+    return String(raw)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function generateUUID() {
     if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
       return crypto.randomUUID();
@@ -43,6 +55,12 @@
     const n = Number(value);
     if (!isFinite(n)) return 0;
     return Number(Math.round(Number(n + 'e2')) + 'e-2');
+  }
+
+  // Валидация цены для отображения: «12.3» → «12.30», NaN → «0.00»
+  function formatPrice(value) {
+    const n = Number(value);
+    return (isFinite(n) ? n : 0).toFixed(2);
   }
 
   function calculateCartTotal(items, discountPercent) {
@@ -85,9 +103,11 @@
   window.Utils = {
     validateTelegramUsername: validateTelegramUsername,
     normalizeTelegramUsername: normalizeTelegramUsername,
+    escapeHtml: escapeHtml,
     generateUUID: generateUUID,
     isValidUUID: isValidUUID,
     roundPrice: roundPrice,
+    formatPrice: formatPrice,
     calculateCartTotal: calculateCartTotal,
     countCartItems: countCartItems,
     isFavorite: isFavorite,
