@@ -170,40 +170,58 @@
 .auth-forgot a:hover { color: var(--accent); }
 .auth-submit { width: 100%; padding: 16px; font-size: 15px; display: flex; justify-content: center; align-items: center; gap: 8px; }
 
-/* ===== ПРОФИЛЬ ===== */
-.profile-modal__content { max-width: 600px; padding: 0; }
-.profile-modal__top { display: flex; justify-content: space-between; align-items: center; padding: 24px 24px 16px; }
+/* ===== ПРОФИЛЬ (Glassmorphism / NOVEMBER) ===== */
+.profile-modal__content { max-width: 600px; padding: 0; border-radius: 24px; }
+
+/* Стекло: полупрозрачный фон + размытие; без поддержки — плотный фолбэк из общих правил выше */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .profile-modal__content {
+        background: rgba(30, 33, 36, 0.72);
+        backdrop-filter: blur(24px) saturate(160%);
+        -webkit-backdrop-filter: blur(24px) saturate(160%);
+        border-color: rgba(255, 255, 255, 0.09);
+        box-shadow:
+            0 1px 2px rgba(0, 0, 0, 0.5),
+            0 30px 80px rgba(0, 0, 0, 0.65),
+            0 60px 140px rgba(0, 0, 0, 0.35),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+}
+
+.profile-modal__top { display: flex; justify-content: space-between; align-items: center; padding: 22px 24px 14px; }
 .profile-modal__heading { display: flex; align-items: center; gap: 10px; }
-.profile-modal__heading h2 { font-family: 'Bitter', serif; font-size: 22px; color: var(--text-primary); }
-.profile-modal__heading-icon { color: var(--accent); }
-.profile-banner-wrap { position: relative; height: 120px; background: var(--bg-main); margin-bottom: 40px; }
-.profile-banner { width: 100%; height: 100%; background-size: cover; background-position: center; position: relative; border-radius: 12px 12px 0 0; overflow: hidden; }
-.profile-banner__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 0%, rgba(23,25,27,0.8) 100%); }
-.profile-banner__line { position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: var(--border-soft); }
-.profile-banner__name { position: absolute; bottom: 12px; left: 100px; font-family: 'Bitter', serif; font-size: 20px; font-weight: 700; color: var(--text-primary); z-index: 2; }
+.profile-modal__heading h2 { font-family: 'Unbounded', 'Manrope', sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 0.4px; color: var(--text-primary); }
+.profile-modal__heading-icon { color: var(--accent); filter: drop-shadow(0 0 8px rgba(197, 138, 69, 0.35)); }
+
+.profile-banner-wrap { position: relative; height: 140px; margin-bottom: 44px; }
+.profile-banner { width: 100%; height: 100%; background-size: cover; background-position: center; position: relative; border-radius: 24px 24px 0 0; overflow: hidden; }
+.profile-banner__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 0%, rgba(23,25,27,0.55) 65%, rgba(23,25,27,0.85) 100%); }
+.profile-banner__line { position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent); }
+.profile-banner__name { position: absolute; bottom: 12px; left: 100px; font-family: 'Unbounded', 'Manrope', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.3px; color: var(--text-primary); z-index: 2; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6); }
 .profile-avatar-wrap { position: absolute; bottom: -40px; left: 24px; width: 80px; height: 80px; }
-.profile-avatar { width: 100%; height: 100%; border-radius: 50%; background: var(--bg-card); border: 3px solid var(--bg-modal); display: flex; align-items: center; justify-content: center; font-size: 36px; overflow: hidden; }
-.avatar-edit-btn, .banner-edit-btn { position: absolute; background: var(--bg-card); border: 1px solid var(--border-soft); color: var(--text-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+.profile-avatar { width: 100%; height: 100%; border-radius: 50%; background: var(--bg-card); border: 3px solid rgba(23, 25, 27, 0.9); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: center; font-size: 36px; overflow: hidden; }
+.avatar-edit-btn, .banner-edit-btn { position: absolute; background: rgba(30, 33, 36, 0.85); border: 1px solid rgba(255, 255, 255, 0.14); color: var(--text-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4); }
 .avatar-edit-btn { bottom: 0; right: 0; width: 24px; height: 24px; }
 .banner-edit-btn { top: 12px; right: 12px; width: 28px; height: 28px; z-index: 3; }
 
-.profile-stats-panel { display: flex; align-items: center; justify-content: center; gap: 24px; padding: 0 24px; margin-bottom: 24px; }
-.profile-stats-block { text-align: center; flex: 1; background: var(--bg-main); padding: 16px; border-radius: 12px; border: 1px solid var(--border-soft); }
-.profile-stats-block__icon { color: var(--cold-blue); margin-bottom: 8px; display: flex; justify-content: center; }
-.profile-stats-block__value { font-family: 'Bitter', serif; font-size: 24px; font-weight: 800; color: var(--text-primary); }
-.profile-stats-block__label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
-.profile-stats-block__divider { width: 1px; height: 40px; background: var(--border-soft); }
+/* Статистика: стеклянные чипы (маленькие, blur не нужен — фон окна уже стекло) */
+.profile-stats-panel { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 0 24px; margin-bottom: 24px; }
+.profile-stats-block { text-align: center; flex: 1; background: rgba(255, 255, 255, 0.04); padding: 18px 16px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); transition: border-color 0.3s var(--ease-smooth), background 0.3s var(--ease-smooth); }
+.profile-stats-block__icon { color: var(--cold-blue); margin-bottom: 8px; display: flex; justify-content: center; filter: drop-shadow(0 0 8px rgba(130, 149, 160, 0.3)); }
+.profile-stats-block__value { font-family: 'Unbounded', 'Manrope', sans-serif; font-size: 20px; font-weight: 600; color: var(--text-primary); }
+.profile-stats-block__label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.4px; margin-top: 6px; }
+.profile-stats-block__divider { width: 1px; height: 40px; background: linear-gradient(180deg, transparent, rgba(255,255,255,0.12), transparent); }
 
-.referral-card { margin: 0 24px 24px; padding: 16px; background: rgba(197, 138, 69, 0.05); border: 1px dashed var(--border-orange); border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+.referral-card { margin: 0 24px 24px; padding: 16px; background: rgba(197, 138, 69, 0.06); border: 1px dashed rgba(197, 138, 69, 0.35); border-radius: 14px; display: flex; justify-content: space-between; align-items: center; }
 .referral-card span { font-size: 14px; color: var(--text-secondary); }
-.referral-card strong { color: var(--accent); font-family: 'Bitter', serif; }
-.referral-copy-btn { background: var(--accent); color: #17191B; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; transition: opacity 0.2s; }
+.referral-card strong { color: var(--accent); font-family: 'Unbounded', 'Manrope', sans-serif; font-weight: 500; }
+.referral-copy-btn { background: var(--accent); color: #17191B; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; transition: opacity 0.2s; }
 
 .orders-section { padding: 0 24px 24px; }
-.orders-section__title { display: flex; align-items: center; gap: 8px; font-family: 'Bitter', serif; font-size: 18px; color: var(--text-primary); margin-bottom: 16px; }
+.orders-section__title { display: flex; align-items: center; gap: 8px; font-family: 'Unbounded', 'Manrope', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.3px; color: var(--text-primary); margin-bottom: 16px; }
 .orders-section__icon { color: var(--accent); }
 .profile-orders { display: flex; flex-direction: column; gap: 12px; max-height: 200px; overflow-y: auto; padding-right: 4px; }
-.profile-order { background: var(--bg-main); border: 1px solid var(--border-soft); border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+.profile-order { background: rgba(255, 255, 255, 0.035); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04); }
 .profile-order__id { color: var(--text-muted); font-size: 12px; }
 .profile-order__total { color: var(--price); font-weight: 700; }
 .profile-order__status { font-size: 12px; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
@@ -214,8 +232,23 @@
 .btn-logout:hover { background: rgba(231, 76, 60, 0.1); border-color: #e74c3c; }
 
 /* ===== АВАТАРКИ / ШАПКИ ===== */
-.avatar-modal__content, .banner-modal__content { max-width: 500px; text-align: center; }
-.avatar-modal__content h2, .banner-modal__content h2 { font-family: 'Bitter', serif; font-size: 22px; margin-bottom: 8px; }
+.avatar-modal__content, .banner-modal__content { max-width: 500px; text-align: center; border-radius: 24px; }
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .banner-modal__content {
+        background: rgba(30, 33, 36, 0.72);
+        backdrop-filter: blur(24px) saturate(160%);
+        -webkit-backdrop-filter: blur(24px) saturate(160%);
+        border-color: rgba(255, 255, 255, 0.09);
+        box-shadow:
+            0 1px 2px rgba(0, 0, 0, 0.5),
+            0 30px 80px rgba(0, 0, 0, 0.65),
+            0 60px 140px rgba(0, 0, 0, 0.35),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+}
+
+.avatar-modal__content h2, .banner-modal__content h2 { font-family: 'Unbounded', 'Manrope', sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 0.4px; margin-bottom: 8px; }
 .avatar-modal__hint, .banner-modal__hint { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; }
 .avatar-grid, .banner-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 12px; margin-bottom: 24px; }
 
@@ -239,22 +272,100 @@
 
 /* Шапки - ПРЯМОУГОЛЬНЫЕ */
 .banner-item {
-    background: var(--bg-main);
-    border: 2px solid transparent;
-    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
     aspect-ratio: 2/1;
     grid-column: span 2;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
     overflow: hidden;
     padding: 0;
-    background-size: cover;
-    background-position: center;
+    position: relative;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 4px 16px rgba(0, 0, 0, 0.3);
 }
-.banner-item.active { border-color: var(--accent); box-shadow: 0 0 15px rgba(197, 138, 69, 0.3); }
+.banner-item__label {
+    position: absolute;
+    left: 12px;
+    bottom: 9px;
+    font-family: 'Unbounded', 'Manrope', sans-serif;
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
+    z-index: 2;
+}
+.banner-item.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(197, 138, 69, 0.35), inset 0 0 0 1px rgba(197, 138, 69, 0.4);
+}
+
+/* ===== CSS-ШАПКИ ПРОФИЛЯ (без картинок) =====
+   Каждая шапка — только градиенты и свечения. Верхний слой — зерно
+   (inline SVG feTurbulence, ничего не скачивается), чтобы градиенты
+   не выглядели «пластиково». Классы вешает script.js на шапку
+   профиля (#profileHeader) и на превью в сетке выбора (.banner-item). */
+:root {
+    --noise-tex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
+}
+
+/* Дефолт (шапка не выбрана): сдержанное тёплое дыхание на тёмном */
+.profile-banner {
+    background:
+        var(--noise-tex),
+        radial-gradient(ellipse 65% 100% at 85% 0%, rgba(197, 138, 69, 0.16), transparent 60%),
+        radial-gradient(ellipse 55% 85% at 10% 100%, rgba(130, 149, 160, 0.12), transparent 65%),
+        linear-gradient(120deg, #1D2024 0%, #17191B 100%);
+}
+
+/* 1. Amber Glow: тёплое янтарное свечение из правого верхнего угла */
+.profile-banner.banner-skin-amber,
+.banner-item.banner-skin-amber {
+    background:
+        var(--noise-tex),
+        radial-gradient(ellipse 60% 95% at 78% 12%, rgba(224, 164, 94, 0.5), transparent 62%),
+        radial-gradient(ellipse 55% 80% at 8% 105%, rgba(197, 138, 69, 0.34), transparent 65%),
+        radial-gradient(ellipse 90% 60% at 50% -20%, rgba(232, 199, 155, 0.16), transparent 70%),
+        linear-gradient(115deg, #251A0E 0%, #1B1712 55%, #17191B 100%);
+}
+
+/* 2. Frost Blue: холодный ледяной градиент с голубым свечением сверху слева */
+.profile-banner.banner-skin-frost,
+.banner-item.banner-skin-frost {
+    background:
+        var(--noise-tex),
+        radial-gradient(ellipse 55% 100% at 18% 0%, rgba(148, 178, 199, 0.42), transparent 62%),
+        radial-gradient(ellipse 45% 75% at 88% 105%, rgba(94, 140, 180, 0.3), transparent 65%),
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(200, 220, 235, 0.12), transparent 75%),
+        linear-gradient(120deg, #0F1620 0%, #142230 55%, #17191B 100%);
+}
+
+/* 3. Deep Noir: глубокий чёрный с едва заметным бордовым отсветом */
+.profile-banner.banner-skin-noir,
+.banner-item.banner-skin-noir {
+    background:
+        var(--noise-tex),
+        radial-gradient(ellipse 70% 120% at 88% 118%, rgba(112, 30, 48, 0.4), transparent 66%),
+        radial-gradient(ellipse 45% 65% at 8% -15%, rgba(70, 22, 36, 0.3), transparent 70%),
+        radial-gradient(ellipse 30% 45% at 45% 40%, rgba(255, 255, 255, 0.04), transparent 70%),
+        linear-gradient(160deg, #0D0E11 0%, #120C10 55%, #17191B 100%);
+}
+
+/* 4. Geometry: абстрактная сетка из тонких диагональных линий + янтарное и холодное свечение */
+.profile-banner.banner-skin-geo,
+.banner-item.banner-skin-geo {
+    background:
+        var(--noise-tex),
+        radial-gradient(ellipse 65% 110% at 80% 10%, rgba(197, 138, 69, 0.3), transparent 60%),
+        radial-gradient(ellipse 50% 80% at 12% 95%, rgba(130, 149, 160, 0.18), transparent 65%),
+        repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 1px, transparent 1px, transparent 14px),
+        repeating-linear-gradient(45deg, rgba(197, 138, 69, 0.06) 0px, rgba(197, 138, 69, 0.06) 1px, transparent 1px, transparent 22px),
+        linear-gradient(150deg, #1E2126 0%, #14171A 100%);
+}
 
 .avatar-modal__buttons, .banner-modal__buttons { display: flex; gap: 12px; }
 .avatar-modal__buttons .btn, .banner-modal__buttons .btn { flex: 1; padding: 14px; font-size: 14px; }
@@ -358,7 +469,7 @@
     .age-gate-modal__btn--no:hover { border-color: var(--text-primary); color: var(--text-primary); }
     .auth-tab:hover:not(.active) { color: var(--text-primary); }
     .avatar-item:hover { border-color: var(--border-medium); transform: scale(1.05); }
-    .banner-item:hover { border-color: var(--border-medium); transform: scale(1.02); }
+    .banner-item:hover { border-color: var(--border-medium); transform: scale(1.02); filter: brightness(1.1); }
     .referral-copy-btn:hover { opacity: 0.8; }
     .confirm-modal__btn--cancel:hover { background: var(--bg-card-hover); }
     .confirm-modal__btn--danger:hover { background: #c0392b; }
