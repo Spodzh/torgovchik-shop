@@ -17,16 +17,20 @@
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Torgovchik" />
-    <meta property="og:title" content="Torgovchik — жидкости для POD-систем" />
-    <meta property="og:description" content="Ассортимент оригинальных вкусов. Только качественные бренды. Работаем в Гомеле." />
-    <meta property="og:image" content="assets/logo.png" />
+    <meta property="og:title" content="Torgovchik — премиальные жидкости для POD-систем" />
+    <meta property="og:description" content="Оригинальные вкусы и качественные бренды. Работаем в Гомеле." />
+    <!-- Абсолютный URL: Telegram/Twitter не видят относительные пути -->
+    <meta property="og:image" content="https://spodzh.github.io/torgovchik-shop/assets/logo.png" />
+    <meta property="og:image:width" content="1118" />
+    <meta property="og:image:height" content="481" />
+    <meta property="og:image:alt" content="Torgovchik — жидкости для POD-систем" />
     <meta property="og:url" content="https://spodzh.github.io/torgovchik-shop/" />
     <meta property="og:locale" content="ru_RU" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Torgovchik — жидкости для POD-систем" />
-    <meta name="twitter:description" content="Ассортимент оригинальных вкусов. Только качественные бренды. Работаем в Гомеле." />
-    <meta name="twitter:image" content="assets/logo.png" />
+    <meta name="twitter:title" content="Torgovchik — премиальные жидкости для POD-систем" />
+    <meta name="twitter:description" content="Оригинальные вкусы и качественные бренды. Работаем в Гомеле." />
+    <meta name="twitter:image" content="https://spodzh.github.io/torgovchik-shop/assets/logo.png" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,6 +59,17 @@
       }
     }
     </script>
+
+    <!-- Анти-FOUC: мгновенно определяем гостя/юзера из кэша снапшота (js/script.js) -->
+    <script>
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('torgovchik_user_cache'));
+        if (u && u.telegram) { document.documentElement.setAttribute('data-user-state', 'user'); return; }
+      } catch (e) { /* приватный режим / битый кэш — считаем гостем */ }
+      document.documentElement.setAttribute('data-user-state', 'guest');
+    })();
+    </script>
 </head>
 <body>
 
@@ -62,7 +77,7 @@
     <div class="age-gate-modal" id="ageGateModal" role="dialog" aria-modal="true" aria-labelledby="ageGateTitle">
         <div class="age-gate-modal__content">
             <div id="ageGateQuestion">
-                <span class="age-gate-modal__icon">🔞</span>
+                <span class="age-gate-modal__icon" aria-hidden="true"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span>
                 <span class="age-gate-modal__badge">18+</span>
                 <h2 class="age-gate-modal__title" id="ageGateTitle">Вам есть 18 лет?</h2>
                 <p class="age-gate-modal__text">
@@ -74,7 +89,7 @@
                 </div>
             </div>
             <div class="age-gate-modal__deny" id="ageGateDeny">
-                <span class="age-gate-modal__deny-icon">🚫</span>
+                <span class="age-gate-modal__deny-icon" aria-hidden="true"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg></span>
                 <div class="age-gate-modal__deny-title">Доступ запрещён</div>
                 <p class="age-gate-modal__deny-text">
                     К сожалению, сайт доступен только пользователям старше 18 лет.<br>
@@ -129,13 +144,33 @@
         </div>
     </header>
 
+    <!-- Анти-FOUC: для авторизованного мгновенно рисуем аватар/ник из кэша, до загрузки script.js -->
+    <script>
+    (function () {
+      if (document.documentElement.getAttribute('data-user-state') !== 'user') return;
+      var btn = document.getElementById('userBtn');
+      if (btn) {
+        try {
+          var u = JSON.parse(localStorage.getItem('torgovchik_user_cache'));
+          btn.classList.add('logged-in');
+          btn.innerHTML =
+            '<span class="user-btn__avatar"><img src="assets/avatars/' + (parseInt(u.avatarId, 10) || 6) + '.png" alt="" style="width:100%; height:100%; object-fit:cover; display:block; border-radius:50%;"></span>' +
+            '<span class="user-btn__name"></span>' +
+            '<span class="user-btn__tickets"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 2px;"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v14"/></svg>' + (parseInt(u.tickets, 10) || 0) + '</span>';
+          btn.querySelector('.user-btn__name').textContent = u.telegram;
+        } catch (e) { /* битый кэш — оставим статичную кнопку, script.js поправит */ }
+      }
+      document.documentElement.setAttribute('data-user-state', 'user-ready');
+    })();
+    </script>
+
     <main>
         <!-- HERO SECTION -->
         <section class="hero">
-            <span class="hero__leaf hero__leaf--tl" aria-hidden="true">🍁</span>
-            <span class="hero__leaf hero__leaf--tr" aria-hidden="true">🍂</span>
-            <span class="hero__leaf hero__leaf--bl" aria-hidden="true">🍂</span>
-            <span class="hero__leaf hero__leaf--br" aria-hidden="true">🍁</span>
+            <span class="hero__leaf hero__leaf--tl" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg></span>
+            <span class="hero__leaf hero__leaf--tr" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg></span>
+            <span class="hero__leaf hero__leaf--bl" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg></span>
+            <span class="hero__leaf hero__leaf--br" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg></span>
             
             <div class="container">
                 <div class="hero__box">
@@ -168,15 +203,15 @@
                 <h2 class="section-title">О нас</h2>
                 <div class="about__grid">
                     <div class="about__card">
-                        <div class="about__icon" aria-hidden="true">🍂</div>
+                        <div class="about__icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg></div>
                         <div><h3>Оригинальная продукция</h3><p>Мы работаем только с проверенными поставщиками.</p></div>
                     </div>
                     <div class="about__card">
-                        <div class="about__icon" aria-hidden="true">💼</div>
+                        <div class="about__icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg></div>
                         <div><h3>Профессиональный подход</h3><p>Консультанты помогут подобрать идеальный вкус.</p></div>
                     </div>
                     <div class="about__card">
-                        <div class="about__icon" aria-hidden="true">❄️</div>
+                        <div class="about__icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--cold-blue)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/></svg></div>
                         <div><h3>Выгодные условия</h3><p>Акции, скидки и бонусы для постоянных клиентов.</p></div>
                     </div>
                 </div>
@@ -219,16 +254,17 @@
                 <a href="consent.html">Согласие на обработку данных</a>
             </p>
             <button id="secretGameBtn" class="secret-game-btn">
-                🎮 Секретная игра
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align: -3px; margin-right: 6px;"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg>
+                Секретная игра
             </button>
         </div>
     </footer>
 
-    <button class="scroll-to-top" id="scrollToTop" aria-label="Наверх" type="button">↑</button>
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Наверх" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg></button>
 
     <div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
         <div class="confirm-modal__content">
-            <div class="confirm-modal__icon" id="confirmIcon">⚠️</div>
+            <div class="confirm-modal__icon" id="confirmIcon" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
             <h2 class="confirm-modal__title" id="confirmTitle">Подтвердите действие</h2>
             <p class="confirm-modal__text" id="confirmText"></p>
             <div class="confirm-modal__buttons">
@@ -263,7 +299,7 @@
             <button class="favorites-modal__close" id="favoritesModalClose" aria-label="Закрыть избранное">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
-            <h2 id="favoritesModalTitle">❤️ Избранное</h2>
+            <h2 id="favoritesModalTitle" style="display:flex; align-items:center; gap:8px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cold-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>Избранное</h2>
             <div class="favorites-grid" id="favoritesGrid"></div>
         </div>
     </div>
@@ -289,7 +325,7 @@
             <button class="login-modal__close" id="loginModalClose" aria-label="Закрыть окно входа">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
-            <span class="login-modal__leaf" aria-hidden="true">🍂</span>
+            <span class="login-modal__leaf" aria-hidden="true"><svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg></span>
             <div class="login-modal__brand">TORGOVCHIK</div>
             <h2 class="login-modal__title" id="authTitle">С возвращением</h2>
             <p class="login-modal__subtitle" id="authSubtitle">Войдите, чтобы продолжить покупки</p>
@@ -299,14 +335,14 @@
             </div>
             <form id="authForm" novalidate>
                 <div class="auth-field">
-                    <span class="auth-field__icon" aria-hidden="true">👤</span>
+                    <span class="auth-field__icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
                     <input type="text" id="loginInput" placeholder="Username без @" autocomplete="username" aria-label="Username" maxlength="33">
                 </div>
                 <div class="auth-error" id="usernameError" role="alert"></div>
                 <div class="auth-field">
-                    <span class="auth-field__icon" aria-hidden="true">🔒</span>
+                    <span class="auth-field__icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
                     <input type="password" id="loginPassword" placeholder="Пароль" autocomplete="current-password" aria-label="Пароль">
-                    <button type="button" class="auth-field__eye" id="togglePassword" aria-label="Показать пароль">👁</button>
+                    <button type="button" class="auth-field__eye" id="togglePassword" aria-label="Показать пароль"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
                 </div>
                 <div class="auth-error" id="passwordError" role="alert"></div>
                 
@@ -357,7 +393,7 @@
                     <div class="profile-banner__name" id="profileName">Пользователь</div>
                 </div>
                 <div class="profile-avatar-wrap">
-                    <div class="profile-avatar" id="profileAvatar" aria-label="Аватар пользователя">👤</div>
+                    <div class="profile-avatar" id="profileAvatar" aria-label="Аватар пользователя"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
                     <button class="avatar-edit-btn" id="avatarEditBtn" title="Сменить аватарку" aria-label="Сменить аватарку">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M12 20h9"/>
@@ -424,7 +460,7 @@
             <button class="avatar-modal__close" id="avatarModalClose" aria-label="Закрыть выбор аватарки">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
-            <h2 id="avatarModalTitle">🎨 Выберите аватарку</h2>
+            <h2 id="avatarModalTitle" style="display:flex; align-items:center; gap:8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>Выберите аватарку</h2>
             <p class="avatar-modal__hint">Нажмите на понравившуюся и подтвердите выбор</p>
             <div class="avatar-grid" id="avatarGrid"></div>
             <div class="avatar-modal__buttons">
@@ -439,7 +475,7 @@
             <button class="banner-modal__close" id="bannerModalClose" aria-label="Закрыть выбор шапки">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
-            <h2 id="bannerModalTitle">🎨 Шапка профиля</h2>
+            <h2 id="bannerModalTitle" style="display:flex; align-items:center; gap:8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>Шапка профиля</h2>
             <p class="banner-modal__hint">Выберите фон для профиля или уберите шапку</p>
             <div class="banner-grid" id="bannerGrid"></div>
             <div class="banner-modal__buttons">

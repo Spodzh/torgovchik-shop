@@ -32,6 +32,19 @@
     .faq__item { backdrop-filter: blur(9px) saturate(140%); -webkit-backdrop-filter: blur(9px) saturate(140%); }
     .recently-viewed__card { backdrop-filter: blur(8px) saturate(130%); -webkit-backdrop-filter: blur(8px) saturate(130%); }
     .cart-panel { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    .product-container,
+    .product-skeleton { backdrop-filter: blur(10px) saturate(140%); -webkit-backdrop-filter: blur(10px) saturate(140%); }
+
+    /* Hero: Unbounded — широкий шрифт, на узких экранах (320-360px)
+       фиксированные размеры вылезали. clamp() даёт плавное масштабирование
+       вместо ступенек 24px/20px; overflow-wrap страхует длинные слова */
+    .hero__content h1 {
+        font-size: clamp(17px, 5vw, 24px);
+        overflow-wrap: anywhere;
+    }
+    .hero__content p {
+        font-size: clamp(12px, 3.2vw, 13px);
+    }
 
     /* Hero: фиксируем минимальную высоту, чтобы при коротком контенте
        полоса картинки (background-position: bottom) не поднималась

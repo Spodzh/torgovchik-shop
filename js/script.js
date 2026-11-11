@@ -52,11 +52,37 @@ const BANNER_SKINS = BANNERS.map(b => b.skin);
 // ===== ФРАЗЫ НА ЛОГОТИПЕ =====
 // =============================================
 const LOGO_PHRASES = [
-    'Купил жижу? 😏', 'Заправиться не хочешь?', 'Есть вкусненькое 😉',
+    'Купил жижу?', 'Заправиться не хочешь?', 'Есть вкусненькое?',
     'Скучал по нам?', 'Как насчёт новой вкусняшки?', 'Жижа сама себя не купит!',
-    'Пара затяжек — и день ярче 🌿', 'Твой Pod скучает по новой жиже 👀',
+    'Пара затяжек — и день ярче', 'Твой Pod скучает по новой жиже',
     'Вкусный день сегодня, да?', 'Псс, есть кое-что новенькое...'
 ];
+
+// =============================================
+// ===== SVG-ИКОНКИ (Lucide, stroke=currentColor) =====
+// =============================================
+// Используются в тостах, подтверждениях, статусах заказов и пустых состояниях.
+// Атрибуты базовые, aria-hidden не нужен — иконки декоративные внутри role="status" и т.п.
+const SVG_BASE = 'width="#SIZE#" height="#SIZE#" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px;" aria-hidden="true"';
+
+function svgIcon(paths, size) {
+  return `<svg ${SVG_BASE.replace(/#SIZE#/g, size || 16)}>${paths}</svg>`;
+}
+
+const UI_ICONS = {
+  info:   s => svgIcon('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>', s),
+  success: s => svgIcon('<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>', s),
+  error:  s => svgIcon('<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>', s),
+  warning: s => svgIcon('<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>', s),
+  trash:  s => svgIcon('<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>', s),
+  heart:  s => svgIcon('<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>', s),
+  heartCrack: s => svgIcon('<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="m12 13-1-1 2-2-3-3 2-2"/>', s),
+  user:   s => svgIcon('<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>', s),
+  users:  s => svgIcon('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>', s),
+  ticket: s => svgIcon('<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>', s),
+  package: s => svgIcon('<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>', s),
+  clock:  s => svgIcon('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>', s)
+};
 
 // =============================================
 // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
@@ -161,7 +187,7 @@ function showConfirm(options) {
     const okBtn = document.getElementById('confirmOkBtn');
     const cancelBtn = document.getElementById('confirmCancelBtn');
 
-    iconEl.textContent = options.icon || '⚠️';
+    iconEl.innerHTML = options.icon || UI_ICONS.warning(40);
     titleEl.textContent = options.title || 'Подтвердите действие';
     textEl.textContent = options.text || '';
     okBtn.textContent = options.okText || 'Подтвердить';
@@ -291,13 +317,11 @@ function showToast(message, type, action) {
   toast.className = `toast toast--${type}`;
   toast.setAttribute('role', 'status');
   
-  let icon = 'ℹ️';
-  if (type === 'success') icon = '✅';
-  if (type === 'error') icon = '❌';
+  const iconSvg = type === 'success' ? UI_ICONS.success(20) : type === 'error' ? UI_ICONS.error(20) : UI_ICONS.info(20);
 
   const iconEl = document.createElement('span');
   iconEl.className = 'toast__icon';
-  iconEl.textContent = icon;
+  iconEl.innerHTML = iconSvg;
   const msgEl = document.createElement('span');
   msgEl.className = 'toast__message';
   // textContent — message может содержать текст ошибки с сервера
@@ -620,7 +644,7 @@ function renderFavoritesModal() {
   if (favProducts.length === 0) {
     grid.innerHTML = `
       <div class="favorites-empty">
-        <div class="favorites-empty__icon" style="font-size:48px; margin-bottom:16px;">💔</div>
+        <div class="favorites-empty__icon" style="color:var(--accent); margin-bottom:16px;">${UI_ICONS.heartCrack(48)}</div>
         <div class="favorites-empty__title" style="font-family:'Bitter', serif; font-size:20px; margin-bottom:8px;">Пока ничего нет</div>
         <div class="favorites-empty__text" style="color:var(--text-secondary); margin-bottom:20px;">Добавляйте товары сердечком — они появятся здесь</div>
         <button class="btn btn-primary favorites-empty__btn" id="favoritesGoCatalog">В каталог</button>
@@ -758,11 +782,14 @@ function applyAvatar(el, avatarId, fallbackText) {
     img.style.cssText = 'width:100%; height:100%; object-fit:cover; display:block; border-radius:50%;';
     el.appendChild(img);
   } else {
-    el.textContent = fallbackText ? fallbackText.charAt(0).toUpperCase() : '👤';
+    el.innerHTML = fallbackText
+      ? Utils.escapeHtml(fallbackText.charAt(0).toUpperCase())
+      : UI_ICONS.user(28);
   }
 }
 
 function updateProfileUI() {
+  saveUserSnapshot(currentUser);
   const userBtn = document.getElementById('userBtn');
   if (currentUser && currentUser.telegram) {
     const tickets = currentUser.totalTickets || 0;
@@ -806,8 +833,8 @@ function updateProfileUI() {
             <span class="profile-referral-card__link" style="flex:1; background:var(--bg-main); padding:10px; border-radius:8px; font-size:12px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${Utils.escapeHtml(referralLink)}</span>
             <button class="profile-referral-card__copy" id="copyReferralBtn" style="background:var(--accent); color:#17191B; border:none; padding:0 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size:12px;">Копировать</button>
           </div>
-          <div class="profile-referral-card__footer" style="font-size:12px; color:var(--text-secondary);">
-            👥 Приглашено: <strong style="color:var(--accent);">${Utils.escapeHtml(currentUser.referralCount || 0)}</strong> человек
+          <div class="profile-referral-card__footer" style="font-size:12px; color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+            ${UI_ICONS.users(14)} Приглашено: <strong style="color:var(--accent);">${Utils.escapeHtml(currentUser.referralCount || 0)}</strong> человек
           </div>
         </div>
       `;
@@ -833,7 +860,9 @@ function updateProfileUI() {
       let html = '';
       currentUser.orders.slice().reverse().forEach(order => {
         const status = order.approved === true ? 'approved' : (order.approved === false ? 'rejected' : 'pending');
-        const statusLabel = order.approved === true ? '✅ Одобрен' : (order.approved === false ? '❌ Отклонён' : '⏳ Ожидает');
+        const statusLabel = order.approved === true
+          ? `${UI_ICONS.success(12)} Одобрен`
+          : (order.approved === false ? `${UI_ICONS.error(12)} Отклонён` : `${UI_ICONS.clock(12)} Ожидает`);
         const date = new Date(order.date).toLocaleDateString('ru-RU', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
         const total = order.total || 0;
         html += `
@@ -843,14 +872,14 @@ function updateProfileUI() {
               <span class="order-total" style="color:var(--price);">${Utils.formatPrice(total)} BYN</span>
             </div>
             <div class="order-date" style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">${date}</div>
-            <span class="order-status ${status}" style="font-size:11px; padding:4px 8px; border-radius:4px; font-weight:700; background:rgba(255,255,255,0.05);">${statusLabel}</span>
-            ${order.tickets ? `&nbsp;<span style="color:#E7A04A; font-size:12px;">🎟️ ${order.tickets} бил.</span>` : ''}
+            <span class="order-status ${status}" style="font-size:11px; padding:4px 8px; border-radius:4px; font-weight:700; background:rgba(255,255,255,0.05); display:inline-flex; align-items:center; gap:4px;">${statusLabel}</span>
+            ${order.tickets ? `&nbsp;<span style="color:#E7A04A; font-size:12px; display:inline-flex; align-items:center; gap:4px;">${UI_ICONS.ticket(12)} ${order.tickets} бил.</span>` : ''}
           </div>
         `;
       });
       ordersDiv.innerHTML = html;
     } else {
-      ordersDiv.innerHTML = `<div class="orders-empty" style="text-align:center; padding:20px; color:var(--text-muted);"><div class="orders-empty__icon" style="font-size:32px; margin-bottom:10px;">📦</div><div class="orders-empty__title">Пока здесь пусто</div></div>`;
+      ordersDiv.innerHTML = `<div class="orders-empty" style="text-align:center; padding:20px; color:var(--text-muted);"><div class="orders-empty__icon" style="color:var(--text-muted); margin-bottom:10px;">${UI_ICONS.package(32)}</div><div class="orders-empty__title">Пока здесь пусто</div></div>`;
     }
   } else {
     userBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 6px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Войти`;
@@ -861,7 +890,7 @@ function updateProfileUI() {
     const profileBanner = document.getElementById('profileHeader');
     if (profileBanner) profileBanner.classList.remove(...BANNER_SKINS);
     const ordersDiv = document.getElementById('profileOrders');
-    if (ordersDiv) ordersDiv.innerHTML = `<div class="orders-empty" style="text-align:center; padding:20px; color:var(--text-muted);"><div class="orders-empty__icon" style="font-size:32px; margin-bottom:10px;">📦</div><div class="orders-empty__title">Пока здесь пусто</div></div>`;
+    if (ordersDiv) ordersDiv.innerHTML = `<div class="orders-empty" style="text-align:center; padding:20px; color:var(--text-muted);"><div class="orders-empty__icon" style="color:var(--text-muted); margin-bottom:10px;">${UI_ICONS.package(32)}</div><div class="orders-empty__title">Пока здесь пусто</div></div>`;
     const referralDiv = document.getElementById('profileReferral');
     if (referralDiv) referralDiv.innerHTML = '';
   }
@@ -1238,7 +1267,7 @@ async function clearCart() {
   if (cart.length === 0) return;
   
   const confirmed = await showConfirm({
-    icon: '🧹',
+    icon: UI_ICONS.trash(40),
     title: 'Очистить корзину?',
     text: 'Все товары будут удалены. Это действие нельзя отменить.',
     okText: 'Очистить',
@@ -1404,7 +1433,7 @@ function renderProducts(category, filter = 'Все') {
     const nameEsc = Utils.escapeHtml(p.name);
 
     return `
-      <div class="product-card" data-id="${pid}">
+      <div class="product-card reveal" data-id="${pid}">
         <button class="product-card__fav ${fav ? 'active' : ''}" data-id="${pid}" aria-label="${fav ? 'Убрать из избранного' : 'Добавить в избранное'}" aria-pressed="${fav ? 'true' : 'false'}">${fav ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'}</button>
         <a href="product.html?id=${pid}" class="product-card__link" aria-label="Открыть ${nameEsc}">
           <img src="${Utils.escapeHtml(p.image)}" alt="${nameEsc}" class="product-card__image" loading="lazy" onerror="this.src='assets/logo.png'">
@@ -1424,6 +1453,9 @@ function renderProducts(category, filter = 'Все') {
       toggleFavorite(parseInt(btn.dataset.id));
     });
   });
+
+  // Появление карточек при скролле (скелетоны не трогаем — их перерисовка)
+  observeReveals(grid);
 }
 
 // =============================================
@@ -1500,7 +1532,8 @@ document.querySelectorAll('.auth-field input').forEach(input => {
 document.getElementById('forgotPasswordLink').addEventListener('click', (e) => { e.preventDefault(); showToast('Напишите в наш Telegram — поможем восстановить пароль', 'info'); });
 
 document.getElementById('profileLogout').addEventListener('click', () => {
-  localStorage.removeItem('user_telegram'); currentUser = null; updateProfileUI();
+  localStorage.removeItem('user_telegram'); localStorage.removeItem(USER_CACHE_KEY);
+  currentUser = null; updateProfileUI();
   profileModalCtrl.closeFn(); showToast('Вы вышли из профиля', 'info');
 });
 
@@ -1792,9 +1825,65 @@ document.addEventListener('pointermove', function (e) {
 }, { passive: true });
 
 // =============================================
+// ===== SCROLL REVEAL (появление при скролле) =====
+// =============================================
+// Карточки товаров, блоки «О нас» и заголовки секций плавно проявляются,
+// когда попадают в экран (IntersectionObserver), с каскадной задержкой
+// внутри ряда. При prefers-reduced-motion всё остаётся видимым без анимаций.
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const revealObserver = ('IntersectionObserver' in window) && !prefersReducedMotion
+  ? new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        revealElement(entry.target);
+        revealObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' })
+  : null;
+
+function revealElement(el) {
+  // Каскад: индекс среди .reveal-соседей даёт задержку появления
+  const siblings = el.parentElement
+    ? Array.prototype.filter.call(el.parentElement.children, c => c.classList && c.classList.contains('reveal'))
+    : [];
+  const idx = siblings.indexOf(el);
+  if (idx > 0) el.style.transitionDelay = Math.min(idx * 70, 350) + 'ms';
+  el.classList.add('reveal--visible');
+  // После анимации снимаем reveal-классы: возвращаем элементу его
+  // собственные transition (ховеры карточек и т.п.)
+  let done = false;
+  const finish = () => {
+    if (done) return; done = true;
+    el.classList.remove('reveal', 'reveal--visible');
+    el.style.transitionDelay = '';
+  };
+  el.addEventListener('transitionend', finish, { once: true });
+  setTimeout(finish, 900); // фолбэк, если transitionend не сработал
+}
+
+// Навешивает наблюдение на все скрытые .reveal в области (или в документе).
+// Вызывается на старте и после каждой перерисовки каталога.
+function observeReveals(root) {
+  const scope = root || document;
+  if (!revealObserver) {
+    scope.querySelectorAll('.reveal').forEach(el => el.classList.add('reveal--visible'));
+    return;
+  }
+  scope.querySelectorAll('.reveal:not(.reveal--visible)').forEach(el => revealObserver.observe(el));
+}
+
+function initScrollReveal() {
+  if (prefersReducedMotion) return; // без движения — ничего не прячем
+  document.querySelectorAll('.about__card, .section-title').forEach(el => el.classList.add('reveal'));
+  observeReveals();
+}
+
+// =============================================
 // ===== ЗАПУСК =====
 // =============================================
 initAgeGate();
+initScrollReveal();
 initScrollToTop();
 checkReferral();
 loadFavoritesFromStorage();

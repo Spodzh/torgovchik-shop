@@ -211,13 +211,19 @@
 
 .product-info__actions .btn {
     flex: 1;
+    min-width: 140px;
     text-align: center;
     padding: 18px;
     font-size: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
 }
+
+/* Кнопка «Поделиться» (Витрина друга): тихая стеклянная, рядом с «В корзину» */
+.btn-share svg { flex-shrink: 0; }
+.btn-share[disabled] { opacity: 0.6; cursor: wait; }
 
 /* Характеристики */
 .product-info__meta {
@@ -284,8 +290,16 @@
         margin: 0 auto;
         width: 100%;
     }
+    /* На планшетах/мобилках кнопки ложатся друг под другом аккуратно,
+       без прилипания к краям карточки */
     .product-info__actions {
         flex-direction: column;
+        gap: 10px;
+    }
+    .product-info__actions .btn {
+        min-width: 0;
+        padding: 14px 18px;
+        font-size: 14px;
     }
 }
 

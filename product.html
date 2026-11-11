@@ -32,6 +32,17 @@
     <link rel="stylesheet" href="css/extras.css" />
     <link rel="stylesheet" href="css/product.css" />
     <link rel="stylesheet" href="css/responsive.css" />
+
+    <!-- Анти-FOUC: мгновенно определяем гостя/юзера из кэша снапшота (js/script.js) -->
+    <script>
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('torgovchik_user_cache'));
+        if (u && u.telegram) { document.documentElement.setAttribute('data-user-state', 'user'); return; }
+      } catch (e) { /* приватный режим / битый кэш — считаем гостем */ }
+      document.documentElement.setAttribute('data-user-state', 'guest');
+    })();
+    </script>
 </head>
 <body>
 
@@ -39,7 +50,7 @@
     <div class="age-gate-modal" id="ageGateModal" role="dialog" aria-modal="true" aria-labelledby="ageGateTitle">
         <div class="age-gate-modal__content">
             <div id="ageGateQuestion">
-                <span class="age-gate-modal__icon">🔞</span>
+                <span class="age-gate-modal__icon" aria-hidden="true"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span>
                 <span class="age-gate-modal__badge">18+</span>
                 <h2 class="age-gate-modal__title" id="ageGateTitle">Вам есть 18 лет?</h2>
                 <p class="age-gate-modal__text">
@@ -51,7 +62,7 @@
                 </div>
             </div>
             <div class="age-gate-modal__deny" id="ageGateDeny">
-                <span class="age-gate-modal__deny-icon">🚫</span>
+                <span class="age-gate-modal__deny-icon" aria-hidden="true"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg></span>
                 <div class="age-gate-modal__deny-title">Доступ запрещён</div>
                 <p class="age-gate-modal__deny-text">
                     К сожалению, сайт доступен только пользователям старше 18 лет.<br>
@@ -92,6 +103,15 @@
         </div>
     </header>
 
+    <!-- Анти-FOUC: здесь нет кнопки профиля, просто показываем блок после проверки состояния -->
+    <script>
+    (function () {
+      if (document.documentElement.getAttribute('data-user-state') === 'user') {
+        document.documentElement.setAttribute('data-user-state', 'user-ready');
+      }
+    })();
+    </script>
+
     <main>
         <section class="product-page" id="productPage">
             <div class="container">
@@ -131,7 +151,7 @@
         </div>
     </footer>
 
-    <button class="scroll-to-top" id="scrollToTop" aria-label="Наверх" type="button">↑</button>
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Наверх" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg></button>
 
     <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
 

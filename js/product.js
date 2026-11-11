@@ -5,6 +5,17 @@ const WORKER_URL = 'https://torgovchik-bot.ernest-chanel.workers.dev/';
 const RECENTLY_VIEWED_KEY = 'torgovchik_recently_viewed';
 const RECENTLY_VIEWED_MAX = 12;
 
+// ===== SVG-ИКОНКИ (Lucide, stroke=currentColor) — те же, что в script.js =====
+function svgIcon(paths, size) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px;" aria-hidden="true">${paths}</svg>`;
+}
+const UI_ICONS = {
+  info:   s => svgIcon('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>', s),
+  success: s => svgIcon('<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>', s),
+  error:  s => svgIcon('<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>', s),
+  leaf:   s => svgIcon('<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>', s)
+};
+
 // =============================================
 // ===== СОСТОЯНИЕ =====
 // =============================================
@@ -27,13 +38,11 @@ function showToast(message, type, action) {
   toast.className = `toast toast--${type}`;
   toast.setAttribute('role', 'status');
   
-  let icon = 'ℹ️';
-  if (type === 'success') icon = '✅';
-  if (type === 'error') icon = '❌';
+  const iconSvg = type === 'success' ? UI_ICONS.success(20) : type === 'error' ? UI_ICONS.error(20) : UI_ICONS.info(20);
 
   const iconEl = document.createElement('span');
   iconEl.className = 'toast__icon';
-  iconEl.textContent = icon;
+  iconEl.innerHTML = iconSvg;
   const msgEl = document.createElement('span');
   msgEl.className = 'toast__message';
   // textContent — message может содержать текст ошибки с сервера
@@ -251,6 +260,271 @@ function isInCart(productId) {
 }
 
 // =============================================
+// ===== ВИТРИНА ДРУГА (шеринг карточки товара) =====
+// =============================================
+// Генерирует премиальную карточку 1200x630 (идеальный размер для Telegram
+// и соцсетей) через Canvas и шарит файлом. Без файла (ПК/старые браузеры) —
+// скачивание картинки; если Canvas «запятнан» CORS — шерингом ссылки.
+
+const SHARE_SITE_URL = 'spodzh.github.io/torgovchik-shop';
+
+// Загрузка картинки товара: сначала с CORS (чтобы Canvas не запятнать),
+// при неудаче — без CORS (картинка нарисуется, но экспорт будет заблокирован)
+function loadShareImage(src) {
+  return new Promise((resolve) => {
+    const crossOrigin = (() => {
+      try { return new URL(src, window.location.href).origin !== window.location.origin; }
+      catch (e) { return true; }
+    })();
+
+    const attempt = (useCors) => {
+      const img = new Image();
+      if (useCors) img.crossOrigin = 'anonymous';
+      const timeout = setTimeout(() => { img.onerror = img.onload = null; resolve({ img: null, tainted: false }); }, 6000);
+      img.onload = () => { clearTimeout(timeout); resolve({ img, tainted: !useCors && crossOrigin }); };
+      img.onerror = () => {
+        clearTimeout(timeout);
+        if (useCors) attempt(false);
+        else resolve({ img: null, tainted: false });
+      };
+      img.src = src;
+    };
+    attempt(true);
+  });
+}
+
+function wrapShareText(ctx, text, maxWidth, maxLines) {
+  const words = String(text).trim().split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = '';
+  for (let i = 0; i < words.length; i++) {
+    const test = line ? line + ' ' + words[i] : words[i];
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = words[i];
+      if (lines.length === maxLines) break;
+    } else {
+      line = test;
+    }
+  }
+  if (lines.length < maxLines && line) lines.push(line);
+  const covered = lines.join(' ').split(/\s+/).length;
+  if (lines.length === maxLines && covered < words.length) {
+    lines[maxLines - 1] += '…';
+  }
+  return lines;
+}
+
+function drawShareCard(product, img) {
+  const W = 1200, H = 630;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const rr = (x, y, w, h, r) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  };
+
+  // ===== ФОН: тёмный + янтарное и холодное свечение =====
+  ctx.fillStyle = '#17191B';
+  ctx.fillRect(0, 0, W, H);
+
+  let glow = ctx.createRadialGradient(120, 80, 0, 120, 80, 520);
+  glow.addColorStop(0, 'rgba(197, 138, 69, 0.14)');
+  glow.addColorStop(1, 'rgba(197, 138, 69, 0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  glow = ctx.createRadialGradient(1080, 560, 0, 1080, 560, 480);
+  glow.addColorStop(0, 'rgba(130, 149, 160, 0.10)');
+  glow.addColorStop(1, 'rgba(130, 149, 160, 0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  // ===== СТЕКЛЯННАЯ КАРТОЧКА =====
+  rr(24, 24, W - 48, H - 48, 32);
+  ctx.fillStyle = 'rgba(41, 39, 37, 0.62)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(130, 149, 160, 0.25)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  // Блик по верхней кромке
+  const shine = ctx.createLinearGradient(24, 24, W - 24, 24);
+  shine.addColorStop(0, 'rgba(255,255,255,0)');
+  shine.addColorStop(0.5, 'rgba(255,255,255,0.22)');
+  shine.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.strokeStyle = shine;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(56, 25.5);
+  ctx.lineTo(W - 56, 25.5);
+  ctx.stroke();
+
+  // ===== ПЬЕДЕСТАЛ ПОД КАРТИНКОЙ ТОВАРА =====
+  glow = ctx.createRadialGradient(900, 380, 0, 900, 380, 300);
+  glow.addColorStop(0, 'rgba(217, 160, 91, 0.12)');
+  glow.addColorStop(1, 'rgba(217, 160, 91, 0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(560, 60, 640, 540);
+
+  // Подложка картинки — как .product-image-wrap на странице
+  rr(700, 95, 400, 400, 28);
+  ctx.fillStyle = 'rgba(23, 25, 27, 0.65)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(130, 149, 160, 0.18)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  if (img) {
+    const pad = 36;
+    const boxW = 400 - pad * 2, boxH = 400 - pad * 2;
+    const scale = Math.min(boxW / img.width, boxH / img.height);
+    const dw = img.width * scale, dh = img.height * scale;
+    // Мягкая тень под товаром, как на витрине
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+    ctx.shadowBlur = 30;
+    ctx.shadowOffsetY = 14;
+    ctx.drawImage(img, 900 - dw / 2, 295 - dh / 2, dw, dh);
+    ctx.restore();
+  } else {
+    // Товар без картинки: аккуратный водяной знак вместо фото
+    ctx.fillStyle = '#7A7D7C';
+    ctx.font = '700 30px Manrope, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('TORGOVCHIK', 900, 305);
+    ctx.font = '500 18px Manrope, sans-serif';
+    ctx.fillText('Гомель', 900, 340);
+    ctx.textAlign = 'left';
+  }
+
+  // ===== ТЕКСТ СЛЕВА =====
+  const textX = 80;
+
+  // Бренд
+  ctx.fillStyle = '#C58A45';
+  ctx.font = '700 20px Manrope, sans-serif';
+  try { ctx.letterSpacing = '4px'; } catch (e) { /* старые браузеры */ }
+  ctx.fillText(String(product.brand || '').toUpperCase(), textX, 160);
+  try { ctx.letterSpacing = '0px'; } catch (e) { /* noop */ }
+
+  // Название: Unbounded с переносом (мелкий шрифт, если слова длинные)
+  let titleSize = 46;
+  ctx.font = `600 ${titleSize}px Unbounded, Manrope, sans-serif`;
+  const longestWord = String(product.name || '').trim().split(/\s+/).reduce((a, w) => Math.max(a, ctx.measureText(w).width), 0);
+  if (longestWord > 560) titleSize = 34;
+  ctx.font = `600 ${titleSize}px Unbounded, Manrope, sans-serif`;
+  ctx.fillStyle = '#E4E7E5';
+  const titleLines = wrapShareText(ctx, product.name || '', 560, 3);
+  titleLines.forEach((line, i) => ctx.fillText(line, textX, 230 + i * (titleSize * 1.25)));
+
+  // Цена
+  ctx.fillStyle = '#D9A05B';
+  ctx.font = '600 62px Unbounded, Manrope, sans-serif';
+  const priceText = String(product.price || '');
+  ctx.fillText(priceText, textX, 480);
+  const priceW = ctx.measureText(priceText).width;
+  ctx.fillStyle = '#A7AAA8';
+  ctx.font = '500 26px Manrope, sans-serif';
+  ctx.fillText('BYN', textX + priceW + 16, 480);
+
+  // ===== ПОДВАЛ: ник или магазин + ссылка =====
+  const telegram = (localStorage.getItem('user_telegram') || '').replace(/^@/, '');
+  ctx.fillStyle = '#A7AAA8';
+  ctx.font = '500 24px Manrope, sans-serif';
+  ctx.fillText(telegram ? `Витрина от @${telegram}` : 'Магазин Torgovchik', textX, 565);
+
+  ctx.fillStyle = '#7A7D7C';
+  ctx.font = '500 20px Manrope, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(SHARE_SITE_URL, W - 80, 565);
+  ctx.textAlign = 'left';
+
+  return canvas;
+}
+
+async function shareProduct(product, btn) {
+  if (!product) return;
+  if (btn) { btn.disabled = true; }
+
+  try {
+    // Ждём загрузки Unbounded/Manrope — без этого Canvas отрисует фолбэк-шрифт
+    try {
+      await Promise.all([
+        document.fonts.load('600 46px Unbounded'),
+        document.fonts.load('600 62px Unbounded'),
+        document.fonts.load('700 20px Manrope'),
+        document.fonts.load('500 24px Manrope')
+      ]);
+      await document.fonts.ready;
+    } catch (e) { /* нет Font API — рисуем тем, что есть */ }
+
+    const { img } = await loadShareImage(product.image);
+    const canvas = drawShareCard(product, img);
+
+    // Экспорт может упасть, если картинка загрузилась без CORS (запятнанный Canvas)
+    let blob = null;
+    try {
+      blob = await new Promise((resolve, reject) => {
+        canvas.toBlob(b => b ? resolve(b) : reject(new Error('toBlob empty')), 'image/png');
+      });
+    } catch (e) {
+      blob = null; // запятнанный Canvas —sharing только ссылкой
+    }
+
+    const shareText = `${product.name} — ${product.brand} · ${product.price} BYN`;
+    const shareUrl = window.location.href;
+
+    if (blob) {
+      const file = new File([blob], `torgovchik-${parseInt(product.id, 10) || 'item'}.png`, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: 'Torgovchik', text: shareText, url: shareUrl });
+          return; // системное окно закрыто пользователем — тост не нужен
+        } catch (err) {
+          if (err && err.name === 'AbortError') return;
+          // Web Share не сработал — скачаем
+        }
+      }
+      // Фолбэк: скачивание картинки
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      showToast('Карточка сохранена — отправь её друзьям!', 'success');
+      return;
+    }
+
+    // Canvas запятнан (нет CORS на картинках) — делимся ссылкой
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Torgovchik', text: shareText, url: shareUrl });
+        return;
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+      }
+    }
+    await navigator.clipboard.writeText(shareText + ' ' + shareUrl);
+    showToast('Ссылка на товар скопирована', 'info');
+  } catch (err) {
+    console.error('Ошибка шеринг-карточки:', err);
+    showToast('Не удалось подготовить карточку', 'error');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+// =============================================
 // ===== ИЗБРАННОЕ =====
 // =============================================
 function loadFavoritesFromStorage() {
@@ -368,7 +642,7 @@ function renderNotFound(message) {
   renderFinished = true;
   content.innerHTML = `
     <div class="product-not-found" style="text-align:center; padding:60px 20px;">
-      <div class="product-not-found__icon" style="font-size:64px; margin-bottom:20px; filter:drop-shadow(0 0 10px rgba(197,138,69,0.3));">🍂</div>
+      <div class="product-not-found__icon" style="color:var(--accent); margin-bottom:20px; filter:drop-shadow(0 0 10px rgba(197,138,69,0.3));">${UI_ICONS.leaf(56)}</div>
       <h2 class="product-not-found__title" style="font-family:'Bitter', serif; font-size:28px; color:var(--text-primary); margin-bottom:12px;">Товар не найден</h2>
       <p class="product-not-found__text" style="color:var(--text-secondary); margin-bottom:24px; line-height:1.6;">
         ${message || 'Возможно, он уже распродан или вы перешли по устаревшей ссылке.'}<br>
@@ -447,6 +721,10 @@ function renderProduct(p) {
                   ${inCart ? 'disabled' : ''}>
             ${inCart ? '✓ В корзине' : 'Добавить в корзину'}
           </button>
+          <button class="btn btn-secondary btn-share" id="productShareBtn" type="button" aria-label="Поделиться товаром с друзьями">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+            Поделиться
+          </button>
           <a href="index.html" class="btn btn-secondary" style="text-decoration:none;">
             В каталог
           </a>
@@ -484,6 +762,11 @@ function renderProduct(p) {
     addBtn.addEventListener('click', (e) => addToCart(p.id, e));
   }
 
+  const shareBtn = document.getElementById('productShareBtn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', () => shareProduct(p, shareBtn));
+  }
+
   // SEO
   try {
     const pageTitle = p.name + ' — ' + p.brand + ' — Torgovchik';
@@ -506,7 +789,7 @@ function renderProduct(p) {
     if (ogDesc) ogDesc.setAttribute('content', metaDesc);
 
     const ogImage = document.getElementById('ogImage');
-    if (ogImage) ogImage.setAttribute('content', p.image);
+    if (ogImage) ogImage.setAttribute('content', new URL(p.image, window.location.href).href);
 
     setMeta('product:price:amount', String(p.price));
     setMeta('product:price:currency', 'BYN');

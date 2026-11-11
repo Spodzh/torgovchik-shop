@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
+    <!-- GH Pages отдаёт 404.html на ЛЮБОЙ глубине путей: без <base> относительные
+         ссылки на css/assets сломаются (например, /torgovchik-shop/foo/bar/) -->
+    <base href="https://spodzh.github.io/torgovchik-shop/">
+
     <title>Страница не найдена — Torgovchik</title>
     <meta name="description" content="Страница не найдена. Вернитесь на главную страницу магазина Torgovchik." />
     <meta name="theme-color" content="#17191B" />
@@ -14,63 +18,192 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=Manrope:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Тот же стек одежды, что на главной: осенний фон, ауры, кнопки, 18+ гейт -->
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/header.css" />
+    <link rel="stylesheet" href="css/modal.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
 
     <style>
+        /* ===== 404 / GLASS NOIR ===== */
         .notfound {
-            min-height: calc(100vh - 200px);
+            min-height: calc(100vh - var(--header-height) - 120px);
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 60px 20px;
             text-align: center;
+            position: relative;
+            z-index: 1;
         }
-        .notfound__inner {
-            max-width: 520px;
+
+        /* Стеклянная карточка — как карточки каталога */
+        .notfound__card {
+            max-width: 560px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            background: var(--bg-card);
+            border: 1px solid rgba(130, 149, 160, 0.18);
+            border-radius: 28px;
+            padding: 64px 48px;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                inset 0 0 30px rgba(130, 149, 160, 0.055),
+                0 1px 2px rgba(0, 0, 0, 0.4),
+                0 14px 40px rgba(0, 0, 0, 0.4);
         }
+
+        @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+            .notfound__card {
+                background: rgba(41, 39, 37, 0.55);
+                backdrop-filter: blur(18px) saturate(150%);
+                -webkit-backdrop-filter: blur(18px) saturate(150%);
+            }
+        }
+
+        /* Витринная подсветка снизу, как у карточек каталога */
+        .notfound__card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 50% 30%, rgba(217, 160, 91, 0.07) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(197, 138, 69, 0) 55%, rgba(197, 138, 69, 0.13) 100%);
+            pointer-events: none;
+        }
+
+        .notfound__content { position: relative; z-index: 1; }
+
+        /* Большая «404»: Unbounded + золотой градиент по буквам
+           (фолбэк — сплошной янтарный цвет, как у hero-заголовка) */
         .notfound__code {
-            font-family: 'Bitter', serif;
-            font-size: 120px;
-            font-weight: 800;
+            font-family: var(--font-display);
+            font-size: clamp(72px, 16vw, 132px);
+            font-weight: 700;
             line-height: 1;
             color: var(--accent);
-            text-shadow:
-                0 0 40px rgba(197, 138, 69, 0.45),
-                0 4px 20px rgba(0, 0, 0, 0.6);
-            margin-bottom: 16px;
-            letter-spacing: -4px;
+            letter-spacing: -0.04em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 40px rgba(197, 138, 69, 0.35), 0 4px 20px rgba(0, 0, 0, 0.6);
         }
+
+        @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+            .notfound__code {
+                background: linear-gradient(115deg, #E8C79B 0%, #D9A05B 45%, #B07C42 100%);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                color: transparent;
+                text-shadow: none;
+            }
+        }
+
         .notfound__title {
-            font-family: 'Bitter', serif;
-            font-size: 28px;
-            font-weight: 700;
+            font-family: var(--font-display);
+            font-size: clamp(17px, 2.6vw, 22px);
+            font-weight: 500;
             color: var(--text-primary);
             margin-bottom: 12px;
+            line-height: 1.3;
+            overflow-wrap: anywhere;
         }
+
         .notfound__text {
             font-family: 'Manrope', sans-serif;
-            font-size: 16px;
+            font-size: 15px;
             color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 32px;
+            line-height: 1.65;
+            margin-bottom: 36px;
         }
-        .notfound__leaf {
-            font-size: 42px;
-            opacity: 0.35;
-            display: block;
-            margin-bottom: 8px;
+
+        /* Золотая кнопка — фирменный янтарный градиент */
+        .notfound__btn {
+            display: inline-block;
+            background: var(--grad-accent);
+            color: #17191B;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 999px;
+            font-family: 'Manrope', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.4px;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 36px rgba(197, 138, 69, 0.25);
         }
+
+        @media (hover: hover) and (pointer: fine) {
+            .notfound__btn:hover {
+                transform: translateY(-2px) scale(1.02);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 18px 48px rgba(197, 138, 69, 0.4);
+            }
+        }
+
+        .notfound__btn:active { transform: translateY(0) scale(0.98); }
+
+        /* Появление карточки при загрузке (как scroll-reveal) */
+        @keyframes notfoundIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .notfound__card {
+            animation: notfoundIn 0.7s var(--ease-smooth) both;
+        }
+
+        /* Частицы — фон позади контента, поверх аур body */
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
         @media (max-width: 600px) {
-            .notfound__code { font-size: 88px; }
-            .notfound__title { font-size: 22px; }
-            .notfound__text { font-size: 15px; }
+            .notfound { padding: 40px 14px; }
+            .notfound__card { padding: 44px 24px; border-radius: 20px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .notfound__card { animation: none; }
+            #particleCanvas { display: none; }
         }
     </style>
 </head>
 <body>
+
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+    <!-- 18+ ВРАТА (обязательный гейт на всех публичных страницах) -->
+    <div class="age-gate-modal" id="ageGateModal" role="dialog" aria-modal="true" aria-labelledby="ageGateTitle">
+        <div class="age-gate-modal__content">
+            <div id="ageGateQuestion">
+                <span class="age-gate-modal__icon" aria-hidden="true"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span>
+                <span class="age-gate-modal__badge">18+</span>
+                <h2 class="age-gate-modal__title" id="ageGateTitle">Вам есть 18 лет?</h2>
+                <p class="age-gate-modal__text">
+                    Сайт содержит информацию о товарах, предназначенных<br>для <strong>совершеннолетних</strong>. Подтвердите свой возраст.
+                </p>
+                <div class="age-gate-modal__buttons">
+                    <button class="age-gate-modal__btn age-gate-modal__btn--yes" id="ageGateYes">Мне есть 18 лет</button>
+                    <button class="age-gate-modal__btn age-gate-modal__btn--no" id="ageGateNo">Мне меньше 18</button>
+                </div>
+            </div>
+            <div class="age-gate-modal__deny" id="ageGateDeny">
+                <span class="age-gate-modal__deny-icon" aria-hidden="true"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg></span>
+                <div class="age-gate-modal__deny-title">Доступ запрещён</div>
+                <p class="age-gate-modal__deny-text">
+                    К сожалению, сайт доступен только пользователям старше 18 лет.<br>
+                    Спасибо за понимание.
+                </p>
+            </div>
+        </div>
+    </div>
 
     <header class="header">
         <div class="container header__inner">
@@ -81,15 +214,15 @@
     </header>
 
     <main class="notfound">
-        <div class="notfound__inner">
-            <span class="notfound__leaf" aria-hidden="true">🍂</span>
-            <div class="notfound__code">404</div>
-            <h1 class="notfound__title">Страница не найдена</h1>
-            <p class="notfound__text">
-                Кажется, эта страница уже улетела с первым ноябрьским снегом.<br>
-                Но у нас есть что-то повкуснее — загляни в каталог.
-            </p>
-            <a href="index.html" class="btn btn-primary">← Вернуться на главную</a>
+        <div class="notfound__card">
+            <div class="notfound__content">
+                <div class="notfound__code" aria-hidden="true">404</div>
+                <h1 class="notfound__title">Похоже, эта страница испарилась...</h1>
+                <p class="notfound__text">
+                    Но у нас есть что-то повкуснее — загляни в каталог.
+                </p>
+                <a href="index.html" class="notfound__btn">Вернуться в магазин</a>
+            </div>
         </div>
     </main>
 
@@ -98,6 +231,122 @@
             <p>© 2026 Torgovchik. Все права защищены.</p>
         </div>
     </footer>
+
+    <script>
+    // Страница самодостаточная (как flappy.html): script.js не подключаем —
+    // он ожидает полноэкранную разметку каталога и упал бы на верхнем уровне.
+    (function () {
+        'use strict';
+
+        // ===== 18+ ВРАТА (та же логика, что в js/script.js) =====
+        function initAgeGate() {
+            var modal = document.getElementById('ageGateModal');
+            if (!modal) return;
+
+            var show = function () {
+                modal.classList.add('open', 'show');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            };
+            var hide = function () {
+                modal.classList.remove('open', 'show');
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+            };
+
+            if (localStorage.getItem('torgovchik_age_verified') === 'true') { hide(); return; }
+            show();
+
+            var question = document.getElementById('ageGateQuestion');
+            document.getElementById('ageGateYes').addEventListener('click', function () {
+                localStorage.setItem('torgovchik_age_verified', 'true');
+                hide();
+            });
+            document.getElementById('ageGateNo').addEventListener('click', function () {
+                question.style.display = 'none';
+                document.getElementById('ageGateDeny').classList.add('open', 'show');
+            });
+        }
+
+        // ===== ЧАСТИЦЫ (атмосфера главной: снег падает, искры поднимаются) =====
+        function initParticles() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            var canvas = document.getElementById('particleCanvas');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            var w = 0, h = 0, dpr = 1, particles = [];
+            var rafId = null, lastT = 0, sizeDirty = true;
+
+            function spawn(anywhere) {
+                var isSnow = Math.random() < 0.6;
+                return {
+                    type: isSnow ? 'snow' : 'spark',
+                    x: Math.random() * w,
+                    y: anywhere ? Math.random() * h : (isSnow ? -12 : h + 12),
+                    size: 3 + Math.random() * 6,
+                    baseAlpha: 0.12 + Math.random() * 0.28,
+                    phase: Math.random() * Math.PI * 2,
+                    twinkle: 0.5 + Math.random() * 1.4,
+                    vy: isSnow ? 9 + Math.random() * 14 : -(6 + Math.random() * 11),
+                    vx: (Math.random() - 0.5) * 6
+                };
+            }
+
+            function resize() {
+                dpr = Math.min(window.devicePixelRatio || 1, 2);
+                w = window.innerWidth;
+                h = window.innerHeight;
+                canvas.width = Math.round(w * dpr);
+                canvas.height = Math.round(h * dpr);
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                var target = Math.min(Math.round((w * h) / 32000), 32);
+                particles.length = 0;
+                for (var i = 0; i < target; i++) particles.push(spawn(true));
+            }
+
+            function tick(t) {
+                rafId = null;
+                if (sizeDirty) { resize(); sizeDirty = false; }
+                if (!lastT) lastT = t;
+                var dt = Math.min((t - lastT) / 1000, 0.05);
+                lastT = t;
+
+                ctx.clearRect(0, 0, w, h);
+                for (var i = 0; i < particles.length; i++) {
+                    var p = particles[i];
+                    p.y += p.vy * dt;
+                    p.x += p.vx * dt + Math.sin(p.phase += p.twinkle * dt) * 5 * dt;
+                    if (p.y < -20 || p.y > h + 20) { particles[i] = spawn(false); continue; }
+                    ctx.globalAlpha = p.baseAlpha * (0.7 + 0.3 * Math.sin(p.phase * 2.1));
+                    ctx.fillStyle = p.type === 'snow' ? '#E4E7E5' : '#D9A05B';
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+                rafId = requestAnimationFrame(tick);
+            }
+
+            window.addEventListener('resize', function () { sizeDirty = true; }, { passive: true });
+            document.addEventListener('visibilitychange', function () {
+                if (document.hidden) {
+                    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+                } else if (!rafId) {
+                    lastT = 0;
+                    rafId = requestAnimationFrame(tick);
+                }
+            });
+
+            resize();
+            rafId = requestAnimationFrame(tick);
+        }
+
+        initAgeGate();
+        initParticles();
+    })();
+    </script>
 
 </body>
 </html>

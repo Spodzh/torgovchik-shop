@@ -209,7 +209,12 @@
 .favorites-badge { background: var(--cold-blue); box-shadow: 0 0 8px rgba(130, 149, 160, 0.3); color: #fff; }
 
 /* ===== КНОПКА ПРОФИЛЯ ===== */
-.header__user { display: flex; align-items: center; }
+/* Анти-FOUC: блок скрыт (без смены layout), пока inline-скрипты не определят,
+   кто зашёл. Состояние ставит скрипт в <head> (guest/user) и скрипт сразу
+   после хедера (user-ready, с уже подставленными аватаром и ником из кэша). */
+.header__user { display: flex; align-items: center; visibility: hidden; }
+html[data-user-state="guest"] .header__user,
+html[data-user-state="user-ready"] .header__user { visibility: visible; }
 
 .user-btn {
     background: transparent;

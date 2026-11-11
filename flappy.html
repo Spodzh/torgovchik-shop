@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Flappy Slush 🧃</title>
+    <title>Flappy Slush</title>
     <meta name="theme-color" content="#17191B" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@700;800&family=Manrope:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --glass: rgba(41, 39, 37, 0.55);
+            --glass-border: rgba(130, 149, 160, 0.18);
+            --gold: linear-gradient(135deg, #C58A45, #94613C);
+            --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+        }
         body {
             background-color: #17191B;
             overflow: hidden;
@@ -20,64 +26,157 @@
             align-items: center;
             touch-action: none;
         }
-        canvas { display: block; background-color: #17191B; box-shadow: 0 0 50px rgba(197, 138, 69, 0.2); }
-        
+        canvas {
+            display: block;
+            background-color: #17191B;
+            border-radius: 28px;
+            box-shadow:
+                0 0 0 1px rgba(130, 149, 160, 0.18),
+                0 0 60px rgba(197, 138, 69, 0.16),
+                0 30px 90px rgba(0, 0, 0, 0.8);
+        }
+
         .ui-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            pointer-events: none;
         }
+
+        /* Счёт: Unbounded, стеклянная пилюля сверху */
         .score-display {
-            position: absolute; top: 40px; font-family: 'Bitter', serif; font-size: 72px; font-weight: 800;
-            color: #E4E7E5; text-shadow: 0 0 20px rgba(197, 138, 69, 0.6); pointer-events: none; z-index: 10;
+            position: absolute; top: 36px;
+            font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 52px;
+            color: #F7F1E6;
+            text-shadow: 0 0 24px rgba(197, 138, 69, 0.55), 0 4px 18px rgba(0, 0, 0, 0.6);
+            pointer-events: none; z-index: 10;
+            padding: 4px 26px;
+            border-radius: 999px;
+            background: rgba(23, 25, 27, 0.45);
+            border: 1px solid rgba(130, 149, 160, 0.2);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            transition: transform 0.25s var(--ease-smooth);
         }
+        .score-display.bump { animation: scoreBump 0.3s var(--ease-smooth); }
+        @keyframes scoreBump {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.22); }
+            100% { transform: scale(1); }
+        }
+
+        /* ===== СТЕКЛЯННЫЕ ЭКРАНЫ (Glass Noir) ===== */
         .screen {
-            background: linear-gradient(180deg, rgba(32, 35, 38, 0.95), rgba(23, 25, 27, 0.95));
-            backdrop-filter: blur(15px); border: 2px solid rgba(197, 138, 69, 0.4);
-            border-radius: 24px; padding: 30px 40px; text-align: center; pointer-events: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 40px rgba(197, 138, 69, 0.15);
-            animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            max-width: 90%; width: 400px; z-index: 20;
+            position: relative;
+            background: var(--glass);
+            backdrop-filter: blur(18px) saturate(150%); -webkit-backdrop-filter: blur(18px) saturate(150%);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 34px 32px;
+            text-align: center; pointer-events: auto;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.06),
+                inset 0 0 30px rgba(130, 149, 160, 0.05),
+                0 24px 70px rgba(0, 0, 0, 0.75),
+                0 0 46px rgba(197, 138, 69, 0.1);
+            animation: popIn 0.45s var(--ease-smooth);
+            max-width: 90%; width: 420px; z-index: 20;
+        }
+        /* Витринная подсветка снизу, как у карточек каталога */
+        .screen::before {
+            content: ''; position: absolute; inset: 0; border-radius: inherit;
+            background:
+                radial-gradient(circle at 50% 25%, rgba(217, 160, 91, 0.07) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(197, 138, 69, 0) 55%, rgba(197, 138, 69, 0.12) 100%);
+            pointer-events: none;
         }
         .screen.hidden { display: none; }
+        .screen > * { position: relative; z-index: 1; }
+
         .screen h1 {
-            font-family: 'Bitter', serif; color: #C58A45; font-size: 42px; margin-bottom: 10px;
-            text-transform: uppercase; text-shadow: 0 2px 10px rgba(197, 138, 69, 0.3);
+            font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 30px;
+            letter-spacing: 0.02em;
+            margin-bottom: 12px;
+            text-transform: uppercase;
         }
-        .screen p { color: #A7AAA8; margin-bottom: 20px; font-size: 16px; line-height: 1.5; }
-        .screen .score-text { font-family: 'Bitter', serif; font-size: 36px; color: #E4E7E5; margin-bottom: 10px; }
-        
+        /* Золотой градиент по буквам, фолбэк — сплошной янтарный */
+        .screen h1 .gold-text { color: #C58A45; }
+        @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+            .screen h1 .gold-text {
+                background: linear-gradient(115deg, #E8C79B 0%, #D9A05B 45%, #B07C42 100%);
+                -webkit-background-clip: text; background-clip: text;
+                -webkit-text-fill-color: transparent; color: transparent;
+            }
+        }
+        .screen p { color: #A7AAA8; margin-bottom: 20px; font-size: 15px; line-height: 1.6; }
+        .score-text {
+            font-family: 'Unbounded', sans-serif; font-weight: 600;
+            font-size: 44px; color: #F7F1E6; margin-bottom: 6px;
+            text-shadow: 0 0 20px rgba(197, 138, 69, 0.5);
+        }
+        .score-label { font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #8295A0; margin-bottom: 14px; }
+
         .new-record {
-            display: none; font-family: 'Bitter', serif; font-size: 20px; font-weight: 800;
+            display: none;
+            font-family: 'Unbounded', sans-serif; font-size: 14px; font-weight: 600;
             color: #D9A05B; text-shadow: 0 0 15px rgba(217, 160, 91, 0.6);
             margin-bottom: 15px; animation: pulse 1s infinite alternate;
             align-items: center; justify-content: center; gap: 8px;
+            background: rgba(197, 138, 69, 0.1); border: 1px solid rgba(197, 138, 69, 0.35);
+            border-radius: 999px; padding: 8px 16px;
         }
         .new-record.show { display: flex; }
         @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
 
+        .best-line { color: #C58A45; font-weight: 700; margin-bottom: 20px; font-size: 14px; }
+        .best-line strong { font-family: 'Unbounded', sans-serif; font-weight: 600; }
+
+        /* ===== ЗОЛОТАЯ КНОПКА (как на сайте) ===== */
         .btn-play {
-            background: linear-gradient(135deg, #C58A45, #94613C); color: #17191B;
-            border: none; padding: 16px 40px; font-size: 20px; font-weight: 800;
-            border-radius: 12px; cursor: pointer; text-transform: uppercase;
-            transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 8px 25px rgba(197, 138, 69, 0.3);
-            width: 100%; margin-bottom: 15px; display: block; text-decoration: none; line-height: 1.5;
+            background: var(--gold); color: #17191B;
+            border: none; padding: 16px 40px; font-size: 16px; font-weight: 700;
+            font-family: 'Manrope', sans-serif; letter-spacing: 0.4px;
+            border-radius: 999px; cursor: pointer; text-transform: uppercase;
+            transition: transform 0.35s var(--ease-smooth), box-shadow 0.35s var(--ease-smooth);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 36px rgba(197, 138, 69, 0.28);
+            width: 100%; margin-bottom: 14px; display: block; text-decoration: none; line-height: 1.5;
         }
-        .btn-play:active { transform: scale(0.95); }
-        .btn-play:hover { box-shadow: 0 8px 35px rgba(197, 138, 69, 0.5); }
-        .back-link { display: block; color: #8295A0; font-size: 14px; text-decoration: none; cursor: pointer; }
+        @media (hover: hover) and (pointer: fine) {
+            .btn-play:hover {
+                transform: translateY(-2px) scale(1.02);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 18px 48px rgba(197, 138, 69, 0.42);
+            }
+        }
+        .btn-play:active { transform: translateY(0) scale(0.97); }
+
+        .back-link { display: inline-block; color: #8295A0; font-size: 14px; text-decoration: none; cursor: pointer; font-weight: 600; transition: color 0.2s; }
         .back-link:hover { color: #C58A45; }
-        
+
         .leaderboard {
-            background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; margin-bottom: 20px;
+            background: rgba(23, 25, 27, 0.45);
+            border: 1px solid rgba(130, 149, 160, 0.12);
+            border-radius: 16px; padding: 12px; margin-bottom: 20px;
             max-height: 150px; overflow-y: auto; text-align: left;
         }
-        .leaderboard-title { color: #8295A0; font-weight: 700; text-align: center; margin-bottom: 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .leaderboard-title { color: #D9A05B; font-weight: 700; text-align: center; margin-bottom: 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; }
         .leaderboard-row { display: flex; justify-content: space-between; color: #E4E7E5; font-size: 14px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .leaderboard-row:last-child { border-bottom: none; }
         .leaderboard-row span:first-child { color: #A7AAA8; }
         .leaderboard-row span:last-child { font-weight: 700; color: #C58A45; }
 
-        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes popIn { from { transform: scale(0.82); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        @media (max-width: 480px) {
+            .score-display { font-size: 40px; top: 28px; }
+            .screen { padding: 26px 20px; }
+            .screen h1 { font-size: 24px; }
+            .score-text { font-size: 36px; }
+            .btn-play { padding: 14px 28px; font-size: 14px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .screen { animation: none; }
+            .new-record { animation: none; }
+            .score-display.bump { animation: none; }
+        }
     </style>
 </head>
 <body>
@@ -88,17 +187,17 @@
         <div class="score-display" id="scoreDisplay" style="display: none;">0</div>
 
         <div class="screen hidden" id="authScreen">
-            <h1>Вход закрыт</h1>
+            <h1><span class="gold-text">Flappy Slush</span></h1>
             <p>Чтобы играть в Flappy Slush и попасть в таблицу лидеров,<br>войдите в свой аккаунт на сайте.</p>
             <a href="index.html" class="btn-play" style="text-decoration:none;">Войти на сайт</a>
             <a href="index.html" class="back-link">← Вернуться в магазин</a>
         </div>
 
         <div class="screen hidden" id="startScreen">
-            <h1>Flappy Slush</h1>
+            <h1><span class="gold-text">Flappy Slush</span></h1>
             <p>Тапай по экрану, чтобы заправляться и летать.<br>Игра бесконечна. С каждым рубежом подики ускоряются!</p>
             <div class="leaderboard" id="leaderboardStart">
-                <div class="leaderboard-title">🏆 Топ игроков</div>
+                <div class="leaderboard-title">Топ игроков</div>
                 <div id="leaderboardListStart" style="color:#A7AAA8; font-size:14px; text-align:center;">Загрузка...</div>
             </div>
             <button class="btn-play" id="startBtn">Играть</button>
@@ -106,16 +205,17 @@
         </div>
 
         <div class="screen hidden" id="gameOverScreen">
-            <h1>Game Over</h1>
-            <div class="new-record" id="newRecordBadge">👑 НОВЫЙ РЕКОРД! 👑</div>
-            <div class="score-text">Счет: <span id="finalScore">0</span></div>
-            <div style="color: #C58A45; margin-bottom: 20px; font-weight: 700;">Твой рекорд: <span id="highScore">0</span></div>
-            
+            <h1><span class="gold-text">Game Over</span></h1>
+            <div class="new-record" id="newRecordBadge">НОВЫЙ РЕКОРД!</div>
+            <div class="score-label">Ваш счёт</div>
+            <div class="score-text" id="finalScore">0</div>
+            <div class="best-line">Рекорд: <strong id="highScore">0</strong></div>
+
             <div class="leaderboard" id="leaderboardGameOver">
-                <div class="leaderboard-title">🏆 Топ игроков</div>
+                <div class="leaderboard-title">Топ игроков</div>
                 <div id="leaderboardListGameOver" style="color:#A7AAA8; font-size:14px; text-align:center;">Загрузка...</div>
             </div>
-            
+
             <button class="btn-play" id="restartBtn">Ещё раз</button>
             <a href="index.html" class="back-link">← В магазин</a>
         </div>
@@ -138,29 +238,35 @@
 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        
+
         const GRAVITY = 0.4;
         const JUMP_FORCE = -6.5;
         const PIPE_WIDTH = 85;
         const PIPE_GAP = 210;
-        let PIPE_SPEED = 3.2; 
+        let PIPE_SPEED = 3.2;
         const SPAWN_RATE = 95;
 
         let frames = 0;
         let score = 0;
         let lastMilestone = 0;
-        let gameState = 'start'; 
+        let gameState = 'start';
         let highScore = localStorage.getItem('flappySlushHighScore') || 0;
         let currentBg = 0;
-        let timeOfDay = 'night'; 
-        let weather = 'clear'; 
+        let timeOfDay = 'night';
+        let weather = 'clear';
         let lightningTimer = 0;
         let explodingTimer = 0;
-        
+
+        // Эффекты: тряска экрана, вспышки, дым на фоне
+        let shake = 0;
+        let deathFlash = 0;
+        let milestoneFlash = 0;
+
         let weatherParticles = [];
-        let birdParticles = [];
-        let pipePieces = [];
-        let smokeParticles = [];
+        let birdParticles = [];   // искры прыжка / взрыва / салюта
+        let pipePieces = [];      // осколки подиков
+        let smokeParticles = [];  // дым от взрыва
+        let clouds = [];          // фоновые клубы дыма
 
         const bgColors = {
             night: ['#17191B', '#202326'],
@@ -186,11 +292,11 @@
 
         // Локальные картинки
         const imgJuice = new Image(); imgJuice.src = 'assets/flappy/juice.png';
-        
+
         const podImages = [
-            new Image(), 
-            new Image(), 
-            new Image()  
+            new Image(),
+            new Image(),
+            new Image()
         ];
         podImages[0].src = 'assets/flappy/pod1.png';
         podImages[1].src = 'assets/flappy/pod2.png';
@@ -202,10 +308,11 @@
             if (imagesLoaded === 4) {
                 if (imgJuice.naturalWidth > 0) {
                     const ratio = imgJuice.height / imgJuice.width;
-                    bird.width = 90; 
+                    bird.width = 90;
                     bird.height = 90 * ratio;
                 }
                 resizeCanvas();
+                initClouds();
                 loop();
             }
         }
@@ -236,14 +343,55 @@
         function resizeCanvas() {
             let width = window.innerWidth;
             let height = window.innerHeight;
-            if (width > 600) width = 600; 
+            if (width > 600) width = 600;
             if (height > 800) height = 800;
             canvas.width = width;
             canvas.height = height;
+            initClouds();
         }
         window.addEventListener('resize', resizeCanvas);
 
-        function jump() { 
+        // ===== ФОНОВЫЙ ДЫМ: медленные полупрозрачные клубы =====
+        function initClouds() {
+            clouds = [];
+            const count = 6;
+            for (let i = 0; i < count; i++) {
+                const r = 80 + Math.random() * 130;
+                // Градиент создаём один раз на клуб — дешевле на мобилках
+                const grd = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+                grd.addColorStop(0, 'rgba(167, 170, 168, 0.09)');
+                grd.addColorStop(1, 'rgba(167, 170, 168, 0)');
+                clouds.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: r,
+                    grd: grd,
+                    spd: 0.25 + Math.random() * 0.5,
+                    bob: Math.random() * Math.PI * 2,
+                    bobAmp: 6 + Math.random() * 10
+                });
+            }
+        }
+
+        function drawSmoke() {
+            for (const c of clouds) {
+                c.x -= c.spd;
+                c.bob += 0.004;
+                if (c.x < -c.r * 1.5) {
+                    c.x = canvas.width + c.r;
+                    c.y = Math.random() * canvas.height;
+                }
+                ctx.save();
+                ctx.translate(c.x, c.y + Math.sin(c.bob) * c.bobAmp);
+                ctx.fillStyle = c.grd;
+                ctx.beginPath();
+                ctx.arc(0, 0, c.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function jump() {
             if (gameState === 'play') {
                 bird.velocity = JUMP_FORCE;
                 for (let i = 0; i < 6; i++) {
@@ -259,7 +407,7 @@
                 }
             }
         }
-        
+
         canvas.addEventListener('mousedown', jump);
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); }, { passive: false });
         document.addEventListener('keydown', (e) => { if (e.code === 'Space') jump(); });
@@ -283,13 +431,14 @@
             PIPE_SPEED = 3.2;
             timeOfDay = 'night';
             weather = 'clear';
+            shake = 0; deathFlash = 0; milestoneFlash = 0;
             currentPalette = bgColors.night;
             scoreDisplay.textContent = '0';
             scoreDisplay.style.display = 'block';
             newRecordBadge.classList.remove('show');
             frames = 0;
             gameState = 'play';
-            
+
             startScreen.classList.add('hidden');
             gameOverScreen.classList.add('hidden');
         }
@@ -327,15 +476,31 @@
             } catch (e) {}
         }
 
-        function triggerFireworks() {
-            const colors = ['#C58A45', '#D9A05B', '#8295A0', '#A7AAA8', '#E4E7E5'];
-            for (let i = 0; i < 50; i++) {
+        // Салют: 2–3 золотых burst-а в случайных точках верхней части экрана
+        function spawnBurst(x, y, count, power) {
+            const colors = ['#E8C79B', '#C58A45', '#D9A05B', '#8295A0', '#E4E7E5'];
+            for (let i = 0; i < count; i++) {
+                const a = Math.random() * Math.PI * 2;
+                const v = Math.random() * power;
                 birdParticles.push({
-                    x: canvas.width / 2, y: canvas.height / 3,
-                    vx: (Math.random() - 0.5) * 15, vy: (Math.random() - 0.5) * 15,
-                    life: 1, color: colors[Math.floor(Math.random() * colors.length)],
+                    x: x, y: y,
+                    vx: Math.cos(a) * v, vy: Math.sin(a) * v,
+                    life: 1, decay: 0.012,
+                    color: colors[Math.floor(Math.random() * colors.length)],
                     size: Math.random() * 4 + 2
                 });
+            }
+        }
+
+        function triggerFireworks() {
+            milestoneFlash = 1;
+            const bursts = 2 + Math.floor(Math.random() * 2);
+            for (let b = 0; b < bursts; b++) {
+                spawnBurst(
+                    canvas.width * (0.25 + Math.random() * 0.5),
+                    canvas.height * (0.15 + Math.random() * 0.35),
+                    36, 7
+                );
             }
         }
 
@@ -369,8 +534,7 @@
         function checkMilestones() {
             if (score > 0 && score % 10 === 0 && score !== lastMilestone) {
                 lastMilestone = score;
-                triggerFireworks();
-                
+
                 if (PIPE_SPEED < 7.5) PIPE_SPEED += 0.15;
 
                 let milestone = score % 100;
@@ -385,12 +549,13 @@
                 else if (milestone === 70) { timeOfDay = 'autumn'; currentPalette = bgColors.autumn; initWeather('leaves'); }
                 else if (milestone === 80) { weather = 'fog'; }
                 else if (milestone === 90) { timeOfDay = 'morning'; currentPalette = bgColors.morning; weather = 'clear'; }
-                else if (milestone === 100) { 
-                    triggerFireworks();
-                    triggerFireworks();
-                    triggerFireworks();
+                else if (milestone === 100) {
                     timeOfDay = 'night'; currentPalette = bgColors.night; weather = 'clear';
                 }
+
+                // Салют на КАЖДЫЙ рубеж, на сотне — тройной
+                triggerFireworks();
+                if (milestone === 100) { triggerFireworks(); triggerFireworks(); }
             }
         }
 
@@ -412,6 +577,9 @@
                 ctx.beginPath(); ctx.arc(canvas.width * 0.8, canvas.height * 0.4, 80, 0, Math.PI * 2); ctx.fill();
             }
             ctx.shadowBlur = 0;
+
+            // Клубы дыма — сразу за луной, перед городом
+            drawSmoke();
 
             bgOffset += PIPE_SPEED * 0.2;
             for (let b of buildings) {
@@ -470,10 +638,10 @@
             pipes.forEach(pipe => {
                 const imgTop = pipe.imgTop;
                 const imgBottom = pipe.imgBottom;
-                
+
                 let imgHTop = (imgTop.naturalWidth > 0) ? PIPE_WIDTH * (imgTop.height / imgTop.width) : PIPE_WIDTH;
                 let yTop = pipe.topHeight;
-                let flipTop = true; 
+                let flipTop = true;
 
                 ctx.save();
                 ctx.beginPath();
@@ -501,7 +669,7 @@
                     }
                     ctx.restore();
                     yTop -= imgHTop;
-                    flipTop = !flipTop; 
+                    flipTop = !flipTop;
                 }
                 ctx.restore();
 
@@ -535,39 +703,32 @@
                     }
                     ctx.restore();
                     yBottom += imgHBottom;
-                    flipBottom = !flipBottom; 
+                    flipBottom = !flipBottom;
                 }
                 ctx.restore();
             });
         }
 
         function drawBird() {
+            // Мягкое янтарное сияние вокруг «птицы»
             ctx.save();
-            ctx.translate(bird.x + bird.width/2, bird.y + bird.height/2);
-            let angle = bird.velocity * 0.08;
-            if (angle < -0.5) angle = -0.5;
-            if (angle > 1.5) angle = 1.5;
-            ctx.rotate(angle);
-            if (imgJuice.naturalWidth > 0) {
-                ctx.drawImage(imgJuice, -bird.width/2, -bird.height/2, bird.width, bird.height);
-            } else {
-                ctx.fillStyle = '#C58A45';
-                ctx.beginPath();
-                ctx.arc(0, 0, bird.width/2, 0, Math.PI * 2);
-                ctx.fill();
-            }
+            ctx.shadowBlur = 24;
+            ctx.shadowColor = 'rgba(197, 138, 69, 0.55)';
+            ctx.drawImage(imgJuice, bird.x, bird.y, bird.width, bird.height);
             ctx.restore();
         }
 
         function updateParticles() {
             for (let i = birdParticles.length - 1; i >= 0; i--) {
                 let p = birdParticles[i];
-                p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life -= 0.015;
+                p.x += p.vx; p.y += p.vy; p.vy += 0.18; p.vx *= 0.99;
+                p.life -= (p.decay || 0.015);
                 if (p.life <= 0) { birdParticles.splice(i, 1); continue; }
-                ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
                 ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
             }
-            
+
             for (let i = pipePieces.length - 1; i >= 0; i--) {
                 let p = pipePieces[i];
                 p.x += p.vx; p.y += p.vy; p.vy += 0.5; p.rot += p.vr; p.life -= 0.02;
@@ -589,18 +750,18 @@
                 s.y += s.vy;
                 s.size += 0.4;
                 s.life -= 0.012;
-                
+
                 if (s.life <= 0) {
                     smokeParticles.splice(i, 1);
                     continue;
                 }
-                
+
                 ctx.fillStyle = `rgba(167, 170, 168, ${s.life * 0.5})`;
                 ctx.beginPath();
                 ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
                 ctx.fill();
             }
-            
+
             ctx.globalAlpha = 1;
         }
 
@@ -610,13 +771,13 @@
                 let maxHeight = canvas.height - PIPE_GAP - 50;
                 if (maxHeight < minHeight) maxHeight = minHeight + 50;
                 let topHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
-                
+
                 let topImgIndex = Math.floor(Math.random() * podImages.length);
                 let bottomImgIndex = Math.floor(Math.random() * podImages.length);
-                
-                pipes.push({ 
-                    x: canvas.width, 
-                    topHeight: topHeight, 
+
+                pipes.push({
+                    x: canvas.width,
+                    topHeight: topHeight,
                     passed: false,
                     imgTop: podImages[topImgIndex],
                     imgBottom: podImages[bottomImgIndex]
@@ -627,7 +788,11 @@
                 let p = pipes[i];
                 p.x -= PIPE_SPEED;
                 if (!p.passed && bird.x > p.x + PIPE_WIDTH) {
-                    p.passed = true; score++; scoreDisplay.textContent = score; checkMilestones();
+                    p.passed = true; score++; scoreDisplay.textContent = score;
+                    scoreDisplay.classList.remove('bump');
+                    void scoreDisplay.offsetWidth;
+                    scoreDisplay.classList.add('bump');
+                    checkMilestones();
                 }
                 if (p.x + PIPE_WIDTH < 0) pipes.splice(i, 1);
             }
@@ -635,7 +800,7 @@
 
         function checkCollisions() {
             let hit = false;
-            
+
             if (bird.y + bird.height >= canvas.height || bird.y <= 0) {
                 hit = true;
             }
@@ -650,11 +815,18 @@
             if (hit && gameState === 'play') {
                 gameState = 'exploding';
                 explodingTimer = 40;
-                
-                for (let i = 0; i < 30; i++) {
+
+                // Тряска + тёплая вспышка
+                shake = 16;
+                deathFlash = 1;
+
+                const cx = bird.x + bird.width/2;
+                const cy = bird.y + bird.height/2;
+
+                // Осколки подиков
+                for (let i = 0; i < 26; i++) {
                     pipePieces.push({
-                        x: bird.x + bird.width/2,
-                        y: bird.y + bird.height/2,
+                        x: cx, y: cy,
                         w: Math.random() * 20 + 10,
                         h: Math.random() * 20 + 10,
                         vx: (Math.random() - 0.5) * 15,
@@ -665,11 +837,25 @@
                         life: 1
                     });
                 }
-                
-                for (let i = 0; i < 30; i++) {
+
+                // Искры: янтарь + холодный голубой
+                const sparkColors = ['#E8C79B', '#D9A05B', '#C58A45', '#8295A0', '#F7F1E6'];
+                for (let i = 0; i < 46; i++) {
+                    const a = Math.random() * Math.PI * 2;
+                    const v = 2 + Math.random() * 9;
+                    birdParticles.push({
+                        x: cx, y: cy,
+                        vx: Math.cos(a) * v, vy: Math.sin(a) * v - 2,
+                        life: 1, decay: 0.02 + Math.random() * 0.02,
+                        color: sparkColors[Math.floor(Math.random() * sparkColors.length)],
+                        size: Math.random() * 4 + 1.5
+                    });
+                }
+
+                // Дым от взрыва
+                for (let i = 0; i < 24; i++) {
                     smokeParticles.push({
-                        x: bird.x + bird.width/2,
-                        y: bird.y + bird.height/2,
+                        x: cx, y: cy,
                         vx: (Math.random() - 0.5) * 5,
                         vy: -Math.random() * 5 - 1,
                         size: Math.random() * 15 + 10,
@@ -686,10 +872,10 @@
                 localStorage.setItem('flappySlushHighScore', highScore);
                 isNewRecord = true;
             }
-            
+
             finalScore.textContent = score;
             highScoreEl.textContent = highScore;
-            
+
             if (isNewRecord) newRecordBadge.classList.add('show');
             else newRecordBadge.classList.remove('show');
 
@@ -711,14 +897,43 @@
                     gameState = 'gameover';
                     gameOver();
                 }
+            } else {
+                // В меню «птица» мягко покачивается за стеклом
+                bird.y = 150 + Math.sin(frames * 0.05) * 7;
+                bird.velocity = 0;
+                frames++;
             }
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            // Тряска экрана после столкновения
+            if (shake > 0.5) {
+                ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+                shake *= 0.86;
+            } else { shake = 0; }
+
             drawBackground();
             drawPipes();
-            drawBird();
+            if (gameState === 'play' || gameState === 'start') drawBird();
             updateParticles();
-            
+
+            // Тёплая вспышка на рубежах
+            if (milestoneFlash > 0.02) {
+                ctx.fillStyle = `rgba(232, 199, 155, ${milestoneFlash * 0.28})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                milestoneFlash *= 0.9;
+            } else { milestoneFlash = 0; }
+
+            // Красная вспышка при столкновении
+            if (deathFlash > 0.02) {
+                ctx.fillStyle = `rgba(214, 84, 48, ${deathFlash * 0.32})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                deathFlash *= 0.88;
+            } else { deathFlash = 0; }
+
+            ctx.restore();
+
             requestAnimationFrame(loop);
         }
     </script>
