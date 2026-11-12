@@ -46,19 +46,18 @@
         font-size: clamp(12px, 3.2vw, 13px);
     }
 
-    /* Hero: фиксируем минимальную высоту, чтобы при коротком контенте
-       картинка не поднималась под текст и кнопку.
-       На мобильных показывается вертикальная версия баннера
-       (assets/hero-mobile.jpg, задаётся в base.css) — смотрим её сверху */
+    /* Hero: фиксируем высоту, чтобы вертикальная картинка
+       (assets/hero-mobile.jpg) показывалась крупно; центр кадра
+       — самый выигрышный, поэтому center center */
     .hero__box {
-        min-height: 400px;
+        min-height: 480px;
         background-size: cover;
-        background-position: center top;
+        background-position: center center;
     }
 }
 
 @media (max-width: 480px) {
-    .hero__box { min-height: 360px; }
+    .hero__box { min-height: 440px; }
 
     .age-gate-modal__content,
     .login-modal__content,

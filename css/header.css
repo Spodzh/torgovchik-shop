@@ -130,35 +130,62 @@
     width: 26px;
     height: 2px;
     background: var(--text-primary);
-    transition: 0.3s;
+    transition:
+        transform 0.4s var(--ease-smooth),
+        opacity 0.25s ease,
+        background 0.3s ease,
+        box-shadow 0.3s ease;
     border-radius: 2px;
     display: block;
 }
 
-.burger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
-.burger.active span:nth-child(2) { opacity: 0; }
-.burger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+/* Превращение в крестик: крайние полоски съезжаются к центру
+   (расстояние между их осями = 2px высота + 5px gap = 7px)
+   и поворачиваются на ±45°, средняя схлопывается */
+.burger.active span { background: var(--accent); box-shadow: 0 0 10px rgba(197, 138, 69, 0.55); }
+.burger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.burger.active span:nth-child(2) { opacity: 0; transform: scaleX(0.2); }
+.burger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-/* ===== МОБИЛЬНОЕ МЕНЮ ===== */
+/* ===== МОБИЛЬНОЕ МЕНЮ (GLASS NOIR) ===== */
 .mobile-menu {
     display: none;
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 8px);
     left: 0;
     width: 100%;
-    background: rgba(23, 25, 27, 0.92);
+    background: linear-gradient(180deg, rgba(30, 33, 38, 0.9) 0%, rgba(23, 25, 27, 0.94) 100%);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     padding: 20px 24px;
-    border-bottom: 1px solid var(--border-medium);
+    border: 1px solid rgba(197, 138, 69, 0.18);
+    border-top: 1px solid rgba(197, 138, 69, 0.35);
     z-index: var(--z-mobile-menu);
-    border-radius: 0 0 16px 16px;
+    border-radius: 0 0 20px 20px;
     box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
         inset 0 0 28px rgba(130, 149, 160, 0.05),
-        0 16px 40px rgba(0, 0, 0, 0.6);
+        0 24px 48px rgba(0, 0, 0, 0.55),
+        0 0 40px rgba(197, 138, 69, 0.08);
 }
 
-.mobile-menu.open { display: block; }
+/* Плавное появление сверху вниз */
+.mobile-menu.open {
+    display: block;
+    animation: menuDrop 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes menuDrop {
+    from { opacity: 0; transform: translateY(-16px) scale(0.99); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Уважаем настройку «меньше движения» */
+@media (prefers-reduced-motion: reduce) {
+    .mobile-menu.open { animation: none; }
+    .burger span { transition: none; }
+}
+
 .mobile-nav { display: flex; flex-direction: column; gap: 12px; }
 
 .category-btn-mobile {
@@ -167,12 +194,27 @@
     color: var(--text-primary);
     font-size: 18px;
     font-weight: 600;
-    padding: 14px 0;
+    padding: 14px 0 14px 16px;
     border-bottom: 1px solid var(--border-soft);
     cursor: pointer;
     text-align: left;
     font-family: 'Manrope', sans-serif;
     transition: color 0.2s;
+    position: relative;
+}
+
+/* Янтарная метка у активного пункта */
+.category-btn-mobile.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 55%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    border-radius: 2px;
 }
 
 .category-btn-mobile.active { color: var(--accent); }
@@ -326,7 +368,14 @@ html[data-user-state="user-ready"] .header__user { visibility: visible; }
 /* ===== АДАПТИВ ===== */
 @media (max-width: 768px) {
     .nav--desktop { display: none; }
-    .burger { display: flex; }
+    .burger { display: flex; margin-left: auto; }
+
+    /* Все элементы (лого, бургер, профиль, избранное, корзина) — строго в один ряд */
+    .header__inner { flex-wrap: nowrap; gap: 6px; }
+    .cart-btn, .favorites-btn { padding: 8px 10px; gap: 6px; font-size: 13px; }
+
+    /* Гостю оставляем только иконку — текст «Войти» прячем, чтобы влезло */
+    html[data-user-state="guest"] .user-btn > span { display: none; }
 }
 
 @media (max-width: 600px) {
@@ -341,6 +390,17 @@ html[data-user-state="user-ready"] .header__user { visibility: visible; }
 
 @media (max-width: 375px) {
     .logo__image { height: 34px; }
+    .header__inner { gap: 4px; }
     .cart-btn, .favorites-btn { padding: 6px 10px; min-height: 44px; gap: 4px; }
     .cart-badge, .favorites-badge { font-size: 11px; line-height: 18px; padding: 0 6px; min-width: 18px; }
+    .burger { padding: 8px; margin: -8px -4px -8px -8px; }
+}
+
+/* Самые узкие экраны (320-360px): последний рубеж компактности */
+@media (max-width: 360px) {
+    .logo__image { height: 28px; }
+    .cart-btn, .favorites-btn { padding: 6px 8px; }
+    .cart-badge, .favorites-badge { font-size: 10px; line-height: 16px; padding: 0 5px; min-width: 16px; }
+    .user-btn { padding: 5px 6px; min-width: 38px; }
+    .user-btn__avatar { width: 22px; height: 22px; }
 }

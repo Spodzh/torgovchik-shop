@@ -607,13 +607,14 @@ input, textarea, select {
     .hero { padding: 10px 0 20px; }
 
     .hero__box {
-        min-height: auto;
-        padding: 20px 16px 110px;
+        min-height: 480px;
+        /* Вертикальный баннер 941x1672: центр кадра — самый выигрышный,
+           показываем именно его (полная высота картинки ~600px) */
+        padding: 40px 16px;
         display: block;
-        /* Вертикальная версия баннера для мобильных */
         background-image: url('../assets/hero-mobile.jpg');
         background-size: cover;
-        background-position: center top;
+        background-position: center center;
         background-repeat: no-repeat;
         border-radius: 20px;
     }
@@ -621,10 +622,11 @@ input, textarea, select {
     .hero__box::before {
         background: linear-gradient(
             180deg,
-            rgba(23, 25, 27, 0.96) 0%,
-            rgba(23, 25, 27, 0.9) 40%,
-            rgba(23, 25, 27, 0.55) 70%,
-            rgba(23, 25, 27, 0.2) 100%
+            rgba(23, 25, 27, 0.95) 0%,
+            rgba(23, 25, 27, 0.82) 30%,
+            rgba(23, 25, 27, 0.4) 55%,
+            rgba(23, 25, 27, 0.3) 75%,
+            rgba(23, 25, 27, 0.88) 100%
         );
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
@@ -660,7 +662,7 @@ input, textarea, select {
 }
 
 @media (max-width: 480px) {
-    .hero__box { padding: 20px 12px 105px; }
+    .hero__box { min-height: 440px; padding: 32px 12px; }
     .hero__content h1 { font-size: 20px; }
     .hero__content p { font-size: 12px; margin-bottom: 14px; }
     .hero__btn { padding: 11px 20px; font-size: 12px; }
