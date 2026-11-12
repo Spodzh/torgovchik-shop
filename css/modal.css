@@ -367,6 +367,56 @@
         linear-gradient(150deg, #1E2126 0%, #14171A 100%);
 }
 
+/* 5. Liquid Gold: жидкое золото с переливающимися бликами и «струями» */
+.profile-banner.banner-skin-gold,
+.banner-item.banner-skin-gold {
+    background:
+        var(--noise-tex),
+        radial-gradient(ellipse 40% 55% at 22% 30%, rgba(255, 226, 171, 0.38), transparent 65%),
+        radial-gradient(ellipse 50% 70% at 72% 65%, rgba(240, 190, 110, 0.3), transparent 60%),
+        radial-gradient(ellipse 60% 90% at 95% 0%, rgba(197, 138, 69, 0.45), transparent 62%),
+        radial-gradient(ellipse 45% 60% at 5% 100%, rgba(150, 100, 40, 0.35), transparent 65%),
+        repeating-linear-gradient(95deg, rgba(255, 215, 150, 0.05) 0px, transparent 6px, transparent 18px, rgba(255, 215, 150, 0.05) 24px),
+        linear-gradient(105deg, #2A1E0C 0%, #3A2A10 30%, #241A0C 60%, #1C150C 100%);
+}
+
+/* 6. Smoke: тёмно-серый с плавными клубами дыма из мягких радиальных пятен */
+.profile-banner.banner-skin-smoke,
+.banner-item.banner-skin-smoke {
+    background:
+        var(--noise-tex),
+        radial-gradient(ellipse 55% 70% at 30% 40%, rgba(190, 200, 210, 0.14), transparent 70%),
+        radial-gradient(ellipse 65% 80% at 75% 25%, rgba(160, 170, 185, 0.11), transparent 72%),
+        radial-gradient(ellipse 70% 60% at 55% 90%, rgba(120, 130, 145, 0.13), transparent 70%),
+        radial-gradient(ellipse 35% 45% at 88% 80%, rgba(220, 228, 235, 0.08), transparent 70%),
+        radial-gradient(ellipse 30% 40% at 12% 15%, rgba(140, 150, 165, 0.1), transparent 72%),
+        linear-gradient(160deg, #23262B 0%, #191C20 60%, #141619 100%);
+}
+
+/* 7. Aurora: изумрудно-фиолетовое северное сияние с косыми «лучами» */
+.profile-banner.banner-skin-aurora,
+.banner-item.banner-skin-aurora {
+    background:
+        var(--noise-tex),
+        radial-gradient(ellipse 50% 110% at 20% 0%, rgba(46, 204, 150, 0.28), transparent 62%),
+        radial-gradient(ellipse 60% 100% at 75% 15%, rgba(138, 84, 220, 0.26), transparent 65%),
+        radial-gradient(ellipse 45% 80% at 55% 110%, rgba(30, 160, 120, 0.2), transparent 65%),
+        repeating-linear-gradient(115deg, rgba(120, 255, 190, 0.05) 0px, rgba(120, 255, 190, 0.05) 2px, transparent 2px, transparent 26px),
+        linear-gradient(140deg, #0B1512 0%, #10121E 55%, #0E0C16 100%);
+}
+
+/* 8. Frost Leaf: ледяная шапка с узором «жилок листа» из скрещенных линий */
+.profile-banner.banner-skin-leaf,
+.banner-item.banner-skin-leaf {
+    background:
+        var(--noise-tex),
+        radial-gradient(ellipse 55% 100% at 15% 0%, rgba(170, 200, 215, 0.3), transparent 62%),
+        radial-gradient(ellipse 50% 70% at 85% 100%, rgba(120, 165, 185, 0.22), transparent 65%),
+        repeating-linear-gradient(60deg, rgba(200, 230, 240, 0.055) 0px, rgba(200, 230, 240, 0.055) 1px, transparent 1px, transparent 16px),
+        repeating-linear-gradient(-60deg, rgba(200, 230, 240, 0.045) 0px, rgba(200, 230, 240, 0.045) 1px, transparent 1px, transparent 16px),
+        linear-gradient(125deg, #0E1A1E 0%, #121E26 55%, #10151B 100%);
+}
+
 .avatar-modal__buttons, .banner-modal__buttons { display: flex; gap: 12px; }
 .avatar-modal__buttons .btn, .banner-modal__buttons .btn { flex: 1; padding: 14px; font-size: 14px; }
 

@@ -47,12 +47,13 @@
     }
 
     /* Hero: фиксируем минимальную высоту, чтобы при коротком контенте
-       полоса картинки (background-position: bottom) не поднималась
-       под текст и кнопку */
+       картинка не поднималась под текст и кнопку.
+       На мобильных показывается вертикальная версия баннера
+       (assets/hero-mobile.jpg, задаётся в base.css) — смотрим её сверху */
     .hero__box {
         min-height: 400px;
         background-size: cover;
-        background-position: center bottom;
+        background-position: center top;
     }
 }
 

@@ -610,18 +610,21 @@ input, textarea, select {
         min-height: auto;
         padding: 20px 16px 110px;
         display: block;
-        background-position: center bottom;
+        /* Вертикальная версия баннера для мобильных */
+        background-image: url('../assets/hero-mobile.jpg');
         background-size: cover;
+        background-position: center top;
+        background-repeat: no-repeat;
         border-radius: 20px;
     }
 
     .hero__box::before {
         background: linear-gradient(
             180deg,
-            rgba(23, 25, 27, 0.95) 0%,
-            rgba(23, 25, 27, 0.88) 35%,
-            rgba(23, 25, 27, 0.45) 65%,
-            rgba(23, 25, 27, 0.1) 100%
+            rgba(23, 25, 27, 0.96) 0%,
+            rgba(23, 25, 27, 0.9) 40%,
+            rgba(23, 25, 27, 0.55) 70%,
+            rgba(23, 25, 27, 0.2) 100%
         );
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
