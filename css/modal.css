@@ -1,4 +1,4 @@
-/* ===== МОДАЛЬНЫЕ ОКНА / NOVEMBER / FIRST FROST ===== */
+﻿/* ===== РњРћР”РђР›Р¬РќР«Р• РћРљРќРђ / NOVEMBER / FIRST FROST ===== */
 .age-gate-modal,
 .login-modal,
 .profile-modal,
@@ -38,7 +38,7 @@
     opacity: 1;
 }
 
-/* Общие стили для контента */
+/* РћР±С‰РёРµ СЃС‚РёР»Рё РґР»СЏ РєРѕРЅС‚РµРЅС‚Р° */
 .age-gate-modal__content,
 .login-modal__content,
 .profile-modal__content,
@@ -74,7 +74,7 @@
     transform: translateY(0);
 }
 
-/* Закрывающие кнопки */
+/* Р—Р°РєСЂС‹РІР°СЋС‰РёРµ РєРЅРѕРїРєРё */
 .login-modal__close,
 .profile-modal__close,
 .avatar-modal__close,
@@ -100,18 +100,18 @@
     z-index: 10;
 }
 
-/* В длинных (скроллящихся) модалках крестик прилипает к верху окна */
+/* Р’ РґР»РёРЅРЅС‹С… (СЃРєСЂРѕР»Р»СЏС‰РёС…СЃСЏ) РјРѕРґР°Р»РєР°С… РєСЂРµСЃС‚РёРє РїСЂРёР»РёРїР°РµС‚ Рє РІРµСЂС…Сѓ РѕРєРЅР° */
 .order-modal__close,
 .favorites-modal__close {
     position: sticky;
     float: right;
     top: 0;
-    /* компенсация: кнопка встаёт туда же, где была absolute (в зону padding 32px) */
+    /* РєРѕРјРїРµРЅСЃР°С†РёСЏ: РєРЅРѕРїРєР° РІСЃС‚Р°С‘С‚ С‚СѓРґР° Р¶Рµ, РіРґРµ Р±С‹Р»Р° absolute (РІ Р·РѕРЅСѓ padding 32px) */
     margin: -20px -20px 8px 20px;
 }
 
-/* Мелкие интерактивные элементы: визуальный размер сохраняем,
-   зону нажатия расширяем прозрачной обводкой до ~44px */
+/* РњРµР»РєРёРµ РёРЅС‚РµСЂР°РєС‚РёРІРЅС‹Рµ СЌР»РµРјРµРЅС‚С‹: РІРёР·СѓР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ СЃРѕС…СЂР°РЅСЏРµРј,
+   Р·РѕРЅСѓ РЅР°Р¶Р°С‚РёСЏ СЂР°СЃС€РёСЂСЏРµРј РїСЂРѕР·СЂР°С‡РЅРѕР№ РѕР±РІРѕРґРєРѕР№ РґРѕ ~44px */
 .toast__close,
 .favorites-card__fav,
 .auth-field__eye,
@@ -142,15 +142,15 @@
 .age-gate-modal__btn--yes { background: var(--grad-accent); color: #17191B; box-shadow: var(--shadow-warm); }
 .age-gate-modal__btn--no { background: transparent; border: 1px solid var(--border-medium); color: var(--text-secondary); }
 .age-gate-modal__deny { display: none; text-align: center; }
-/* JS добавляет 'show' на __deny при клике «Мне меньше 18» (script.js / product.js) */
+/* JS РґРѕР±Р°РІР»СЏРµС‚ 'show' РЅР° __deny РїСЂРё РєР»РёРєРµ В«РњРЅРµ РјРµРЅСЊС€Рµ 18В» (script.js / product.js) */
 .age-gate-modal__deny.show,
 .age-gate-modal__deny.open { display: block; }
 .age-gate-modal__deny-icon { font-size: 48px; display: block; margin-bottom: 16px; }
 .age-gate-modal__deny-title { font-family: 'Bitter', serif; font-size: 24px; color: #e74c3c; margin-bottom: 12px; }
 .age-gate-modal__deny-text { font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
 
-/* ===== АВТОРИЗАЦИЯ ===== */
-/* overflow-x обрезает декоративный лист, overflow-y даёт скролл при выросшем контенте */
+/* ===== РђР’РўРћР РР—РђР¦РРЇ ===== */
+/* overflow-x РѕР±СЂРµР·Р°РµС‚ РґРµРєРѕСЂР°С‚РёРІРЅС‹Р№ Р»РёСЃС‚, overflow-y РґР°С‘С‚ СЃРєСЂРѕР»Р» РїСЂРё РІС‹СЂРѕСЃС€РµРј РєРѕРЅС‚РµРЅС‚Рµ */
 .login-modal__content { max-width: 400px; overflow-y: auto; overflow-x: hidden; }
 .login-modal__leaf { position: absolute; top: -10px; right: -10px; font-size: 100px; opacity: 0.05; pointer-events: none; transform: rotate(15deg); }
 .login-modal__brand { font-family: 'Bitter', serif; font-size: 14px; font-weight: 800; color: var(--accent); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 8px; }
@@ -170,10 +170,10 @@
 .auth-forgot a:hover { color: var(--accent); }
 .auth-submit { width: 100%; padding: 16px; font-size: 15px; display: flex; justify-content: center; align-items: center; gap: 8px; }
 
-/* ===== ПРОФИЛЬ (Glassmorphism / NOVEMBER) ===== */
+/* ===== РџР РћР¤РР›Р¬ (Glassmorphism / NOVEMBER) ===== */
 .profile-modal__content { max-width: 600px; padding: 0; border-radius: 24px; }
 
-/* Стекло: полупрозрачный фон + размытие; без поддержки — плотный фолбэк из общих правил выше */
+/* РЎС‚РµРєР»Рѕ: РїРѕР»СѓРїСЂРѕР·СЂР°С‡РЅС‹Р№ С„РѕРЅ + СЂР°Р·РјС‹С‚РёРµ; Р±РµР· РїРѕРґРґРµСЂР¶РєРё вЂ” РїР»РѕС‚РЅС‹Р№ С„РѕР»Р±СЌРє РёР· РѕР±С‰РёС… РїСЂР°РІРёР» РІС‹С€Рµ */
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .profile-modal__content {
         background: rgba(30, 33, 36, 0.72);
@@ -204,7 +204,7 @@
 .avatar-edit-btn { bottom: 0; right: 0; width: 24px; height: 24px; }
 .banner-edit-btn { top: 12px; right: 12px; width: 28px; height: 28px; z-index: 3; }
 
-/* Статистика: стеклянные чипы (маленькие, blur не нужен — фон окна уже стекло) */
+/* РЎС‚Р°С‚РёСЃС‚РёРєР°: СЃС‚РµРєР»СЏРЅРЅС‹Рµ С‡РёРїС‹ (РјР°Р»РµРЅСЊРєРёРµ, blur РЅРµ РЅСѓР¶РµРЅ вЂ” С„РѕРЅ РѕРєРЅР° СѓР¶Рµ СЃС‚РµРєР»Рѕ) */
 .profile-stats-panel { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 0 24px; margin-bottom: 24px; }
 .profile-stats-block { text-align: center; flex: 1; background: rgba(255, 255, 255, 0.04); padding: 18px 16px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); transition: border-color 0.3s var(--ease-smooth), background 0.3s var(--ease-smooth); }
 .profile-stats-block__icon { color: var(--cold-blue); margin-bottom: 8px; display: flex; justify-content: center; filter: drop-shadow(0 0 8px rgba(130, 149, 160, 0.3)); }
@@ -231,7 +231,7 @@
 .btn-logout { width: calc(100% - 48px); margin: 0 24px 24px; padding: 14px; background: transparent; border: 1px solid rgba(231, 76, 60, 0.3); color: #e74c3c; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .btn-logout:hover { background: rgba(231, 76, 60, 0.1); border-color: #e74c3c; }
 
-/* ===== АВАТАРКИ / ШАПКИ ===== */
+/* ===== РђР’РђРўРђР РљР / РЁРђРџРљР ===== */
 .avatar-modal__content, .banner-modal__content { max-width: 500px; text-align: center; border-radius: 24px; }
 
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -252,7 +252,7 @@
 .avatar-modal__hint, .banner-modal__hint { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; }
 .avatar-grid, .banner-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 12px; margin-bottom: 24px; }
 
-/* Аватарки - КРУГЛЫЕ */
+/* РђРІР°С‚Р°СЂРєРё - РљР РЈР“Р›Р«Р• */
 .avatar-item {
     background: var(--bg-main);
     border: 2px solid transparent;
@@ -270,7 +270,7 @@
 .avatar-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 .avatar-item.active { border-color: var(--accent); background: rgba(197, 138, 69, 0.1); box-shadow: 0 0 15px rgba(197, 138, 69, 0.3); }
 
-/* Шапки - ПРЯМОУГОЛЬНЫЕ */
+/* РЁР°РїРєРё - РџР РЇРњРћРЈР“РћР›Р¬РќР«Р• */
 .banner-item {
     border: 2px solid rgba(255, 255, 255, 0.06);
     border-radius: 12px;
@@ -304,16 +304,16 @@
     box-shadow: 0 0 20px rgba(197, 138, 69, 0.35), inset 0 0 0 1px rgba(197, 138, 69, 0.4);
 }
 
-/* ===== CSS-ШАПКИ ПРОФИЛЯ (без картинок) =====
-   Каждая шапка — только градиенты и свечения. Верхний слой — зерно
-   (inline SVG feTurbulence, ничего не скачивается), чтобы градиенты
-   не выглядели «пластиково». Классы вешает script.js на шапку
-   профиля (#profileHeader) и на превью в сетке выбора (.banner-item). */
+/* ===== CSS-РЁРђРџРљР РџР РћР¤РР›РЇ (Р±РµР· РєР°СЂС‚РёРЅРѕРє) =====
+   РљР°Р¶РґР°СЏ С€Р°РїРєР° вЂ” С‚РѕР»СЊРєРѕ РіСЂР°РґРёРµРЅС‚С‹ Рё СЃРІРµС‡РµРЅРёСЏ. Р’РµСЂС…РЅРёР№ СЃР»РѕР№ вЂ” Р·РµСЂРЅРѕ
+   (inline SVG feTurbulence, РЅРёС‡РµРіРѕ РЅРµ СЃРєР°С‡РёРІР°РµС‚СЃСЏ), С‡С‚РѕР±С‹ РіСЂР°РґРёРµРЅС‚С‹
+   РЅРµ РІС‹РіР»СЏРґРµР»Рё В«РїР»Р°СЃС‚РёРєРѕРІРѕВ». РљР»Р°СЃСЃС‹ РІРµС€Р°РµС‚ script.js РЅР° С€Р°РїРєСѓ
+   РїСЂРѕС„РёР»СЏ (#profileHeader) Рё РЅР° РїСЂРµРІСЊСЋ РІ СЃРµС‚РєРµ РІС‹Р±РѕСЂР° (.banner-item). */
 :root {
     --noise-tex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
 }
 
-/* Дефолт (шапка не выбрана): сдержанное тёплое дыхание на тёмном */
+/* Р”РµС„РѕР»С‚ (С€Р°РїРєР° РЅРµ РІС‹Р±СЂР°РЅР°): СЃРґРµСЂР¶Р°РЅРЅРѕРµ С‚С‘РїР»РѕРµ РґС‹С…Р°РЅРёРµ РЅР° С‚С‘РјРЅРѕРј */
 .profile-banner {
     background:
         var(--noise-tex),
@@ -322,7 +322,7 @@
         linear-gradient(120deg, #1D2024 0%, #17191B 100%);
 }
 
-/* 1. Amber Glow: тёплое янтарное свечение из правого верхнего угла */
+/* 1. Amber Glow: С‚С‘РїР»РѕРµ СЏРЅС‚Р°СЂРЅРѕРµ СЃРІРµС‡РµРЅРёРµ РёР· РїСЂР°РІРѕРіРѕ РІРµСЂС…РЅРµРіРѕ СѓРіР»Р° */
 .profile-banner.banner-skin-amber,
 .banner-item.banner-skin-amber {
     background:
@@ -333,7 +333,7 @@
         linear-gradient(115deg, #251A0E 0%, #1B1712 55%, #17191B 100%);
 }
 
-/* 2. Frost Blue: холодный ледяной градиент с голубым свечением сверху слева */
+/* 2. Frost Blue: С…РѕР»РѕРґРЅС‹Р№ Р»РµРґСЏРЅРѕР№ РіСЂР°РґРёРµРЅС‚ СЃ РіРѕР»СѓР±С‹Рј СЃРІРµС‡РµРЅРёРµРј СЃРІРµСЂС…Сѓ СЃР»РµРІР° */
 .profile-banner.banner-skin-frost,
 .banner-item.banner-skin-frost {
     background:
@@ -344,7 +344,7 @@
         linear-gradient(120deg, #0F1620 0%, #142230 55%, #17191B 100%);
 }
 
-/* 3. Deep Noir: глубокий чёрный с едва заметным бордовым отсветом */
+/* 3. Deep Noir: РіР»СѓР±РѕРєРёР№ С‡С‘СЂРЅС‹Р№ СЃ РµРґРІР° Р·Р°РјРµС‚РЅС‹Рј Р±РѕСЂРґРѕРІС‹Рј РѕС‚СЃРІРµС‚РѕРј */
 .profile-banner.banner-skin-noir,
 .banner-item.banner-skin-noir {
     background:
@@ -355,7 +355,7 @@
         linear-gradient(160deg, #0D0E11 0%, #120C10 55%, #17191B 100%);
 }
 
-/* 4. Geometry: абстрактная сетка из тонких диагональных линий + янтарное и холодное свечение */
+/* 4. Geometry: Р°Р±СЃС‚СЂР°РєС‚РЅР°СЏ СЃРµС‚РєР° РёР· С‚РѕРЅРєРёС… РґРёР°РіРѕРЅР°Р»СЊРЅС‹С… Р»РёРЅРёР№ + СЏРЅС‚Р°СЂРЅРѕРµ Рё С…РѕР»РѕРґРЅРѕРµ СЃРІРµС‡РµРЅРёРµ */
 .profile-banner.banner-skin-geo,
 .banner-item.banner-skin-geo {
     background:
@@ -367,7 +367,7 @@
         linear-gradient(150deg, #1E2126 0%, #14171A 100%);
 }
 
-/* 5. Liquid Gold: жидкое золото с переливающимися бликами и «струями» */
+/* 5. Liquid Gold: Р¶РёРґРєРѕРµ Р·РѕР»РѕС‚Рѕ СЃ РїРµСЂРµР»РёРІР°СЋС‰РёРјРёСЃСЏ Р±Р»РёРєР°РјРё Рё В«СЃС‚СЂСѓСЏРјРёВ» */
 .profile-banner.banner-skin-gold,
 .banner-item.banner-skin-gold {
     background:
@@ -380,7 +380,7 @@
         linear-gradient(105deg, #2A1E0C 0%, #3A2A10 30%, #241A0C 60%, #1C150C 100%);
 }
 
-/* 6. Smoke: тёмно-серый с плавными клубами дыма из мягких радиальных пятен */
+/* 6. Smoke: С‚С‘РјРЅРѕ-СЃРµСЂС‹Р№ СЃ РїР»Р°РІРЅС‹РјРё РєР»СѓР±Р°РјРё РґС‹РјР° РёР· РјСЏРіРєРёС… СЂР°РґРёР°Р»СЊРЅС‹С… РїСЏС‚РµРЅ */
 .profile-banner.banner-skin-smoke,
 .banner-item.banner-skin-smoke {
     background:
@@ -393,7 +393,7 @@
         linear-gradient(160deg, #23262B 0%, #191C20 60%, #141619 100%);
 }
 
-/* 7. Aurora: изумрудно-фиолетовое северное сияние с косыми «лучами» */
+/* 7. Aurora: РёР·СѓРјСЂСѓРґРЅРѕ-С„РёРѕР»РµС‚РѕРІРѕРµ СЃРµРІРµСЂРЅРѕРµ СЃРёСЏРЅРёРµ СЃ РєРѕСЃС‹РјРё В«Р»СѓС‡Р°РјРёВ» */
 .profile-banner.banner-skin-aurora,
 .banner-item.banner-skin-aurora {
     background:
@@ -405,7 +405,7 @@
         linear-gradient(140deg, #0B1512 0%, #10121E 55%, #0E0C16 100%);
 }
 
-/* 8. Frost Leaf: ледяная шапка с узором «жилок листа» из скрещенных линий */
+/* 8. Frost Leaf: Р»РµРґСЏРЅР°СЏ С€Р°РїРєР° СЃ СѓР·РѕСЂРѕРј В«Р¶РёР»РѕРє Р»РёСЃС‚Р°В» РёР· СЃРєСЂРµС‰РµРЅРЅС‹С… Р»РёРЅРёР№ */
 .profile-banner.banner-skin-leaf,
 .banner-item.banner-skin-leaf {
     background:
@@ -420,7 +420,7 @@
 .avatar-modal__buttons, .banner-modal__buttons { display: flex; gap: 12px; }
 .avatar-modal__buttons .btn, .banner-modal__buttons .btn { flex: 1; padding: 14px; font-size: 14px; }
 
-/* ===== ОФОРМЛЕНИЕ ЗАКАЗА ===== */
+/* ===== РћР¤РћР РњР›Р•РќРР• Р—РђРљРђР—Рђ ===== */
 .order-modal__content { max-width: 500px; }
 .order-modal__content h2 { font-family: 'Bitter', serif; font-size: 24px; margin-bottom: 24px; text-align: center; }
 .form-group { margin-bottom: 16px; }
@@ -430,7 +430,7 @@
 .form-hint { display: block; font-size: 12px; color: var(--text-muted); margin-top: 6px; }
 .order-modal__content .btn[type="submit"] { width: 100%; padding: 16px; font-size: 16px; margin-top: 10px; }
 
-/* ===== ПОДТВЕРЖДЕНИЕ ===== */
+/* ===== РџРћР”РўР’Р•Р Р–Р”Р•РќРР• ===== */
 .confirm-modal__content { max-width: 380px; text-align: center; }
 .confirm-modal__icon { font-size: 40px; margin-bottom: 16px; }
 .confirm-modal__title { font-family: 'Bitter', serif; font-size: 22px; margin-bottom: 12px; }
@@ -440,7 +440,7 @@
 .confirm-modal__btn--cancel { background: var(--bg-card); color: var(--text-primary); }
 .confirm-modal__btn--danger { background: #e74c3c; color: #fff; }
 
-/* ===== ОБЪЯВЛЕНИЕ ===== */
+/* ===== РћР‘РЄРЇР’Р›Р•РќРР• ===== */
 .announcement-modal__content { max-width: 440px; text-align: center; padding: 0; overflow: hidden; }
 .announcement-modal__badge { display: inline-flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; color: var(--cold-blue); text-transform: uppercase; letter-spacing: 1px; margin: 24px 0 16px; }
 .announcement-modal__badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cold-blue); box-shadow: 0 0 8px var(--cold-blue); }
@@ -450,7 +450,7 @@
 .announcement-modal__text { font-size: 15px; color: var(--text-secondary); padding: 0 24px; margin-bottom: 24px; line-height: 1.6; }
 .announcement-modal__ok { width: calc(100% - 48px); margin: 0 24px 24px; padding: 14px; font-size: 15px; }
 
-/* ===== ИЗБРАННОЕ ===== */
+/* ===== РР—Р‘Р РђРќРќРћР• ===== */
 .favorites-modal__content { max-width: 800px; }
 .favorites-modal__content h2 { font-family: 'Bitter', serif; font-size: 24px; margin-bottom: 24px; text-align: center; }
 .favorites-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
@@ -512,9 +512,9 @@
 
 .favorites-empty { text-align: center; color: var(--text-secondary); padding: 40px 0; grid-column: 1 / -1; }
 
-/* ===== ХОВЕРЫ ===== */
+/* ===== РҐРћР’Р•Р Р« ===== */
 @media (hover: hover) and (pointer: fine) {
-    .login-modal__close:hover, .profile-modal__close:hover, .avatar-modal__close:hover, .banner-modal__close:hover, .order-modal__close:hover, .announcement-modal__close:hover, .favorites-modal__close:hover { color: var(--accent); border-color: var(--accent); background: rgba(197, 138, 69, 0.1); }
+    .login-modal__close:hover, .profile-modal__close:hover, .avatar-modal__close:hover, .banner-modal__close:hover, .order-modal__close:hover, .announcement-modal__close:hover,     .favorites-modal__close:hover { color: var(--accent); border-color: var(--accent); background: rgba(197, 138, 69, 0.1); }
     .age-gate-modal__btn--yes:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(197, 138, 69, 0.4); }
     .age-gate-modal__btn--no:hover { border-color: var(--text-primary); color: var(--text-primary); }
     .auth-tab:hover:not(.active) { color: var(--text-primary); }

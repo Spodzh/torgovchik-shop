@@ -1,4 +1,4 @@
-// =============================================
+﻿// =============================================
 // ===== КОНФИГУРАЦИЯ =====
 // =============================================
 const WORKER_URL = 'https://torgovchik-bot.ernest-chanel.workers.dev/';
@@ -1830,17 +1830,50 @@ if (secretBtn) {
 })();
 
 // =============================================
-// ===== СПOTLIGHT КАРТОЧЕК (Glass Noir) =====
+// ===== СПOTLIGHT + 3D-TILT КАРТОЧЕК (Glass Noir) =====
 // =============================================
-// Обновляет --mx/--my для подсветки, следующей за курсором.
+// Обновляет --mx/--my для подсветки, следующей за курсором,
+// и --tilt-x/--tilt-y для лёгкого 3D-наклона карточки.
 // Делегирование — работает и для динамически созданных карточек.
+// Наклон включается только для точного указателя (мышь/трекпад)
+// и отключается при prefers-reduced-motion: reduce.
+const TILT_MAX_DEG = 7;
+const tiltAllowed = window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+  !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let tiltActiveCard = null;
+
+function resetCardTilt(card) {
+  if (!card) return;
+  card.style.setProperty('--tilt-x', '0deg');
+  card.style.setProperty('--tilt-y', '0deg');
+}
+
 document.addEventListener('pointermove', function (e) {
     var card = e.target.closest ? e.target.closest('.product-card') : null;
     if (!card || card.classList.contains('product-card--skeleton')) return;
     var rect = card.getBoundingClientRect();
-    card.style.setProperty('--mx', (e.clientX - rect.left) + 'px');
-    card.style.setProperty('--my', (e.clientY - rect.top) + 'px');
+    var px = e.clientX - rect.left;
+    var py = e.clientY - rect.top;
+    card.style.setProperty('--mx', px + 'px');
+    card.style.setProperty('--my', py + 'px');
+    if (!tiltAllowed) return;
+    if (tiltActiveCard && tiltActiveCard !== card) resetCardTilt(tiltActiveCard);
+    tiltActiveCard = card;
+    // Курсор в центре → 0deg, у краёв → до ±TILT_MAX_DEG.
+    // Знаки подобраны так, что карточка наклоняется «под» курсор.
+    var nx = (px / rect.width) - 0.5;
+    var ny = (py / rect.height) - 0.5;
+    card.style.setProperty('--tilt-x', (-ny * TILT_MAX_DEG * 2).toFixed(2) + 'deg');
+    card.style.setProperty('--tilt-y', (nx * TILT_MAX_DEG * 2).toFixed(2) + 'deg');
 }, { passive: true });
+
+// Уход курсора с карточки — плавно возвращаем ровную плоскость
+document.addEventListener('pointerout', function (e) {
+    var card = e.target.closest ? e.target.closest('.product-card') : null;
+    if (!card || (e.relatedTarget && card.contains(e.relatedTarget))) return;
+    if (tiltActiveCard === card) tiltActiveCard = null;
+    resetCardTilt(card);
+});
 
 // =============================================
 // ===== SCROLL REVEAL (появление при скролле) =====
