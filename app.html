@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <title>Torgovchik AI Studio</title>
+    <meta name="description" content="Личный AI-ассистент: отправляй задачи с телефона — ПК выполнит их и запушит на GitHub." />
+    <meta name="theme-color" content="#17191B" />
+    <meta name="author" content="Torgovchik" />
+
+    <!-- PWA: установка на рабочий стол телефона -->
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="apple-touch-icon" href="assets/favicon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="AI Studio" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+    <!-- Атмосферные пятна фона (Glass Noir) -->
+    <div class="glow glow--gold" aria-hidden="true"></div>
+    <div class="glow glow--blue" aria-hidden="true"></div>
+
+    <div class="app">
+        <!-- Шапка -->
+        <header class="app-header">
+            <span class="app-header__icon" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+            </span>
+            <div class="app-header__titles">
+                <h1 class="app-header__title">Torgovchik <span>AI Studio</span></h1>
+                <p class="app-header__status"><span class="status-dot" aria-hidden="true"></span>Ассистент на связи · задача выполняется на ПК</p>
+            </div>
+        </header>
+
+        <!-- Лента сообщений -->
+        <main class="chat" id="chat" aria-live="polite">
+            <div class="chat__feed" id="chatFeed"></div>
+        </main>
+
+        <!-- Поле ввода -->
+        <footer class="composer">
+            <form class="composer__glass" id="composerForm" autocomplete="off">
+                <label class="visually-hidden" for="composerInput">Опиши задачу</label>
+                <textarea
+                    id="composerInput"
+                    class="composer__input"
+                    rows="1"
+                    placeholder="Опиши задачу…"
+                    enterkeyhint="send"
+                    maxlength="4000"
+                ></textarea>
+                <button type="submit" class="composer__send" id="composerSend" aria-label="Отправить задачу" disabled>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+            </form>
+            <p class="composer__hint">Enter — отправить · Shift+Enter — новая строка</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

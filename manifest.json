@@ -1,0 +1,33 @@
+{
+  "name": "Torgovchik AI Studio",
+  "short_name": "AI Studio",
+  "description": "Личный ассистент: отправляй задачи с телефона — ПК выполнит и запушит на GitHub",
+  "lang": "ru",
+  "dir": "ltr",
+  "start_url": "app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#17191B",
+  "theme_color": "#17191B",
+  "icons": [
+    {
+      "src": "assets/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
