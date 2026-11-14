@@ -17,6 +17,37 @@
   const sendBtn = document.getElementById('composerSend');
   const tokensValue = document.getElementById('tokensValue');
   const tokensReset = document.getElementById('tokensReset');
+  const modeToggle = document.getElementById('modeToggle');
+
+  // ===== Режимы Build / Plan (как в десктопном OpenCode) =====
+  // Ключ в localStorage — часть контракта хранилища, не переименовывать
+  const MODE_STORAGE_KEY = 'torgovchik_ai_mode';
+  const MODE_PLACEHOLDERS = {
+    build: 'Что нужно изменить в коде?',
+    plan: 'Опиши, что нужно спланировать…'
+  };
+
+  let currentMode = 'build';
+  try {
+    const saved = localStorage.getItem(MODE_STORAGE_KEY);
+    if (saved === 'build' || saved === 'plan') currentMode = saved;
+  } catch (e) { /* приватный режим Safari — работаем с дефолтом */ }
+
+  function setMode(mode) {
+    if (mode !== 'build' && mode !== 'plan') return;
+    currentMode = mode;
+    modeToggle.classList.toggle('mode-toggle--plan', mode === 'plan');
+    document.getElementById('modeBuild').setAttribute('aria-selected', mode === 'build' ? 'true' : 'false');
+    document.getElementById('modePlan').setAttribute('aria-selected', mode === 'plan' ? 'true' : 'false');
+    input.placeholder = MODE_PLACEHOLDERS[mode];
+    try {
+      localStorage.setItem(MODE_STORAGE_KEY, mode);
+    } catch (e) { /* сохранение недоступно — режим просто не переживёт перезагрузку */ }
+  }
+
+  document.getElementById('modeBuild').addEventListener('click', () => setMode('build'));
+  document.getElementById('modePlan').addEventListener('click', () => setMode('plan'));
+  setMode(currentMode); // применяем сохранённый режим при загрузке
 
   function nowTime() {
     return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
@@ -70,7 +101,7 @@
     const res = await fetch(WORKER_URL + 'ai-task', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: prompt })
+      body: JSON.stringify({ prompt: prompt, mode: currentMode })
     });
     if (!res.ok) {
       throw new Error('Сервер вернул ' + res.status);
@@ -106,8 +137,10 @@
         if (status === 'done') {
           clearInterval(timer);
           hideTyping();
-          const result = data.result || data.message || 'Код обновлен и запушен в GitHub';
-          appendMessage('ai', '✅ ' + result);
+          // В plan-режиме сервер присылает план, а не «запушено» —
+          // поэтому показываем ровно то, что прислал сервер
+          const result = data.result || data.message || '✅ Задача выполнена';
+          appendMessage('ai', result);
           setSending(false);
           input.focus();
           fetchAiStats(); // счётчик токенов мог измениться

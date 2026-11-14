@@ -53,6 +53,18 @@
 
         <!-- Поле ввода -->
         <footer class="composer">
+            <!-- Переключатель режимов: Build (правим код) / Plan (составляем план) -->
+            <div class="mode-toggle" id="modeToggle" role="tablist" aria-label="Режим ассистента">
+                <button type="button" class="mode-toggle__btn" id="modeBuild" role="tab" aria-selected="true">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    Build
+                </button>
+                <button type="button" class="mode-toggle__btn" id="modePlan" role="tab" aria-selected="false">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                    Plan
+                </button>
+                <span class="mode-toggle__thumb" id="modeThumb" aria-hidden="true"></span>
+            </div>
             <form class="composer__glass" id="composerForm" autocomplete="off">
                 <label class="visually-hidden" for="composerInput">Опиши задачу</label>
                 <textarea

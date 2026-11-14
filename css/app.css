@@ -286,9 +286,79 @@ body {
 .typing span:nth-child(2) { animation-delay: 0.15s; }
 .typing span:nth-child(3) { animation-delay: 0.3s; }
 
+/* ===== Переключатель режимов Build / Plan ===== */
+.mode-toggle {
+    position: relative;
+    display: flex;
+    align-self: center;
+    margin-bottom: 10px;
+    padding: 4px;
+    border-radius: 999px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    animation: glassIn 0.6s var(--ease-smooth) 0.05s both;
+}
+
+.mode-toggle__btn {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 18px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    font-family: 'Manrope', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.35s var(--ease-smooth);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mode-toggle__btn svg {
+    flex-shrink: 0;
+    transition: color 0.35s var(--ease-smooth);
+}
+
+.mode-toggle__btn:active { transform: scale(0.97); }
+
+.mode-toggle__btn[aria-selected="true"] {
+    color: var(--accent-hover);
+    text-shadow: 0 0 12px rgba(217, 160, 91, 0.4);
+}
+
+/* Стеклянный «бегунок», подсвеченный янтарным под активным режимом */
+.mode-toggle__thumb {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(197, 138, 69, 0.28), rgba(148, 97, 60, 0.18));
+    border: 1px solid var(--border-orange);
+    box-shadow: 0 0 18px rgba(197, 138, 69, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition: transform 0.4s var(--ease-smooth);
+    pointer-events: none;
+}
+
+/* Plan — бегунок уезжает вправо на вторую половину */
+.mode-toggle--plan .mode-toggle__thumb {
+    transform: translateX(100%);
+}
+
 /* ===== Поле ввода ===== */
 .composer {
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
     padding-top: 4px;
     /* Не даём системной полоске iOS перекрывать поле ввода */
     padding-bottom: calc(env(safe-area-inset-bottom) + 10px);
@@ -415,9 +485,10 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .app-header, .composer__glass, .composer__hint, .msg, .typing {
+    .app-header, .composer__glass, .composer__hint, .msg, .typing, .mode-toggle {
         animation: none;
     }
     .status-dot { animation: none; }
     .typing span { animation: none; opacity: 0.7; }
+    .mode-toggle__thumb { transition: none; }
 }
