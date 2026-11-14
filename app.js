@@ -15,6 +15,8 @@
   const form = document.getElementById('composerForm');
   const input = document.getElementById('composerInput');
   const sendBtn = document.getElementById('composerSend');
+  const tokensValue = document.getElementById('tokensValue');
+  const tokensReset = document.getElementById('tokensReset');
 
   function nowTime() {
     return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
@@ -108,6 +110,7 @@
           appendMessage('ai', '✅ ' + result);
           setSending(false);
           input.focus();
+          fetchAiStats(); // счётчик токенов мог измениться
         } else if (status === 'error') {
           clearInterval(timer);
           hideTyping();
@@ -115,6 +118,7 @@
           appendMessage('ai', '❌ Ошибка выполнения' + (detail ? ': ' + detail : ''));
           setSending(false);
           input.focus();
+          fetchAiStats();
         } else if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
           clearInterval(timer);
           hideTyping();
@@ -214,6 +218,72 @@
     scrollAfterKeyboard();
   });
   input.addEventListener('blur', applyKeyboardOffset);
+
+  // ===== Счётчик токенов (GET /ai-stats) =====
+  let statsResetMs = null;
+
+  async function fetchAiStats() {
+    try {
+      const res = await fetch(WORKER_URL + 'ai-stats');
+      if (!res.ok) throw new Error('Сервер вернул ' + res.status);
+      const data = await res.json();
+      renderAiStats(data);
+    } catch (err) {
+      console.error('Не удалось получить статистику токенов:', err);
+    }
+  }
+
+  // Воркер может назвать поля по-разному — поддерживаем основные варианты
+  function renderAiStats(data) {
+    if (!data || typeof data !== 'object') return;
+
+    const tokens = data.tokens ?? data.tokensUsed ?? data.usedTokens ?? data.totalTokens ?? data.count;
+    if (tokens != null && Number.isFinite(Number(tokens))) {
+      tokensValue.textContent = '🪙 Токены: ' + Number(tokens).toLocaleString('ru-RU');
+    }
+
+    // Момент сброса лимита: timestamp, ISO-строка или «осталось N сек/мин/ч»
+    let resetMs = null;
+    const raw = data.resetAt ?? data.reset_at ?? data.resetTime ?? data.resetsAt ?? data.nextReset;
+    if (raw != null) {
+      if (typeof raw === 'number') resetMs = raw > 1e12 ? raw : raw * 1000;
+      else {
+        const parsed = Date.parse(raw);
+        if (!Number.isNaN(parsed)) resetMs = parsed;
+      }
+    }
+    if (resetMs == null) {
+      const hours = data.resetInHours;
+      const minutes = data.resetInMinutes;
+      const seconds = data.resetInSeconds ?? data.resetSeconds ?? data.resetIn;
+      if (typeof hours === 'number') resetMs = Date.now() + hours * 3600000;
+      else if (typeof minutes === 'number') resetMs = Date.now() + minutes * 60000;
+      else if (typeof seconds === 'number') resetMs = Date.now() + seconds * 1000;
+    }
+    if (resetMs != null) {
+      statsResetMs = resetMs;
+      updateResetTimer();
+    }
+  }
+
+  function updateResetTimer() {
+    if (statsResetMs == null) return;
+    const diff = statsResetMs - Date.now();
+    if (diff <= 0) {
+      statsResetMs = null;
+      tokensReset.textContent = 'Лимит сброшен';
+      fetchAiStats(); // лимит обнулился — запрашиваем свежие цифры
+      return;
+    }
+    const hours = Math.floor(diff / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
+    tokensReset.textContent = hours > 0
+      ? 'Сброс через ' + hours + ' ч'
+      : 'Сброс через ' + minutes + ' мин';
+  }
+
+  setInterval(updateResetTimer, 30000);
+  fetchAiStats();
 
   // Приветствие от ИИ при открытии приложения
   appendMessage(

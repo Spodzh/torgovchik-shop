@@ -39,6 +39,11 @@
                 <h1 class="app-header__title">Torgovchik <span>AI Studio</span></h1>
                 <p class="app-header__status"><span class="status-dot" aria-hidden="true"></span>Ассистент на связи · задача выполняется на ПК</p>
             </div>
+            <!-- Счётчик токенов (данные — GET /ai-stats у воркера) -->
+            <div class="token-badge" id="tokenBadge" title="Токены, потраченные с последнего сброса лимита">
+                <span class="token-badge__tokens" id="tokensValue">🪙 Токены: —</span>
+                <span class="token-badge__reset" id="tokensReset">Сброс через —</span>
+            </div>
         </header>
 
         <!-- Лента сообщений -->
