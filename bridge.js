@@ -4,7 +4,7 @@
 //   mode 'plan'  → только план (агент plan, БЕЗ правок файлов, БЕЗ git)
 //   mode 'build' → полный цикл: правки + git add/commit/push
 // =============================================
-const { execFile } = require('child_process');
+const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -26,11 +26,13 @@ async function fetchNextTask() {
   return data && data.task ? data.task : null;
 }
 
-async function completeTask(taskId, status, result) {
+async function completeTask(taskId, status, result, tokens) {
+  const body = { taskId, status, result };
+  if (Number.isFinite(tokens)) body.tokens = tokens;
   const res = await fetch(`${SERVER_URL}/ai-task/complete`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ taskId, status, result })
+    body: JSON.stringify(body)
   });
   if (!res.ok) throw new Error(`ai-task/complete HTTP ${res.status}`);
   return res.json();
@@ -41,16 +43,50 @@ async function completeTask(taskId, status, result) {
 // =============================================
 function runCmd(cmd, args, cwd, timeout) {
   return new Promise((resolve) => {
-    execFile(cmd, args, {
+    // На Windows opencode — это .cmd, который execFile без shell не находит.
+    // Собираем ОДНУ строку команды (args-массив + shell:true в Node 22+
+    // вызывает DeprecationWarning DEP0190) и запускаем через spawn.
+    const fullCommand = [cmd, ...args]
+      .map((s) => '"' + String(s).replace(/"/g, '""') + '"')
+      .join(' ');
+
+    const child = spawn(fullCommand, {
       cwd,
       timeout,
-      windowsHide: true,
-      maxBuffer: 10 * 1024 * 1024,
-      encoding: 'utf8'
-    }, (err, stdout, stderr) => {
-      resolve({ code: err && typeof err.code === 'number' ? err.code : (err ? 1 : 0), stdout: stdout || '', stderr: stderr || '' });
+      shell: true,
+      windowsHide: true
     });
+
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (d) => { stdout += d; });
+    child.stderr.on('data', (d) => { stderr += d; });
+    child.on('error', () => resolve({ code: 1, stdout, stderr }));
+    child.on('close', (code) => resolve({ code: typeof code === 'number' ? code : 1, stdout, stderr }));
   });
+}
+
+// Достаём потраченные токены из ответа OpenCode.
+// Он пишет по-разному: «Tokens: 1250», «Token usage: 1,250»,
+// «totalTokens: 1250», «… 34 tokens» — покрываем основные варианты.
+function parseTokens(text) {
+  if (!text) return null;
+  // Вариант 1: ключевое слово, затем число — «Tokens: 1250»
+  // (точку из разделителей убрали — иначе «usage: 0.05» склеится в 005)
+  let m = text.match(/(?:token\s*usage|tokens?)[^\d\n]{0,30}(\d[\d\s,']*)/i);
+  if (m) {
+    const n = parseInt(m[1].replace(/[\s,']/g, ''), 10);
+    if (Number.isFinite(n) && n > 0) return n;
+  }
+  // Вариант 2: число перед словом — «… всего 34 tokens».
+  // Группы разделителей требуем строго по 3 цифры, чтобы
+  // «$0.05, 34 tokens» не склеился в 534
+  m = text.match(/(\d{1,3}(?:[ ,]\d{3})+|\d+)\s*tokens?\b/i);
+  if (m) {
+    const n = parseInt(m[1].replace(/[\s,']/g, ''), 10);
+    if (Number.isFinite(n) && n > 0) return n;
+  }
+  return null;
 }
 
 // OpenCode: plan → агент plan (read-only), build → обычный запуск
@@ -64,11 +100,13 @@ async function runOpencode(prompt, mode) {
     args.push(prompt);
   }
   const r = await runCmd('opencode', args, PROJECT_DIR, TASK_TIMEOUT_MS);
-  const output = (r.stdout || '').trim();
+  const output = ((r.stdout || '') + '\n' + (r.stderr || '')).trim();
+  const tokens = parseTokens(output);
+  if (tokens != null) console.log(`🪙 Токены: ${tokens.toLocaleString('ru-RU')}`);
   if (r.code !== 0) {
-    return { ok: false, output: output || r.stderr || `opencode завершился с кодом ${r.code}` };
+    return { ok: false, tokens, output: output || `opencode завершился с кодом ${r.code}` };
   }
-  return { ok: true, output: output || '(пустой ответ OpenCode)' };
+  return { ok: true, tokens, output: output || '(пустой ответ OpenCode)' };
 }
 
 // =============================================
@@ -106,14 +144,14 @@ async function processTask(task) {
   const run = await runOpencode(task.prompt, mode);
   if (!run.ok) {
     console.error(`✖ opencode ошибка: ${run.output.slice(0, 300)}`);
-    await completeTask(task.taskId, 'error', run.output.slice(0, 10000));
+    await completeTask(task.taskId, 'error', run.output.slice(0, 10000), run.tokens);
     return;
   }
 
   // PLAN: только текстовый отчёт, git-шаги полностью пропускаем
   if (mode === 'plan') {
     console.log('✓ План составлен (git-шаги пропущены)');
-    await completeTask(task.taskId, 'done', run.output.slice(0, 10000));
+    await completeTask(task.taskId, 'done', run.output.slice(0, 10000), run.tokens);
     return;
   }
 
@@ -122,10 +160,10 @@ async function processTask(task) {
   const result = `${run.output}\n\n---\nGIT: ${git.ok ? 'OK' : 'FAIL'}\n${git.output}`;
   if (git.ok) {
     console.log(`✓ Задача выполнена: ${git.output}`);
-    await completeTask(task.taskId, 'done', result.slice(0, 10000));
+    await completeTask(task.taskId, 'done', result.slice(0, 10000), run.tokens);
   } else {
     console.error(`✖ git ошибка: ${git.output.slice(0, 300)}`);
-    await completeTask(task.taskId, 'error', result.slice(0, 10000));
+    await completeTask(task.taskId, 'error', result.slice(0, 10000), run.tokens);
   }
 }
 
