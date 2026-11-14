@@ -1,25 +1,20 @@
 // =============================================
-// ===== TORGOVCHIK AI STUDIO / чат-заглушка =====
+// ===== TORGOVCHIK AI STUDIO / чат с бэкендом =====
 // =============================================
-// Пока без реальных запросов: сообщения пользователя
-// просто появляются в ленте, ИИ отвечает заглушкой.
 
 (function () {
   'use strict';
+
+  // Тот же воркер, что и в js/script.js
+  const WORKER_URL = 'https://torgovchik-bot.ernest-chanel.workers.dev/';
+
+  const POLL_INTERVAL_MS = 4000;  // опрос статуса каждые 4 секунды
+  const POLL_TIMEOUT_MS = 10 * 60 * 1000; // максимальное ожидание задачи — 10 минут
 
   const feed = document.getElementById('chatFeed');
   const form = document.getElementById('composerForm');
   const input = document.getElementById('composerInput');
   const sendBtn = document.getElementById('composerSend');
-
-  // Заглушки-ответы ИИ (потом заменятся реальными ответами бэкенда)
-  const AI_STUB_REPLIES = [
-    '⏳ Задача принята в разработку...',
-    '📋 Понял. Задача добавлена в очередь — ПК скоро возьмётся за неё.',
-    '🚀 Принял! Начинаю выполнять и после готовности запушу на GitHub.',
-    '🛠 Задача зарегистрирована. О результате сообщу здесь.'
-  ];
-  let stubIndex = 0;
 
   function nowTime() {
     return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
@@ -47,7 +42,9 @@
     return el;
   }
 
+  // Пульсирующие точки — индикатор ожидания ответа сервера
   function showTyping() {
+    if (document.getElementById('typingIndicator')) return;
     const el = document.createElement('div');
     el.className = 'typing';
     el.id = 'typingIndicator';
@@ -61,28 +58,100 @@
     if (el) el.remove();
   }
 
-  function aiReply(userText) {
-    showTyping();
-    // Имитируем раздумья ИИ, затем отдаём заглушку
-    setTimeout(() => {
-      hideTyping();
-      appendMessage('ai', AI_STUB_REPLIES[stubIndex % AI_STUB_REPLIES.length]);
-      stubIndex += 1;
-    }, 900 + Math.min(userText.length * 15, 900));
+  function setSending(sending) {
+    sendBtn.disabled = sending || input.value.trim().length === 0;
+    input.disabled = sending;
   }
 
-  function handleSubmit(e) {
+  // POST /ai-task — ставим задачу в очередь
+  async function submitTask(prompt) {
+    const res = await fetch(WORKER_URL + 'ai-task', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: prompt })
+    });
+    if (!res.ok) {
+      throw new Error('Сервер вернул ' + res.status);
+    }
+    const data = await res.json().catch(() => ({}));
+    // Воркер может отдать id под разными именами — проверяем основные варианты
+    const taskId = data.taskId || data.task_id || data.id || (data.task && data.task.id);
+    if (!taskId) {
+      throw new Error('Сервер не вернул taskId');
+    }
+    return taskId;
+  }
+
+  // GET /ai-task/status?taskId=... — узнаём судьбу конкретной задачи
+  async function fetchTaskStatus(taskId) {
+    const res = await fetch(WORKER_URL + 'ai-task/status?taskId=' + encodeURIComponent(taskId));
+    if (!res.ok) {
+      throw new Error('Сервер вернул ' + res.status);
+    }
+    return res.json();
+  }
+
+  // Поллинг: каждые POLL_INTERVAL_MS спрашиваем статус, пока не done/error
+  function pollTaskStatus(taskId) {
+    const startedAt = Date.now();
+    showTyping();
+
+    const timer = setInterval(async () => {
+      try {
+        const data = await fetchTaskStatus(taskId);
+        const status = data.status || data.state;
+
+        if (status === 'done') {
+          clearInterval(timer);
+          hideTyping();
+          const result = data.result || data.message || 'Код обновлен и запушен в GitHub';
+          appendMessage('ai', '✅ ' + result);
+          setSending(false);
+          input.focus();
+        } else if (status === 'error') {
+          clearInterval(timer);
+          hideTyping();
+          const detail = data.error || data.message || '';
+          appendMessage('ai', '❌ Ошибка выполнения' + (detail ? ': ' + detail : ''));
+          setSending(false);
+          input.focus();
+        } else if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
+          clearInterval(timer);
+          hideTyping();
+          appendMessage('ai', '⌛ Задача выполняется слишком долго. Результат придёт позже — проверь GitHub.');
+          setSending(false);
+          input.focus();
+        }
+        // иначе — статус pending/queued/running, продолжаем ждать
+      } catch (err) {
+        console.error('Ошибка опроса статуса:', err);
+        // Разовый сбой сети не роняем поллинг — попробуем на следующем тике
+      }
+    }, POLL_INTERVAL_MS);
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault();
     const text = input.value.trim();
-    if (!text) return;
+    if (!text || sendBtn.disabled) return;
 
     appendMessage('user', text);
     input.value = '';
     autosize();
     updateSendState();
-    input.focus();
 
-    aiReply(text);
+    setSending(true);
+    try {
+      const taskId = await submitTask(text);
+      appendMessage('ai', '⏳ Задача отправлена в очередь...');
+      pollTaskStatus(taskId);
+    } catch (err) {
+      console.error('Ошибка отправки задачи:', err);
+      hideTyping();
+      appendMessage('ai', '❌ Не удалось отправить задачу на сервер. Попробуй ещё раз.');
+      setSending(false);
+    }
+    input.focus();
   }
 
   function autosize() {
@@ -91,7 +160,9 @@
   }
 
   function updateSendState() {
-    sendBtn.disabled = input.value.trim().length === 0;
+    if (!input.disabled) {
+      sendBtn.disabled = input.value.trim().length === 0;
+    }
   }
 
   form.addEventListener('submit', handleSubmit);
