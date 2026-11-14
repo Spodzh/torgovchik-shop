@@ -176,6 +176,45 @@
     }
   });
 
+  // ===== iOS: клавиатура =====
+  const appShell = document.querySelector('.app');
+
+  // В iOS клавиатура сжимает visual viewport, а layout остаётся прежним —
+  // иначе композер уезжает под клавиатуру. Сдвигаем каркас на величину смещения.
+  function applyKeyboardOffset() {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const overlap = window.innerHeight - vv.height;
+    if (overlap > 0) {
+      appShell.style.height = vv.height + 'px';
+      appShell.style.transform = 'translateY(' + vv.offsetTop + 'px)';
+    } else {
+      appShell.style.height = '';
+      appShell.style.transform = '';
+    }
+  }
+
+  // Прокрутка чата вниз с учётом того, что iOS анимирует клавиатуру ~250мс
+  function scrollAfterKeyboard() {
+    setTimeout(scrollDown, 120);
+    setTimeout(scrollDown, 350);
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      applyKeyboardOffset();
+      scrollAfterKeyboard();
+    });
+    window.visualViewport.addEventListener('scroll', applyKeyboardOffset);
+  }
+
+  // При фокусе на поле (выезд клавиатуры) последнее сообщение не должно прятаться
+  input.addEventListener('focus', () => {
+    applyKeyboardOffset();
+    scrollAfterKeyboard();
+  });
+  input.addEventListener('blur', applyKeyboardOffset);
+
   // Приветствие от ИИ при открытии приложения
   appendMessage(
     'ai',

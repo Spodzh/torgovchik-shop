@@ -52,6 +52,9 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     overflow: hidden;
+    /* Без резиновой прокрутки страницы и двойного тапа-зума на iOS */
+    overscroll-behavior: none;
+    touch-action: manipulation;
 }
 
 .visually-hidden {
@@ -92,12 +95,15 @@ body {
 .app {
     position: relative;
     z-index: 1;
-    height: 100dvh;
+    height: 100vh; /* запас для старых iOS без поддержки dvh */
+    height: 100dvh; /* не дёргается при сворачивании адресной строки Safari */
     display: flex;
     flex-direction: column;
     max-width: 720px;
     margin: 0 auto;
-    padding: calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 10px);
+    /* Верхняя safe-зона отодвигает шапку из-под Dynamic Island,
+       нижнюю отдаём композеру (см. .composer) */
+    padding: calc(env(safe-area-inset-top) + 12px) 16px 0;
 }
 
 /* ===== Шапка ===== */
@@ -109,9 +115,10 @@ body {
     border-radius: 20px;
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    /* Glassmorphism в духе нативных приложений Apple */
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
     animation: glassIn 0.6s var(--ease-smooth) both;
 }
@@ -251,6 +258,8 @@ body {
 .composer {
     flex-shrink: 0;
     padding-top: 4px;
+    /* Не даём системной полоске iOS перекрывать поле ввода */
+    padding-bottom: calc(env(safe-area-inset-bottom) + 10px);
 }
 
 .composer__glass {
@@ -282,7 +291,8 @@ body {
     background: transparent;
     color: var(--text-primary);
     font-family: 'Manrope', sans-serif;
-    font-size: 15px;
+    /* Меньше 16px — iOS Safari принудительно зумит экран при фокусе */
+    font-size: 16px;
     line-height: 1.5;
     resize: none;
     padding: 8px 0;
@@ -364,8 +374,6 @@ body {
     .app-header__status { font-size: 11px; }
 
     .msg { max-width: 92%; font-size: 13.5px; padding: 10px 14px; }
-
-    .composer__input { font-size: 14px; }
 
     .composer__hint { display: none; }
 }
