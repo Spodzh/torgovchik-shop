@@ -89,6 +89,12 @@ function parseTokens(text) {
   return null;
 }
 
+// Грубая оценка токенов, если parseTokens не нашёл число в выводе:
+// ~(символы промпта + ответа) / 4
+function estimateTokens(prompt, output) {
+  return Math.ceil(((prompt || '').length + (output || '').length) / 4);
+}
+
 // OpenCode: plan → агент plan (read-only), build → обычный запуск
 async function runOpencode(prompt, mode) {
   const args = ['run'];
@@ -101,7 +107,7 @@ async function runOpencode(prompt, mode) {
   }
   const r = await runCmd('opencode', args, PROJECT_DIR, TASK_TIMEOUT_MS);
   const output = ((r.stdout || '') + '\n' + (r.stderr || '')).trim();
-  const tokens = parseTokens(output);
+  const tokens = parseTokens(output) ?? estimateTokens(prompt, output);
   if (tokens != null) console.log(`🪙 Токены: ${tokens.toLocaleString('ru-RU')}`);
   if (r.code !== 0) {
     return { ok: false, tokens, output: output || `opencode завершился с кодом ${r.code}` };
