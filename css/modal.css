@@ -7,6 +7,7 @@
 .order-modal,
 .confirm-modal,
 .announcement-modal,
+.changelog-modal,
 .favorites-modal {
     position: fixed;
     top: 0;
@@ -33,6 +34,7 @@
 .order-modal.show,
 .confirm-modal.show,
 .announcement-modal.show,
+.changelog-modal.show,
 .favorites-modal.show {
     display: flex;
     opacity: 1;
@@ -47,6 +49,7 @@
 .order-modal__content,
 .confirm-modal__content,
 .announcement-modal__content,
+.changelog-modal__content,
 .favorites-modal__content {
     background: var(--bg-modal);
     border: 1px solid var(--border-medium);
@@ -70,6 +73,7 @@
 .order-modal.show .order-modal__content,
 .confirm-modal.show .confirm-modal__content,
 .announcement-modal.show .announcement-modal__content,
+.changelog-modal.show .changelog-modal__content,
 .favorites-modal.show .favorites-modal__content {
     transform: translateY(0);
 }
@@ -81,6 +85,7 @@
 .banner-modal__close,
 .order-modal__close,
 .announcement-modal__close,
+.changelog-modal__close,
 .favorites-modal__close {
     position: absolute;
     top: 12px;
@@ -102,6 +107,7 @@
 
 /* Р’ РґР»РёРЅРЅС‹С… (СЃРєСЂРѕР»Р»СЏС‰РёС…СЃСЏ) РјРѕРґР°Р»РєР°С… РєСЂРµСЃС‚РёРє РїСЂРёР»РёРїР°РµС‚ Рє РІРµСЂС…Сѓ РѕРєРЅР° */
 .order-modal__close,
+.changelog-modal__close,
 .favorites-modal__close {
     position: sticky;
     float: right;
@@ -514,7 +520,7 @@
 
 /* ===== РҐРћР’Р•Р Р« ===== */
 @media (hover: hover) and (pointer: fine) {
-    .login-modal__close:hover, .profile-modal__close:hover, .avatar-modal__close:hover, .banner-modal__close:hover, .order-modal__close:hover, .announcement-modal__close:hover,     .favorites-modal__close:hover { color: var(--accent); border-color: var(--accent); background: rgba(197, 138, 69, 0.1); }
+    .login-modal__close:hover, .profile-modal__close:hover, .avatar-modal__close:hover, .banner-modal__close:hover, .order-modal__close:hover, .announcement-modal__close:hover, .changelog-modal__close:hover,     .favorites-modal__close:hover { color: var(--accent); border-color: var(--accent); background: rgba(197, 138, 69, 0.1); }
     .age-gate-modal__btn--yes:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(197, 138, 69, 0.4); }
     .age-gate-modal__btn--no:hover { border-color: var(--text-primary); color: var(--text-primary); }
     .auth-tab:hover:not(.active) { color: var(--text-primary); }
@@ -523,4 +529,121 @@
     .referral-copy-btn:hover { opacity: 0.8; }
     .confirm-modal__btn--cancel:hover { background: var(--bg-card-hover); }
     .confirm-modal__btn--danger:hover { background: #c0392b; }
+}
+
+/* ===== CHANGELOG / ИСТОРИЯ ОБНОВЛЕНИЙ ===== */
+.changelog-modal__content { max-width: 560px; }
+
+.changelog-modal__subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.changelog-timeline {
+    position: relative;
+    margin-top: 24px;
+}
+
+/* Вертикальная линия таймлайна */
+.changelog-timeline::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    bottom: 8px;
+    left: 7px;
+    width: 2px;
+    background: linear-gradient(180deg, var(--accent) 0%, var(--border-orange) 60%, transparent 100%);
+    opacity: 0.55;
+    border-radius: 2px;
+}
+
+.changelog-item {
+    position: relative;
+    padding-left: 34px;
+    padding-bottom: 26px;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s ease var(--reveal-delay, 0ms), transform 0.5s ease var(--reveal-delay, 0ms);
+}
+.changelog-item:last-child { padding-bottom: 4px; }
+.changelog-item.is-visible { opacity: 1; transform: translateY(0); }
+
+/* Янтарная точка версии */
+.changelog-item__dot {
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent-deep);
+    border: 2px solid var(--accent);
+    box-shadow: 0 0 10px rgba(197, 138, 69, 0.45);
+}
+
+.changelog-item--current .changelog-item__dot {
+    background: var(--accent);
+    box-shadow: 0 0 16px rgba(197, 138, 69, 0.7);
+}
+
+.changelog-item__version {
+    font-family: 'Bitter', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.changelog-item__badge {
+    font-family: 'Manrope', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #1A1815;
+    background: var(--grad-ivory);
+    padding: 3px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.changelog-item__date {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 3px;
+}
+
+.changelog-item__list {
+    margin-top: 10px;
+    padding-left: 0;
+    list-style: none;
+}
+.changelog-item__list li {
+    position: relative;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    padding-left: 16px;
+    padding-bottom: 4px;
+}
+.changelog-item__list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 6px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--accent);
+    opacity: 0.7;
+}
+
+/* Плавные появления без анимации для тех, кто просит меньше движения */
+@media (prefers-reduced-motion: reduce) {
+    .changelog-item { opacity: 1; transform: none; transition: none; }
 }

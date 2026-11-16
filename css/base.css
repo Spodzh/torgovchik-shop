@@ -577,6 +577,38 @@ input, textarea, select {
 
 .footer a { color: var(--text-secondary); text-decoration: none; border-bottom: 1px dashed rgba(167,170,168,0.3); transition: color 0.2s, border-color 0.2s; }
 
+.footer__legal {
+    margin-top: 4px;
+    font-size: 14px;
+    opacity: 0.85;
+    line-height: 1.8;
+}
+
+.footer__divider {
+    margin: 0 10px;
+    color: var(--text-muted);
+}
+
+.footer__version {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    background: transparent;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.4px;
+    color: var(--text-muted);
+    opacity: 0.75;
+    cursor: pointer;
+    transition: color 0.2s, opacity 0.2s;
+}
+
+.footer__version svg { flex-shrink: 0; }
+
 /* ===== ХОВЕРЫ ===== */
 @media (hover: hover) and (pointer: fine) {
     .about__card:hover { 
@@ -592,6 +624,7 @@ input, textarea, select {
     .contacts__icon:hover { fill: var(--accent); }
     .contacts__btn:hover { background: rgba(197,138,69,0.1); box-shadow: 0 0 20px rgba(197,138,69,0.2); color: var(--accent-hover); }
     .footer a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+    .footer__version:hover { color: var(--accent); opacity: 1; }
 }
 
 /* ===== АДАПТИВ ===== */

@@ -139,7 +139,7 @@ function hideModal(modal) {
   modal.classList.remove('open', 'show');
   modal.setAttribute('aria-hidden', 'true');
   const anyOpen = document.querySelector(
-    '.login-modal.open, .profile-modal.open, .avatar-modal.open, .banner-modal.open, .order-modal.open, .announcement-modal.open, .favorites-modal.open, .confirm-modal.open, .age-gate-modal.open'
+    '.login-modal.open, .profile-modal.open, .avatar-modal.open, .banner-modal.open, .order-modal.open, .announcement-modal.open, .favorites-modal.open, .confirm-modal.open, .changelog-modal.open, .age-gate-modal.open'
   );
   if (!anyOpen) document.body.style.overflow = '';
 }
@@ -256,7 +256,7 @@ function showConfirm(options) {
 // =============================================
 function updateBodyOverflow() {
   const anyOpen = document.querySelector(
-    '.login-modal.open, .profile-modal.open, .avatar-modal.open, .banner-modal.open, .order-modal.open, .announcement-modal.open, .favorites-modal.open, .confirm-modal.open, .age-gate-modal.open'
+    '.login-modal.open, .profile-modal.open, .avatar-modal.open, .banner-modal.open, .order-modal.open, .announcement-modal.open, .favorites-modal.open, .confirm-modal.open, .changelog-modal.open, .age-gate-modal.open'
   );
   document.body.style.overflow = anyOpen ? 'hidden' : '';
 }
@@ -1511,6 +1511,7 @@ const bannerModalCtrl = setupModal('bannerModal', () => { pendingBannerId = null
 const orderModalCtrl = setupModal('orderModal');
 const announcementCtrl = setupModal('announcementModal');
 const favoritesModalCtrl = setupModal('favoritesModal');
+const changelogCtrl = setupModal('changelogModal', () => resetChangelogReveal());
 
 document.getElementById('loginModalClose').addEventListener('click', () => loginModalCtrl.closeFn());
 document.getElementById('profileModalClose').addEventListener('click', () => profileModalCtrl.closeFn());
@@ -1521,6 +1522,206 @@ document.getElementById('orderModalClose').addEventListener('click', () => order
 document.getElementById('announcementClose').addEventListener('click', () => announcementCtrl.closeFn());
 document.getElementById('announcementOk').addEventListener('click', () => announcementCtrl.closeFn());
 document.getElementById('favoritesModalClose').addEventListener('click', () => favoritesModalCtrl.closeFn());
+document.getElementById('changelogModalClose').addEventListener('click', () => changelogCtrl.closeFn());
+
+// =============================================
+// ===== ИСТОРИЯ ОБНОВЛЕНИЙ (CHANGELOG) =====
+// =============================================
+const CHANGELOG = [
+  {
+    version: 'v1.6.0',
+    title: 'Осень: новые фишки',
+    date: '2026-11-14',
+    items: [
+      'Генератор карточек товаров для Telegram — красивые посты о новинках',
+      'Бот-уведомления о статусах заказов в Telegram',
+      'Убран квиз по вкусам — каталог стал быстрее и понятнее',
+      'Новый футер: кнопка мини-игры и юридические ссылки',
+      'Мелкие правки вёрстки и отступов',
+      'Улучшены тексты и подсказки в интерфейсе',
+      'Повышена стабильность работы сайта'
+    ]
+  },
+  {
+    version: 'v1.5.0',
+    title: 'Премиум-полировка',
+    date: '2026-11-12',
+    items: [
+      'Финальные премиум-обновления интерфейса',
+      'Мобильная шапка и анимированный бургер-меню',
+      'Центрированный hero-баннер',
+      'Подсветка кнопки покупки при наведении на карточку',
+      'Серия доработок карточек и витрины каталога',
+      'Обновлены шапка профиля и личный кабинет',
+      'Мелкие исправления вёрстки на мобильных'
+    ]
+  },
+  {
+    version: 'v1.4.1',
+    title: 'Точечные улучшения',
+    date: '2026-11-10',
+    items: [
+      'Обновлены карточки товаров и витрина каталога',
+      'Оптимизирована загрузка изображений товаров',
+      'Улучшены отступы и выравнивание в вёрстке',
+      'Сглажены анимации наведения на элементы',
+      'Исправлены мелкие баги отображения на мобильных'
+    ]
+  },
+  {
+    version: 'v1.4.0',
+    title: 'Редизайн Glass Noir «Первый иней»',
+    date: '2026-11-05',
+    items: [
+      'Новая тема: стеклянные поверхности, янтарный акцент, cold-blue',
+      'Атмосфера: искры и снежинки на Canvas',
+      'Полностью обновлены все стили компонентов (base, header, catalog, cart, modal, toast, responsive)',
+      'Раздельные стили по компонентам (css/ по блокам)',
+      'Страницы документов: соглашение, политика, согласие',
+      'Переработана шапка сайта и навигация',
+      'Обновлены модальные окна: анимации и затемнения'
+    ]
+  },
+  {
+    version: 'v1.3.0',
+    title: 'Игра и пасхалки',
+    date: '2026-10-27',
+    items: [
+      'Мини-игра Flappy Slush (canvas, самодостаточная страница)',
+      'Секретная кнопка в футере: три клика — и ты в игре',
+      'Тизеры анонсов через модальное окно',
+      'Страница товара выделена в отдельный файл — быстрее открытие',
+      'Оптимизация загрузки каталога'
+    ]
+  },
+  {
+    version: 'v1.2.0',
+    title: 'Полировка каталога',
+    date: '2026-10-05',
+    items: [
+      'Обновлены стили всех блоков: каталог, корзина, модалки, тосты',
+      'Рефактор тултипа логотипа: стили и позиционирование',
+      'Улучшены фильтры и сортировка в каталоге',
+      'Исправлены баги отображения цен в корзине',
+      'Доработана шапка сайта и навигация',
+      'Плавные появления модальных окон',
+      'Правки адаптива для планшетов',
+      'Ускорена отрисовка списка товаров'
+    ]
+  },
+  {
+    version: 'v1.1.0',
+    title: 'Профиль и документы',
+    date: '2026-08-03',
+    items: [
+      'Профиль покупателя: аватарки, шапка профиля, выбор баннера',
+      'Реферальная система',
+      'Каталог товаров с сервера: категории и фильтры',
+      'Избранное и недавние просмотры',
+      'Доработка модальных окон и шапки сайта',
+      'Улучшения входа по Telegram и хранения профиля',
+      'Правки текстов и описаний в интерфейсе'
+    ]
+  },
+  {
+    version: 'v1.0.2',
+    title: 'Публикация на домене',
+    date: '2026-07-15',
+    items: [
+      'Настройка публикации на GitHub Pages',
+      'Подключение домена сайта',
+      'Финальные правки стилей и скриптов',
+      'Проверка корзины и заказа после релиза',
+      'Обновление текстов и описаний'
+    ]
+  },
+  {
+    version: 'v1.0.1',
+    title: 'Стабилизация релиза',
+    date: '2026-07-14',
+    items: [
+      'Исправления в корзине и оформлении заказа',
+      'Полировка анимаций и переходов',
+      'Правки адаптива на мобильных',
+      'Исправлены баги каталога и карточек',
+      'Ускорение загрузки страницы',
+      'Улучшение текстов интерфейса'
+    ]
+  },
+  {
+    version: 'v1.0.0',
+    title: 'Запуск магазина',
+    date: '2026-07-13',
+    items: [
+      'Первый релиз витрины: каталог, карточки товаров, корзина',
+      'Оформление заказа онлайн в пару кликов',
+      'Возрастные ворота 18+ на всех страницах',
+      'Промокоды и тосты-уведомления',
+      'CSS-архитектура: стили разбиты по компонентам (base, header, catalog, cart, modal, toast, responsive)',
+      'Адаптивная вёрстка и мобильное бургер-меню',
+      'Страница пользовательского соглашения',
+      'Загрузка товаров и цен напрямую с сервера'
+    ]
+  }
+];
+
+const changelogModal = document.getElementById('changelogModal');
+const changelogTimeline = document.getElementById('changelogTimeline');
+let changelogObserver = null;
+
+function renderChangelog() {
+  const currentVersion = CHANGELOG[0].version;
+  changelogTimeline.innerHTML = CHANGELOG.map(function (entry, i) {
+    const isCurrent = entry.version === currentVersion;
+    const badge = isCurrent ? '<span class="changelog-item__badge">текущая версия</span>' : '';
+    const items = entry.items.map(function (it) { return '<li>' + it + '</li>'; }).join('');
+    return (
+      '<article class="changelog-item' + (isCurrent ? ' changelog-item--current' : '') + '" style="--reveal-delay:' + (i * 90) + 'ms">' +
+        '<span class="changelog-item__dot" aria-hidden="true"></span>' +
+        '<div class="changelog-item__body">' +
+          '<h3 class="changelog-item__version">' + entry.version + ' — ' + entry.title + badge + '</h3>' +
+          '<time class="changelog-item__date" datetime="' + entry.date + '">' + entry.date + '</time>' +
+          '<ul class="changelog-item__list">' + items + '</ul>' +
+        '</div>' +
+      '</article>'
+    );
+  }).join('');
+}
+
+// Плавное появление записей при прокрутке внутри модалки
+function initChangelogReveal() {
+  if (changelogObserver) changelogObserver.disconnect();
+  const items = changelogTimeline.querySelectorAll('.changelog-item');
+  if (!('IntersectionObserver' in window)) {
+    items.forEach(function (el) { el.classList.add('is-visible'); });
+    return;
+  }
+  changelogObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        changelogObserver.unobserve(entry.target);
+      }
+    });
+  }, { root: changelogModal, rootMargin: '0px 0px -8% 0px', threshold: 0.1 });
+  items.forEach(function (el) { changelogObserver.observe(el); });
+}
+
+// При каждом открытии — проигрываем анимации заново
+function resetChangelogReveal() {
+  changelogTimeline.querySelectorAll('.changelog-item').forEach(function (el) {
+    el.classList.remove('is-visible');
+  });
+}
+
+document.getElementById('changelogBtn').addEventListener('click', function () {
+  if (!changelogTimeline.dataset.rendered) {
+    renderChangelog();
+    changelogTimeline.dataset.rendered = '1';
+  }
+  initChangelogReveal();
+  showModal(changelogModal);
+});
 
 document.getElementById('userBtn').addEventListener('click', () => {
   if (currentUser && currentUser.telegram) {
@@ -1702,30 +1903,6 @@ document.addEventListener('DOMContentLoaded', function() {
     tooltipTimeout = setTimeout(() => { tooltip.classList.remove('show'); setTimeout(() => tooltip.remove(), 300); }, 2500);
   });
 });
-
-// =============================================
-// ===== СЕКРЕТНАЯ КНОПКА (ПАСХАЛКА) =====
-// =============================================
-let secretClickCount = 0;
-let secretClickTimeout = null;
-const secretBtn = document.getElementById('secretGameBtn');
-
-if (secretBtn) {
-  secretBtn.addEventListener('click', () => {
-    secretClickCount++;
-    secretBtn.style.opacity = '0.5';
-    if (secretClickTimeout) clearTimeout(secretClickTimeout);
-
-    if (secretClickCount >= 3) {
-      window.location.href = 'flappy.html';
-    } else {
-      secretClickTimeout = setTimeout(() => {
-        secretClickCount = 0;
-        secretBtn.style.opacity = '1';
-      }, 2000);
-    }
-  });
-}
 
 // =============================================
 // ===== АТМОСФЕРА: ИСКРЫ И СНЕЖИНКИ =====

@@ -14,7 +14,7 @@ const PROJECT_DIR = process.env.BRIDGE_PROJECT_DIR || path.resolve(__dirname, '.
 const POLL_INTERVAL_MS = 10 * 1000;          // опрос очереди раз в 10 секунд
 const TASK_TIMEOUT_MS = 13 * 60 * 1000;      // таймаут opencode (13 мин — меньше STALE_MS=15 мин на воркере)
 const GIT_TIMEOUT_MS = 2 * 60 * 1000;        // таймаут git-команд
-const PLAN_PROMPT_PREFIX = 'Сначала составь подробный план действий, НЕ МЕНЯЙ код. Промпт: ';
+const PLAN_PROMPT_PREFIX = 'ВНИМАНИЕ: Твоя задача — ТОЛЬКО составить подробный план действий. КАТЕГОРИЧЕСКИ НЕ МЕНЯЙ файлы, не делай коммитов. Просто опиши, что нужно сделать. Задача: ';
 
 // =============================================
 // ===== HTTP-ХЕЛПЕРЫ =====
@@ -43,18 +43,22 @@ async function completeTask(taskId, status, result, tokens) {
 // =============================================
 function runCmd(cmd, args, cwd, timeout) {
   return new Promise((resolve) => {
-    // На Windows opencode — это .cmd, который execFile без shell не находит.
-    // Собираем ОДНУ строку команды (args-массив + shell:true в Node 22+
-    // вызывает DeprecationWarning DEP0190) и запускаем через spawn.
+    // На Windows opencode — это .cmd, без shell его не найти.
+    // Собираем ОДНУ строку команды с экранированием кавычек.
     const fullCommand = [cmd, ...args]
       .map((s) => '"' + String(s).replace(/"/g, '""') + '"')
       .join(' ');
 
+    // stdio: stdin = 'ignore' — ключевой момент: если stdin оставить pipe,
+    // opencode в фоне ждёт ввода и висит. CI=true и NO_COLOR=1 — часть
+    // CLI-инструментов по ним понимает, что TTY/интерфейс не нужен
     const child = spawn(fullCommand, {
       cwd,
       timeout,
       shell: true,
-      windowsHide: true
+      windowsHide: true,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env, CI: 'true', NO_COLOR: '1' }
     });
 
     let stdout = '';
@@ -95,14 +99,16 @@ function estimateTokens(prompt, output) {
   return Math.ceil(((prompt || '').length + (output || '').length) / 4);
 }
 
-// OpenCode: plan → агент plan (read-only), build → обычный запуск
+// OpenCode: в headless-режиме работает только обычный агент с --auto
+// (проверено для v1.19.5: --auto — официальный авто-апрув разрешений;
+// флагов --dangerously-skip-permissions/--yolo/--standalone в этой версии
+// НЕТ — с ними run печатает справку вместо выполнения), поэтому plan
+// отличаем строго инструкцией в промпте; git-шаги для plan пропускаем
 async function runOpencode(prompt, mode) {
-  const args = ['run'];
+  const args = ['run', '--auto'];
   if (mode === 'plan') {
-    args.push('--agent', 'plan');
     args.push(PLAN_PROMPT_PREFIX + prompt);
   } else {
-    args.push('--auto');
     args.push(prompt);
   }
   const r = await runCmd('opencode', args, PROJECT_DIR, TASK_TIMEOUT_MS);

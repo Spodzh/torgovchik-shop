@@ -8,28 +8,27 @@
     font-family: 'Manrope', sans-serif;
 }
 
-/* --- СЕКРЕТНАЯ ИГРА --- */
-/* Класс вместо #id-антипаттерна; !important не нужен — специфичности хватает */
-.secret-game-btn {
-    background: rgba(197, 138, 69, 0.08);
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    padding: 12px 24px;
-    border-radius: 8px;
-    margin-top: 24px;
-    cursor: pointer;
+/* --- ФУТЕР --- */
+/* Стили .footer и ссылок — в base.css; здесь только кнопка «Играть» */
+.footer__play {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    margin-bottom: 4px;
+    padding: 12px 28px;
     font-family: 'Manrope', sans-serif;
     font-weight: 700;
     font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-    box-shadow: 0 0 15px rgba(197, 138, 69, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.secret-game-btn:hover {
-    background: rgba(197, 138, 69, 0.2);
-    box-shadow: 0 0 25px rgba(197, 138, 69, 0.3);
-    transform: translateY(-2px);
+
+@media (hover: hover) and (pointer: fine) {
+    .footer__play:hover {
+        transform: translateY(-2px);
+    }
 }
 
 /* --- КНОПКА НАВЕРХ --- */
