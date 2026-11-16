@@ -2108,12 +2108,175 @@ function initScrollReveal() {
 }
 
 // =============================================
+// ===== ОЦЕНКА МАГАЗИНА =====
+// =============================================
+const RATING_KEY = 'torgovchik_rated';
+const ratingStarsWrap = document.getElementById('ratingStars');
+const ratingValueEl = document.getElementById('ratingValue');
+const ratingVotesEl = document.getElementById('ratingVotes');
+const ratingThanksEl = document.getElementById('ratingThanks');
+let ratingLocked = false;
+
+function ratingVotesWord(n) {
+  const mod10 = n % 10, mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return 'голос';
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'голоса';
+  return 'голосов';
+}
+
+// Ответ воркера парсим терпеливо: average/avg/score и count/votes/total
+function parseRatingData(data) {
+  if (!data || typeof data !== 'object') return null;
+  const rawAvg = data.average !== undefined ? data.average : (data.avg !== undefined ? data.avg : (data.rating !== undefined ? data.rating : data.score));
+  const rawCount = data.count !== undefined ? data.count : (data.votes !== undefined ? data.votes : data.total);
+  if (rawAvg === undefined && rawCount === undefined) return null;
+  return {
+    average: rawAvg == null ? null : Math.round(parseFloat(rawAvg) * 10) / 10,
+    count: rawCount == null ? 0 : parseInt(rawCount, 10) || 0
+  };
+}
+
+function renderRatingAverage(data) {
+  if (!data) return;
+  if (data.count === 0) {
+    ratingValueEl.textContent = '—';
+    ratingVotesEl.textContent = 'Станьте первым!';
+  } else {
+    if (data.average != null) {
+      ratingValueEl.textContent = data.average;
+      ratingValueEl.classList.remove('rating__score--pulse');
+      void ratingValueEl.offsetWidth; // перезапуск анимации при изменении
+      ratingValueEl.classList.add('rating__score--pulse');
+    }
+    ratingVotesEl.textContent = '(' + data.count + ' ' + ratingVotesWord(data.count) + ')';
+  }
+}
+
+function applySelectedStars(value) {
+  ratingStarsWrap.querySelectorAll('.rating__star').forEach(function (btn, i) {
+    const n = i + 1;
+    btn.classList.toggle('is-selected', n <= value);
+    if (n === 1 && value === 1) btn.classList.add('rating__star--broken');
+  });
+}
+
+function setStarPreview(value) {
+  ratingStarsWrap.querySelectorAll('.rating__star').forEach(function (btn, i) {
+    btn.classList.toggle('is-preview', i + 1 <= value);
+  });
+}
+
+function clearStarPreview() {
+  ratingStarsWrap.querySelectorAll('.rating__star').forEach(function (btn) { btn.classList.remove('is-preview'); });
+}
+
+function showRatingThanks(value) {
+  ratingThanksEl.hidden = false;
+  requestAnimationFrame(function () {
+    ratingThanksEl.classList.add('is-visible');
+  });
+  if (value && value >= 1 && value <= 10) {
+    ratingThanksEl.textContent = 'Спасибо за вашу оценку! Вы поставили ' + value + ' из 10';
+  } else {
+    ratingThanksEl.textContent = 'Спасибо за вашу оценку!';
+  }
+}
+
+async function fetchShopRating() {
+  try {
+    const response = await fetch(WORKER_URL + 'api/rating');
+    if (!response.ok) return null;
+    return parseRatingData(await response.json());
+  } catch (e) {
+    return null;
+  }
+}
+
+async function submitShopRating(value) {
+  const response = await fetch(WORKER_URL + 'api/rate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rating: value })
+  });
+  if (!response.ok) throw new Error('rate failed');
+  const data = await response.json().catch(function () { return null; });
+  return parseRatingData(data);
+}
+
+function buildRatingStars() {
+  const starPath = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.83 5.9 6.17.83-4.53 4.3 1.15 6.47L12 16.9l-5.62 3.1 1.15-6.47L3 9.23l6.17-.83L12 2.5z"/></svg>';
+  let html = '';
+  for (let i = 1; i <= 10; i++) {
+    html += '<button class="rating__star" type="button" data-value="' + i + '" aria-label="Оценить на ' + i + ' из 10">' + starPath + '</button>';
+  }
+  ratingStarsWrap.innerHTML = html;
+
+  ratingStarsWrap.addEventListener('mouseover', function (e) {
+    if (ratingLocked) return;
+    const star = e.target.closest('.rating__star');
+    if (star) setStarPreview(parseInt(star.dataset.value, 10));
+  });
+  ratingStarsWrap.addEventListener('mouseleave', function () {
+    if (ratingLocked) return;
+    clearStarPreview();
+  });
+
+  ratingStarsWrap.addEventListener('click', async function (e) {
+    if (ratingLocked) return;
+    const star = e.target.closest('.rating__star');
+    if (!star) return;
+    const value = parseInt(star.dataset.value, 10);
+    ratingLocked = true;
+    clearStarPreview();
+    applySelectedStars(value);
+    ratingStarsWrap.classList.add('is-locked');
+    try {
+      const updated = await submitShopRating(value);
+      localStorage.setItem(RATING_KEY, String(value));
+      if (updated) renderRatingAverage(updated); else fetchShopRating().then(renderRatingAverage);
+      setTimeout(function () {
+        ratingStarsWrap.classList.add('is-fading');
+        setTimeout(function () {
+          ratingStarsWrap.style.display = 'none';
+          showRatingThanks(value);
+        }, 500);
+      }, 450);
+    } catch (err) {
+      ratingLocked = false;
+      ratingStarsWrap.classList.remove('is-locked');
+      ratingStarsWrap.querySelectorAll('.rating__star').forEach(function (btn) {
+        btn.classList.remove('is-selected', 'rating__star--broken');
+      });
+      showToast('Не удалось отправить оценку. Попробуйте ещё раз.', 'error');
+    }
+  });
+}
+
+function initShopRating() {
+  if (!ratingStarsWrap) return;
+  buildRatingStars();
+
+  // Уже голосовал — звёзды не показываем, сразу благодарность
+  const rated = localStorage.getItem(RATING_KEY);
+  if (rated) {
+    const value = parseInt(rated, 10);
+    if (value >= 1 && value <= 10) showRatingThanks(value); else showRatingThanks(null);
+    ratingStarsWrap.style.display = 'none';
+  }
+
+  fetchShopRating().then(function (data) {
+    if (data) renderRatingAverage(data); else ratingValueEl.textContent = '—';
+  });
+}
+
+// =============================================
 // ===== ЗАПУСК =====
 // =============================================
 initAgeGate();
 initScrollReveal();
 initScrollToTop();
 checkReferral();
+initShopRating();
 loadFavoritesFromStorage();
 loadCartFromStorage(false);
 loadProducts().then(() => {

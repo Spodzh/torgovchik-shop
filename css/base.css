@@ -609,6 +609,121 @@ input, textarea, select {
 
 .footer__version svg { flex-shrink: 0; }
 
+/* ===== ОЦЕНКА МАГАЗИНА ===== */
+.rating { padding: 40px 0 20px; }
+
+.rating__card {
+    --star-size: 34px;
+    --star-gap: 6px;
+    max-width: 560px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
+    padding: 28px 30px;
+    text-align: center;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.rating__card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.45;
+}
+
+.rating__average {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    font-size: 17px;
+    color: var(--text-primary);
+}
+
+.rating__medal {
+    color: var(--accent);
+    display: inline-flex;
+    align-self: center;
+    filter: drop-shadow(0 0 8px rgba(197, 138, 69, 0.5));
+}
+
+.rating__score b {
+    display: inline-block;
+    font-family: 'Bitter', serif;
+    font-size: 24px;
+    color: var(--accent-hover);
+    text-shadow: 0 0 18px rgba(197, 138, 69, 0.35);
+    transition: color 0.4s ease;
+}
+
+.rating__score--pulse { animation: rating-score-pulse 0.6s ease; }
+
+@keyframes rating-score-pulse {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.18); }
+    100% { transform: scale(1); }
+}
+
+.rating__votes {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.rating__stars {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--star-gap);
+    margin-top: 20px;
+}
+
+.rating__star {
+    width: var(--star-size);
+    height: var(--star-size);
+    padding: 0;
+    background: none;
+    border: none;
+    color: rgba(130, 149, 160, 0.35);
+    cursor: pointer;
+    transition: transform 0.18s ease, color 0.25s ease, filter 0.3s ease;
+    touch-action: manipulation;
+}
+
+.rating__star svg { display: block; width: 100%; height: 100%; fill: currentColor; }
+
+/* Предпросмотр при наведении — янтарные звёзды до курсора */
+.rating__star.is-preview { color: var(--accent); filter: drop-shadow(0 0 6px rgba(197, 138, 69, 0.45)); transform: translateY(-2px); }
+
+/* Выбранная оценка — светящееся золото */
+.rating__star.is-selected { color: var(--accent-hover); filter: drop-shadow(0 0 9px rgba(217, 160, 91, 0.65)); }
+
+/* Оценка 1/10 — красная «разбитая» звезда */
+.rating__star--broken {
+    color: #E05555 !important;
+    filter: drop-shadow(0 0 8px rgba(224, 85, 85, 0.6)) !important;
+    transform: rotate(-24deg) scale(0.88);
+}
+
+/* После голосования звёзды блокируются и растворяются */
+.rating__stars.is-locked .rating__star { cursor: default; }
+.rating__stars.is-fading { opacity: 0; transform: scale(0.96); transition: opacity 0.5s ease, transform 0.5s ease; }
+
+.rating__thanks {
+    margin-top: 18px;
+    font-size: 15px;
+    color: var(--text-secondary);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.rating__thanks.is-visible { opacity: 1; transform: translateY(0); }
+
 /* ===== ХОВЕРЫ ===== */
 @media (hover: hover) and (pointer: fine) {
     .about__card:hover { 
@@ -625,6 +740,7 @@ input, textarea, select {
     .contacts__btn:hover { background: rgba(197,138,69,0.1); box-shadow: 0 0 20px rgba(197,138,69,0.2); color: var(--accent-hover); }
     .footer a:hover { color: var(--accent); border-bottom-color: var(--accent); }
     .footer__version:hover { color: var(--accent); opacity: 1; }
+    .rating__stars:not(.is-locked) .rating__star:hover { transform: translateY(-3px) scale(1.12); filter: drop-shadow(0 0 7px rgba(197, 138, 69, 0.5)); }
 }
 
 /* ===== АДАПТИВ ===== */
@@ -709,6 +825,11 @@ input, textarea, select {
     .faq__answer { font-size: 14px; }
     .contacts__btn { font-size: 14px; padding: 12px 24px; width: 100%; }
     .section-title { margin-bottom: 32px; }
+    .rating__card { padding: 24px 14px; }
+    .rating__average { font-size: 15px; }
+    .rating__score b { font-size: 21px; }
+    /* 10 крупных звёзд в ряд на экране от 320px */
+    .rating__card { --star-size: clamp(25px, calc((100vw - 64px - 27px) / 10), 30px); --star-gap: 3px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
