@@ -1,5 +1,5 @@
 /* =============================================
-   ===== БАЗА / NOVEMBER / FIRST FROST =====
+   ===== БАЗА / GTA 6 EDITION / VICE CITY =====
    ============================================= */
 * {
     margin: 0;
@@ -20,49 +20,50 @@
 }
 
 :root {
-    /* Фоны */
-    --bg-main: #17191B;
-    --bg-section: #202326;
-    --bg-card: #292725;
-    --bg-card-hover: #33302C;
-    --bg-modal: #202326;
-    --bg-footer: #111315;
+    /* Фоны: глубокий фиолетово-чёрный Vice City */
+    --bg-main: #140A1E;
+    --bg-section: #1D1229;
+    --bg-card: #241733;
+    --bg-card-hover: #2E1E40;
+    --bg-modal: #1D1229;
+    --bg-footer: #0F0817;
 
     /* Границы */
-    --border-soft: rgba(130, 149, 160, 0.15);
-    --border-medium: rgba(130, 149, 160, 0.35);
-    --border-orange: rgba(197, 138, 69, 0.3);
-    --border-modal: rgba(130, 149, 160, 0.25);
+    --border-soft: rgba(0, 240, 255, 0.15);
+    --border-medium: rgba(0, 240, 255, 0.35);
+    --border-orange: rgba(255, 0, 127, 0.3);
+    --border-modal: rgba(0, 240, 255, 0.25);
 
     /* Текст */
-    --text-primary: #E4E7E5;
-    --text-secondary: #A7AAA8;
-    --text-muted: #7A7D7C;
-    --text-footer: #7A7D7C;
+    --text-primary: #FFF0F5;
+    --text-secondary: #C9A9C4;
+    --text-muted: #9A7B99;
+    --text-footer: #9A7B99;
 
-    /* Акценты */
-    --accent: #C58A45;
-    --accent-hover: #D9A05B;
-    --accent-deep: #94613C;
-    --cold-blue: #8295A0;
-    --price: #D9A05B;
+    /* Акценты: неон Vice City */
+    --accent: #FF007F;
+    --accent-hover: #FF4DA6;
+    --accent-deep: #B0005C;
+    --cold-blue: #00F0FF;
+    --price: #FF4DA6;
 
     /* Градиенты */
-    --grad-accent: linear-gradient(135deg, #C58A45, #94613C);
-    --grad-cold: linear-gradient(135deg, #8295A0, #6B7D88);
-    --grad-header: rgba(23, 25, 27, 0.68);
-    --grad-card-hover: linear-gradient(180deg, rgba(51, 48, 44, 0) 0%, rgba(197, 138, 69, 0.05) 100%);
-    --grad-ivory: linear-gradient(135deg, #F7F1E6 0%, #E9DCC8 100%);
+    --grad-accent: linear-gradient(135deg, #FF007F, #B0005C);
+    --grad-cold: linear-gradient(135deg, #00F0FF, #0090B8);
+    --grad-header: rgba(20, 10, 30, 0.68);
+    --grad-card-hover: linear-gradient(180deg, rgba(46, 30, 64, 0) 0%, rgba(255, 0, 127, 0.05) 100%);
+    --grad-ivory: linear-gradient(135deg, #FFF0F5 0%, #FFD6E8 100%);
 
-    /* Типографика: Unbounded — «элитный гаджет», Manrope — текст */
+    /* Типографика: Montserrat Black — постеры GTA, Manrope — текст */
     --font-display: 'Unbounded', 'Manrope', sans-serif;
+    --font-gta: 'Montserrat', 'Manrope', sans-serif;
 
     /* Тени */
     --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.4);
-    --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(197, 138, 69, 0.1);
-    --shadow-warm: 0 8px 30px rgba(197, 138, 69, 0.2);
-    --shadow-warm-hover: 0 12px 40px rgba(197, 138, 69, 0.35);
-    --shadow-cold: 0 8px 30px rgba(130, 149, 160, 0.15);
+    --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 0, 127, 0.1);
+    --shadow-warm: 0 8px 30px rgba(255, 0, 127, 0.2);
+    --shadow-warm-hover: 0 12px 40px rgba(255, 0, 127, 0.35);
+    --shadow-cold: 0 8px 30px rgba(0, 240, 255, 0.15);
 
     /* Z-index слои */
     --z-mobile-menu: 90;
@@ -95,33 +96,49 @@ body {
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
     overflow-x: hidden;
-    /* ===== АТМОСФЕРНЫЙ ФОН (Поздняя осень / Первый иней) =====
-       Слои (сверху вниз): тёмный оверлей для читаемости → длинная
-       вертикальная картинка → мягкие пятна-фолбэк.
-       ВАЖНО: attachment по умолчанию = scroll, картинка ПРОКРУЧИВАЕТСЯ
-       вместе с сайтом, никакого background-attachment: fixed.
-       Если картинка не загрузится — остаётся цвет + пятна. */
+    /* Позиционирующий контейнер для фонового слоя body::before */
+    position: relative;
+    /* Сама картинка фона вынесена в body::before и размыта —
+       см. блок «РАЗМЫТЫЙ ФОН» ниже. Здесь только цвет-фолбэк. */
+}
+
+/* ===== РАЗМЫТЫЙ ФОН (GTA 6 EDITION) =====
+   Фоновая картинка живёт в отдельном псевдоэлементе и размывается
+   filter: blur() — так в глубину уходит ТОЛЬКО фон, а контент
+   (текст, карточки) остаётся идеально резким.
+   Слои (сверху вниз): фиолетовый оверлей для читаемости → длинная
+   картинка gta-long-bg.jpg → неоновые пятна-фолбэк.
+   ВАЖНО: слой absolute, картинка ПРОКРУЧИВАЕТСЯ вместе с сайтом,
+   никакого position: fixed. inset отрицательный — прячет мутные
+   края блюра. Слой ниже контента (z-index: -2), ауры выше (z-index: -1). */
+body::before {
+    content: '';
+    position: absolute;
+    inset: -14px;
+    z-index: -2;
+    pointer-events: none;
     background-image:
         linear-gradient(
             180deg,
-            rgba(19, 21, 23, 0.84) 0%,
-            rgba(20, 22, 24, 0.76) 40%,
-            rgba(16, 18, 20, 0.86) 100%
+            rgba(20, 10, 30, 0.84) 0%,
+            rgba(24, 12, 36, 0.76) 40%,
+            rgba(14, 7, 22, 0.86) 100%
         ),
-        url('../assets/bg-long-autumn.jpg'),
-        radial-gradient(circle at 15% 50%, rgba(130, 149, 160, 0.04) 0%, transparent 50%),
-        radial-gradient(circle at 85% 30%, rgba(197, 138, 69, 0.04) 0%, transparent 50%);
+        url('../assets/gta-long-bg.jpg'),
+        radial-gradient(circle at 15% 50%, rgba(0, 240, 255, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 85% 30%, rgba(255, 0, 127, 0.04) 0%, transparent 50%);
     background-repeat: no-repeat;
     background-position: top center;
     /* Оверлей тянется на весь документ, картинка — cover относительно
        scrollable-области (вся высота сайта, без искажений и повторов) */
     background-size: auto, cover, auto, auto;
+    /* Лёгкая дымка Vice City: фон уходит на второй план */
+    filter: blur(4px) saturate(1.15);
 }
 
-/* Слой 2: плавающие ауры (Glass Noir).
+/* Слой: неоновая аура (Glass Noir).
    Анимируется только transform — не вызывает repaint, мягкость
    даёт градиент вместо дорогого filter: blur на большой области */
-body::before,
 body::after {
     content: '';
     position: fixed;
@@ -129,29 +146,12 @@ body::after {
     pointer-events: none;
     z-index: -1;
     will-change: transform;
-}
-
-body::before {
-    top: -18%;
-    left: -12%;
-    width: 60vmax;
-    height: 60vmax;
-    background: radial-gradient(circle at center, rgba(197, 138, 69, 0.08) 0%, transparent 62%);
-    animation: aura-drift-warm 28s ease-in-out infinite alternate;
-}
-
-body::after {
     bottom: -20%;
     right: -10%;
     width: 55vmax;
     height: 55vmax;
-    background: radial-gradient(circle at center, rgba(130, 149, 160, 0.07) 0%, transparent 62%);
+    background: radial-gradient(circle at center, rgba(0, 240, 255, 0.07) 0%, transparent 62%);
     animation: aura-drift-cold 36s ease-in-out infinite alternate;
-}
-
-@keyframes aura-drift-warm {
-    from { transform: translate3d(0, 0, 0) scale(1); }
-    to   { transform: translate3d(7vw, 9vh, 0) scale(1.18); }
 }
 
 @keyframes aura-drift-cold {
@@ -205,10 +205,10 @@ input, textarea, select {
 /* Первичная кнопка: слоновья кость на тёмном — люксовый контраст */
 .btn-primary {
     background: var(--grad-ivory);
-    color: #1A1815;
+    color: #140A1E;
     box-shadow:
         0 1px 2px rgba(0, 0, 0, 0.5),
-        0 12px 36px rgba(197, 138, 69, 0.22);
+        0 12px 36px rgba(255, 0, 127, 0.22);
     position: relative;
     overflow: hidden;
 }
@@ -225,12 +225,12 @@ input, textarea, select {
         transform: translateY(-2px) scale(1.02);
         box-shadow:
             0 2px 4px rgba(0, 0, 0, 0.5),
-            0 18px 48px rgba(197, 138, 69, 0.35);
+            0 18px 48px rgba(255, 0, 127, 0.35);
     }
     .btn-secondary:hover {
         background: rgba(255, 255, 255, 0.08);
         border-color: var(--accent);
-        box-shadow: 0 6px 24px rgba(197, 138, 69, 0.15);
+        box-shadow: 0 6px 24px rgba(255, 0, 127, 0.15);
     }
 }
 
@@ -245,21 +245,31 @@ input, textarea, select {
     .btn-primary:hover .btn-arrow { transform: translateX(4px); }
 }
 
-/* ===== ЗАГОЛОВКИ ===== */
+/* ===== ЗАГОЛОВКИ (GTA 6 EDITION: Montserrat Black Italic) ===== */
+h1, h2 {
+    font-family: var(--font-gta);
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: 0.01em;
+}
+
 .section-title {
-    font-family: var(--font-display);
+    font-family: var(--font-gta);
     font-size: clamp(24px, 3vw, 38px);
-    font-weight: 500;
+    font-weight: 900;
+    font-style: italic;
     margin-bottom: 40px;
     text-align: center;
     color: var(--text-primary);
-    letter-spacing: -0.01em;
+    letter-spacing: 0.01em;
     position: relative;
     display: block;
     width: max-content;
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
+    /* Неоновое свечение, как у логотипа GTA */
+    text-shadow: 0 0 24px rgba(255, 0, 127, 0.25);
 }
 
 /* ===== ГЕРОЙ (NOIR EDITORIAL POSTER, КОМПАКТНЫЙ) ===== */
@@ -306,11 +316,11 @@ input, textarea, select {
     z-index: 0;
     background: linear-gradient(
         90deg,
-        rgba(23, 25, 27, 0.95) 0%,
-        rgba(23, 25, 27, 0.85) 30%,
-        rgba(23, 25, 27, 0.6) 55%,
-        rgba(23, 25, 27, 0.15) 80%,
-        rgba(23, 25, 27, 0) 100%
+        rgba(20, 10, 30, 0.95) 0%,
+        rgba(20, 10, 30, 0.85) 30%,
+        rgba(20, 10, 30, 0.6) 55%,
+        rgba(20, 10, 30, 0.15) 80%,
+        rgba(20, 10, 30, 0) 100%
     );
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
@@ -341,7 +351,7 @@ input, textarea, select {
     height: 80%;
     background: radial-gradient(
         circle at center,
-        rgba(130, 149, 160, 0.15),
+        rgba(0, 240, 255, 0.15),
         transparent 70%
     );
     filter: blur(50px);
@@ -379,14 +389,15 @@ input, textarea, select {
 }
 
 .hero__content h1 {
-    font-family: var(--font-display);
+    font-family: var(--font-gta);
     font-size: clamp(30px, 4.2vw, 56px);
-    font-weight: 500;
+    font-weight: 900;
+    font-style: italic;
     line-height: 1.12;
     margin-bottom: 24px;
     color: var(--text-primary);
-    letter-spacing: -0.01em;
-    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.55);
+    letter-spacing: 0.01em;
+    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.55), 0 0 30px rgba(255, 0, 127, 0.2);
 }
 
 .hero__content h1 .accent {
@@ -396,7 +407,7 @@ input, textarea, select {
 
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
     .hero__content h1 .accent {
-        background: linear-gradient(115deg, #E8C79B 0%, #D9A05B 45%, #B07C42 100%);
+        background: linear-gradient(115deg, #FF9BD4 0%, #FF007F 45%, #B0005C 100%);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -445,7 +456,7 @@ input, textarea, select {
     transition: background 0.35s var(--ease-smooth), border-color 0.35s var(--ease-smooth), transform 0.35s var(--ease-smooth), box-shadow 0.35s var(--ease-smooth);
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        inset 0 0 26px rgba(130, 149, 160, 0.06),
+        inset 0 0 26px rgba(0, 240, 255, 0.06),
         0 1px 2px rgba(0, 0, 0, 0.4),
         0 12px 36px rgba(0, 0, 0, 0.35);
 }
@@ -453,13 +464,13 @@ input, textarea, select {
 /* Fallback: если blur недоступен, карточки остаются плотными */
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .about__card {
-        background: rgba(41, 39, 37, 0.55);
+        background: rgba(36, 23, 51, 0.55);
         backdrop-filter: blur(18px) saturate(150%);
         -webkit-backdrop-filter: blur(18px) saturate(150%);
     }
 }
 
-.about__icon { font-size: 40px; line-height: 1; flex-shrink: 0; filter: drop-shadow(0 0 12px rgba(197,138,69,0.4)); }
+.about__icon { font-size: 40px; line-height: 1; flex-shrink: 0; filter: drop-shadow(0 0 12px rgba(255, 0, 127, 0.4)); }
 .about__card h3 { font-family: var(--font-display); font-size: 17px; font-weight: 500; color: var(--text-primary); margin-bottom: 8px; letter-spacing: 0; }
 .about__card p { font-size: 15px; color: var(--text-secondary); line-height: 1.65; }
 
@@ -482,13 +493,13 @@ input, textarea, select {
     overflow: hidden;
     transition: border-color 0.35s var(--ease-smooth), box-shadow 0.35s var(--ease-smooth);
     box-shadow:
-        inset 0 0 24px rgba(130, 149, 160, 0.06),
+        inset 0 0 24px rgba(0, 240, 255, 0.06),
         0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .faq__item {
-        background: rgba(41, 39, 37, 0.55);
+        background: rgba(36, 23, 51, 0.55);
         backdrop-filter: blur(16px) saturate(150%);
         -webkit-backdrop-filter: blur(16px) saturate(150%);
     }
@@ -540,7 +551,7 @@ input, textarea, select {
 }
 
 .contacts__simple { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
-.contacts__icon { fill: var(--text-primary); transition: fill 0.35s var(--ease-smooth); filter: drop-shadow(0 0 10px rgba(197,138,69,0.3)); }
+.contacts__icon { fill: var(--cold-blue); transition: fill 0.35s var(--ease-smooth), filter 0.35s var(--ease-smooth); filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.45)); }
 
 .contacts__btn {
     display: inline-block;
@@ -649,7 +660,7 @@ input, textarea, select {
     color: var(--accent);
     display: inline-flex;
     align-self: center;
-    filter: drop-shadow(0 0 8px rgba(197, 138, 69, 0.5));
+    filter: drop-shadow(0 0 8px rgba(255, 0, 127, 0.5));
 }
 
 .rating__score b {
@@ -657,7 +668,7 @@ input, textarea, select {
     font-family: 'Bitter', serif;
     font-size: 24px;
     color: var(--accent-hover);
-    text-shadow: 0 0 18px rgba(197, 138, 69, 0.35);
+    text-shadow: 0 0 18px rgba(255, 0, 127, 0.35);
     transition: color 0.4s ease;
 }
 
@@ -688,7 +699,7 @@ input, textarea, select {
     padding: 0;
     background: none;
     border: none;
-    color: rgba(130, 149, 160, 0.35);
+    color: rgba(0, 240, 255, 0.35);
     cursor: pointer;
     transition: transform 0.18s ease, color 0.25s ease, filter 0.3s ease;
     touch-action: manipulation;
@@ -697,10 +708,10 @@ input, textarea, select {
 .rating__star svg { display: block; width: 100%; height: 100%; fill: currentColor; }
 
 /* Предпросмотр при наведении — янтарные звёзды до курсора */
-.rating__star.is-preview { color: var(--accent); filter: drop-shadow(0 0 6px rgba(197, 138, 69, 0.45)); transform: translateY(-2px); }
+.rating__star.is-preview { color: var(--accent); filter: drop-shadow(0 0 6px rgba(255, 0, 127, 0.45)); transform: translateY(-2px); }
 
 /* Выбранная оценка — светящееся золото */
-.rating__star.is-selected { color: var(--accent-hover); filter: drop-shadow(0 0 9px rgba(217, 160, 91, 0.65)); }
+.rating__star.is-selected { color: var(--accent-hover); filter: drop-shadow(0 0 9px rgba(255, 77, 166, 0.65)); }
 
 /* Оценка 1/10 — красная «разбитая» звезда */
 .rating__star--broken {
@@ -730,17 +741,17 @@ input, textarea, select {
         background: var(--bg-card-hover); 
         border-color: var(--border-orange); 
         transform: translateY(-4px); 
-        box-shadow: 0 12px 30px rgba(0,0,0,0.4), 0 0 20px rgba(197,138,69,0.1); 
+        box-shadow: 0 12px 30px rgba(0,0,0,0.4), 0 0 20px rgba(255, 0, 127, 0.1); 
     }
     .faq__item:hover {
         border-color: var(--border-orange);
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
-    .contacts__icon:hover { fill: var(--accent); }
-    .contacts__btn:hover { background: rgba(197,138,69,0.1); box-shadow: 0 0 20px rgba(197,138,69,0.2); color: var(--accent-hover); }
+    .contacts__icon:hover { fill: var(--accent); filter: drop-shadow(0 0 12px rgba(255, 0, 127, 0.6)); }
+    .contacts__btn:hover { background: rgba(255, 0, 127, 0.1); box-shadow: 0 0 20px rgba(255, 0, 127, 0.2); color: var(--accent-hover); }
     .footer a:hover { color: var(--accent); border-bottom-color: var(--accent); }
     .footer__version:hover { color: var(--accent); opacity: 1; }
-    .rating__stars:not(.is-locked) .rating__star:hover { transform: translateY(-3px) scale(1.12); filter: drop-shadow(0 0 7px rgba(197, 138, 69, 0.5)); }
+    .rating__stars:not(.is-locked) .rating__star:hover { transform: translateY(-3px) scale(1.12); filter: drop-shadow(0 0 7px rgba(255, 0, 127, 0.5)); }
 }
 
 /* ===== АДАПТИВ ===== */
@@ -771,11 +782,11 @@ input, textarea, select {
     .hero__box::before {
         background: linear-gradient(
             180deg,
-            rgba(23, 25, 27, 0.95) 0%,
-            rgba(23, 25, 27, 0.82) 30%,
-            rgba(23, 25, 27, 0.4) 55%,
-            rgba(23, 25, 27, 0.3) 75%,
-            rgba(23, 25, 27, 0.88) 100%
+            rgba(20, 10, 30, 0.95) 0%,
+            rgba(20, 10, 30, 0.82) 30%,
+            rgba(20, 10, 30, 0.4) 55%,
+            rgba(20, 10, 30, 0.3) 75%,
+            rgba(20, 10, 30, 0.88) 100%
         );
         -webkit-backdrop-filter: none;
         backdrop-filter: none;

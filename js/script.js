@@ -1318,6 +1318,7 @@ function updateCartUI() {
   if (cart.length === 0) {
     if (cartItems) cartItems.innerHTML = `
       <div class="cart-empty">
+          <svg class="cart-empty__icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
           <p>Корзина пуста</p>
           <span>Добавьте товары из каталога</span>
       </div>
@@ -1528,6 +1529,18 @@ document.getElementById('changelogModalClose').addEventListener('click', () => c
 // ===== ИСТОРИЯ ОБНОВЛЕНИЙ (CHANGELOG) =====
 // =============================================
 const CHANGELOG = [
+  {
+    version: 'v1.7.0',
+    title: 'GTA 6 Edition',
+    date: '2026-11-17',
+    items: [
+      'Полный редизайн в стиле Vice City (GTA 6)',
+      'Неоновые цвета и свечения',
+      'Новые фоны и частицы',
+      'Перекрашена игра Flappy Slush',
+      'Обновлен шрифт заголовков'
+    ]
+  },
   {
     version: 'v1.6.0',
     title: 'Осень: новые фишки',
@@ -1905,11 +1918,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // =============================================
-// ===== АТМОСФЕРА: ИСКРЫ И СНЕЖИНКИ =====
+// ===== АТМОСФЕРА: НЕОНОВЫЕ ЧАСТИЦЫ =====
 // =============================================
-// «Поздняя осень / Первый иней»: редкие тёплые искры поднимаются,
-// холодные снежинки оседают. Прекомпилированные спрайты (градиент
-// рисуется один раз), DPR <= 2, пауза на скрытой вкладке.
+// «GTA 6 Edition / Vice City»: горячий неоново-розовый свет клубов
+// поднимается, неоново-голубой оседает. Прекомпилированные спрайты
+// (градиент рисуется один раз), DPR <= 2, пауза на скрытой вкладке.
 (function () {
   if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -1935,8 +1948,9 @@ document.addEventListener('DOMContentLoaded', function() {
     c.fillRect(0, 0, 28, 28);
     return s;
   }
-  var sparkSprite = makeSprite(217, 160, 91);
-  var snowSprite = makeSprite(150, 175, 196);
+  // Неон ночных клубов Vice City: розовый — вверх, голубой — вниз
+  var sparkSprite = makeSprite(255, 0, 127);
+  var snowSprite = makeSprite(0, 240, 255);
 
   function spawn(spawnAnywhere) {
     var isSnow = Math.random() < 0.62;

@@ -21,14 +21,14 @@
     border: 1px solid var(--border-soft);
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        inset 0 0 26px rgba(130, 149, 160, 0.05),
+        inset 0 0 26px rgba(0, 240, 255, 0.05),
         0 1px 2px rgba(0, 0, 0, 0.4),
         0 12px 36px rgba(0, 0, 0, 0.3);
 }
 
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .catalog__filters {
-        background: rgba(41, 39, 37, 0.55);
+        background: rgba(36, 23, 51, 0.55);
         backdrop-filter: blur(18px) saturate(150%);
         -webkit-backdrop-filter: blur(18px) saturate(150%);
     }
@@ -50,10 +50,10 @@
 }
 
 .filter-btn.active {
-    background: rgba(130, 149, 160, 0.15);
+    background: rgba(0, 240, 255, 0.15);
     color: var(--cold-blue);
     border-color: var(--cold-blue);
-    box-shadow: 0 0 15px rgba(130, 149, 160, 0.2);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
 }
 
 /* ===== СЕТКА ===== */
@@ -67,7 +67,7 @@
 .product-card {
     position: relative;
     background: var(--bg-card);
-    border: 1px solid rgba(130, 149, 160, 0.18);
+    border: 1px solid rgba(0, 240, 255, 0.18);
     border-radius: 20px;
     padding: 24px 20px 16px;
     text-align: left;
@@ -78,7 +78,7 @@
     flex-direction: column;
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        inset 0 0 30px rgba(130, 149, 160, 0.055),
+        inset 0 0 30px rgba(0, 240, 255, 0.055),
         0 1px 2px rgba(0, 0, 0, 0.4),
         0 14px 40px rgba(0, 0, 0, 0.4);
     user-select: none;
@@ -88,7 +88,7 @@
 /* Стеклянная поверхность поверх плавающих аур страницы */
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .product-card {
-        background: rgba(41, 39, 37, 0.55);
+        background: rgba(36, 23, 51, 0.55);
         backdrop-filter: blur(18px) saturate(150%);
         -webkit-backdrop-filter: blur(18px) saturate(150%);
     }
@@ -102,12 +102,12 @@
     background:
         radial-gradient(
             120px circle at var(--mx, 50%) var(--my, 20%),
-            rgba(255, 236, 200, 0.16) 0%,
+            rgba(255, 225, 245, 0.16) 0%,
             transparent 70%
         ),
         radial-gradient(
             340px circle at var(--mx, 50%) var(--my, 20%),
-            rgba(217, 160, 91, 0.14) 0%,
+            rgba(255, 0, 127, 0.14) 0%,
             transparent 70%
         );
     opacity: 0;
@@ -149,7 +149,7 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: rgba(23, 25, 27, 0.7);
+    background: rgba(20, 10, 30, 0.7);
     backdrop-filter: blur(4px);
     border: 1px solid var(--border-soft);
     color: var(--cold-blue);
@@ -164,9 +164,9 @@
 }
 
 .product-card__fav.active {
-    background: rgba(130, 149, 160, 0.2);
+    background: rgba(0, 240, 255, 0.2);
     border-color: var(--cold-blue);
-    box-shadow: 0 0 12px rgba(130, 149, 160, 0.3);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
 }
 
 .product-card__image {
@@ -180,8 +180,8 @@
     border-radius: 14px;
     /* «Пьедестал»: мягкое тёплое свечение снизу, как витринная подсветка */
     background:
-        radial-gradient(circle at 50% 35%, rgba(217, 160, 91, 0.07) 0%, transparent 70%),
-        linear-gradient(180deg, rgba(197, 138, 69, 0) 55%, rgba(197, 138, 69, 0.13) 100%);
+        radial-gradient(circle at 50% 35%, rgba(255, 77, 166, 0.07) 0%, transparent 70%),
+        linear-gradient(180deg, rgba(255, 0, 127, 0) 55%, rgba(255, 0, 127, 0.13) 100%);
     padding: 12px;
     pointer-events: none;
     transition: transform 0.45s var(--ease-smooth), filter 0.45s var(--ease-smooth);
@@ -211,7 +211,7 @@
     color: var(--text-muted);
     margin-bottom: 0;
     padding-bottom: 12px;
-    border-bottom: 1px solid rgba(130, 149, 160, 0.18);
+    border-bottom: 1px solid rgba(0, 240, 255, 0.18);
     text-transform: uppercase;
     letter-spacing: 2px;
 }
@@ -225,10 +225,11 @@
     line-height: 1.1;
 }
 
-/* Кнопка «В корзину»: настоящая кнопка — полупрозрачный фон, рамка, скругление */
+/* Кнопка «В корзину»: настоящая кнопка — полупрозрачный фон, рамка, скругление.
+   GTA 6 Edition: неоново-розовое свечение по умолчанию */
 .product-card__btn {
-    background: rgba(217, 160, 91, 0.08);
-    border: 1px solid rgba(217, 160, 91, 0.35);
+    background: rgba(255, 0, 127, 0.08);
+    border: 1px solid rgba(255, 0, 127, 0.35);
     border-radius: 10px;
     padding: 10px 16px;
     font-weight: 600;
@@ -242,6 +243,9 @@
     z-index: 2;
     letter-spacing: 0.3px;
     position: relative;
+    box-shadow:
+        0 0 12px rgba(255, 0, 127, 0.28),
+        inset 0 0 8px rgba(255, 0, 127, 0.08);
 }
 
 .product-card__popularity {
@@ -250,8 +254,8 @@
     font-size: 11px;
     font-weight: 700;
     color: var(--accent);
-    background: rgba(197, 138, 69, 0.1);
-    border: 1px solid rgba(197, 138, 69, 0.3);
+    background: rgba(255, 0, 127, 0.1);
+    border: 1px solid rgba(255, 0, 127, 0.3);
     padding: 4px 12px;
     border-radius: 20px;
     margin-bottom: 12px;
@@ -268,9 +272,9 @@
 .skeleton {
     background: linear-gradient(
         90deg,
-        rgba(51, 48, 44, 0.5) 0%,
-        rgba(130, 149, 160, 0.1) 50%,
-        rgba(51, 48, 44, 0.5) 100%
+        rgba(46, 30, 64, 0.5) 0%,
+        rgba(0, 240, 255, 0.1) 50%,
+        rgba(46, 30, 64, 0.5) 100%
     );
     background-size: 200% 100%;
     border-radius: 8px;
@@ -344,7 +348,7 @@
 
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .recently-viewed__card {
-        background: rgba(41, 39, 37, 0.55);
+        background: rgba(36, 23, 51, 0.55);
         backdrop-filter: blur(14px) saturate(140%);
         -webkit-backdrop-filter: blur(14px) saturate(140%);
     }
@@ -357,7 +361,7 @@
     object-fit: contain;
     margin: 0 auto 12px;
     border-radius: 8px;
-    background: radial-gradient(circle, rgba(197, 138, 69, 0.05) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 0, 127, 0.05) 0%, transparent 70%);
     padding: 8px;
     pointer-events: none;
 }
@@ -394,12 +398,14 @@
         /* Во время наклона transform отдаём быстрее, чтобы карточка «липла» к курсору */
         transition: transform 0.16s var(--ease-smooth), border-color 0.35s var(--ease-smooth), box-shadow 0.35s var(--ease-smooth);
         will-change: transform;
-        border-color: rgba(217, 160, 91, 0.35);
+        border-color: rgba(0, 240, 255, 0.35);
+        /* Неоновое свечение Vice City: розовый ореол + голубой контур */
         box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.07),
             0 2px 4px rgba(0, 0, 0, 0.4),
             0 24px 56px rgba(0, 0, 0, 0.5),
-            0 0 40px rgba(197, 138, 69, 0.08);
+            0 0 40px rgba(255, 0, 127, 0.28),
+            0 0 18px rgba(0, 240, 255, 0.18);
     }
     .product-card:hover::before { opacity: 1; }
     .product-card:hover::after { transform: scaleY(1); }
@@ -408,14 +414,14 @@
         transform: translateY(-6px) scale(1.07);
         filter: brightness(1.06) drop-shadow(0 22px 22px rgba(0, 0, 0, 0.45));
     }
-    .product-card__fav:hover { transform: scale(1.1); background: rgba(130, 149, 160, 0.2); border-color: var(--cold-blue); }
+    .product-card__fav:hover { transform: scale(1.1); background: rgba(0, 240, 255, 0.2); border-color: var(--cold-blue); }
     .product-card__btn:hover {
-        background: rgba(217, 160, 91, 0.18);
+        background: rgba(255, 0, 127, 0.18);
         border-color: var(--accent);
-        color: #E8C79B;
-        box-shadow: 0 4px 16px rgba(197, 138, 69, 0.25);
+        color: #FFF0F5;
+        box-shadow: 0 0 20px rgba(255, 0, 127, 0.45), inset 0 0 10px rgba(255, 0, 127, 0.12);
     }
-    .recently-viewed__card:hover { border-color: rgba(217, 160, 91, 0.3); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
+    .recently-viewed__card:hover { border-color: rgba(255, 77, 166, 0.3); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
 }
 
 /* ===== АДАПТИВ ===== */

@@ -25,13 +25,28 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Геймпад: неоново-розовая вывеска */
+.footer__play svg {
+    color: var(--accent);
+    filter: drop-shadow(0 0 5px var(--accent));
+}
+.footer__play svg * { stroke-width: 2.4; }
+
 @media (hover: hover) and (pointer: fine) {
     .footer__play:hover {
         transform: translateY(-2px);
     }
+    .footer__play:hover svg { filter: drop-shadow(0 0 8px var(--accent)); }
 }
 
 /* --- КНОПКА НАВЕРХ --- */
+/* Стрелка: неоново-голубая, на розовой кнопке — тёмная, без свечения */
+.scroll-to-top svg {
+    color: var(--cold-blue);
+    filter: drop-shadow(0 0 5px var(--cold-blue));
+}
+.scroll-to-top svg * { stroke-width: 2.4; }
+.scroll-to-top:hover svg { color: #140A1E; filter: none; }
 .scroll-to-top {
     position: fixed;
     bottom: 24px;
@@ -61,10 +76,10 @@
 
 .scroll-to-top:hover {
     background: var(--accent);
-    color: #17191B;
+    color: #140A1E;
     border-color: var(--accent);
     transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(197, 138, 69, 0.3);
+    box-shadow: 0 8px 25px rgba(255, 0, 127, 0.3);
 }
 
 @media (max-width: 768px) {

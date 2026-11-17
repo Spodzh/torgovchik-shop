@@ -144,7 +144,7 @@
 .cart-item__remove {
     margin-left: auto;
     background: transparent;
-    border: 1px solid rgba(197, 138, 69, 0.3);
+    border: 1px solid rgba(255, 0, 127, 0.3);
     color: var(--accent);
     cursor: pointer;
     font-size: 18px;
@@ -169,11 +169,16 @@
     padding: 20px;
 }
 
-.cart-empty::before {
-    content: '🍂';
-    font-size: 64px;
-    margin-bottom: 20px;
-    filter: drop-shadow(0 0 15px rgba(197, 138, 69, 0.3));
+/* Пустая корзина: неоновая SVG-вывеска Vice City (иконка инлайновая,
+   в разметке script.js / index.html — стилизуем её здесь) */
+.cart-empty__icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 18px;
+    /* Двухцветный неон: голубой ореол вокруг розовой обводки + розовый залив */
+    filter:
+        drop-shadow(0 0 6px rgba(0, 240, 255, 0.8))
+        drop-shadow(0 0 20px rgba(255, 0, 127, 0.55));
 }
 
 .cart-empty p {
@@ -239,7 +244,7 @@
     width: 100%;
     margin-top: 16px;
     background: transparent;
-    border: 1px dashed rgba(197, 138, 69, 0.4);
+    border: 1px dashed rgba(255, 0, 127, 0.4);
     color: var(--text-muted);
     padding: 14px 20px;
     border-radius: 8px;
@@ -258,7 +263,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(23, 25, 27, 0.8);
+    background: rgba(20, 10, 30, 0.8);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     z-index: var(--z-overlay);
@@ -271,10 +276,10 @@
 
 /* ===== ХОВЕРЫ ===== */
 @media (hover: hover) and (pointer: fine) {
-    .cart-panel__close:hover { color: var(--accent); border-color: var(--accent); background: rgba(197, 138, 69, 0.08); }
-    .cart-qty-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(197, 138, 69, 0.05); }
-    .cart-item__remove:hover { background: rgba(197, 138, 69, 0.15); border-color: var(--accent); }
-    .btn-clear-cart:hover { color: var(--accent); border-color: var(--accent); background: rgba(197, 138, 69, 0.05); }
+    .cart-panel__close:hover { color: var(--accent); border-color: var(--accent); background: rgba(255, 0, 127, 0.08); }
+    .cart-qty-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(255, 0, 127, 0.05); }
+    .cart-item__remove:hover { background: rgba(255, 0, 127, 0.15); border-color: var(--accent); }
+    .btn-clear-cart:hover { color: var(--accent); border-color: var(--accent); background: rgba(255, 0, 127, 0.05); }
 }
 
 /* ===== АДАПТИВ ===== */
@@ -290,4 +295,7 @@
     .cart-qty-btn { width: 44px; height: 44px; font-size: 18px; }
     .cart-item__remove { width: 44px; height: 44px; font-size: 16px; }
     .cart-panel__footer p strong span { font-size: 24px; }
+    /* Неоновая вывеска пустой корзины: компактнее на узких экранах */
+    .cart-empty__icon { width: 48px; height: 48px; margin-bottom: 14px; }
+    .cart-empty p { font-size: 19px; }
 }

@@ -4,20 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Flappy Slush</title>
-    <meta name="theme-color" content="#17191B" />
+    <meta name="theme-color" content="#140A1E" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --glass: rgba(41, 39, 37, 0.55);
-            --glass-border: rgba(130, 149, 160, 0.18);
-            --gold: linear-gradient(135deg, #C58A45, #94613C);
+            --glass: rgba(36, 23, 51, 0.55);
+            --glass-border: rgba(0, 240, 255, 0.18);
+            --gold: linear-gradient(135deg, #FF007F, #B0005C);
             --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
         }
         body {
-            background-color: #17191B;
+            background-color: #140A1E;
             overflow: hidden;
             font-family: 'Manrope', sans-serif;
             height: 100vh;
@@ -28,11 +28,11 @@
         }
         canvas {
             display: block;
-            background-color: #17191B;
+            background-color: #140A1E;
             border-radius: 28px;
             box-shadow:
-                0 0 0 1px rgba(130, 149, 160, 0.18),
-                0 0 60px rgba(197, 138, 69, 0.16),
+                0 0 0 1px rgba(0, 240, 255, 0.18),
+                0 0 60px rgba(255, 0, 127, 0.16),
                 0 30px 90px rgba(0, 0, 0, 0.8);
         }
 
@@ -47,12 +47,12 @@
             position: absolute; top: 36px;
             font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 52px;
             color: #F7F1E6;
-            text-shadow: 0 0 24px rgba(197, 138, 69, 0.55), 0 4px 18px rgba(0, 0, 0, 0.6);
+            text-shadow: 0 0 24px rgba(255, 0, 127, 0.55), 0 4px 18px rgba(0, 0, 0, 0.6);
             pointer-events: none; z-index: 10;
             padding: 4px 26px;
             border-radius: 999px;
-            background: rgba(23, 25, 27, 0.45);
-            border: 1px solid rgba(130, 149, 160, 0.2);
+            background: rgba(20, 10, 30, 0.45);
+            border: 1px solid rgba(0, 240, 255, 0.2);
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             transition: transform 0.25s var(--ease-smooth);
         }
@@ -74,9 +74,9 @@
             text-align: center; pointer-events: auto;
             box-shadow:
                 inset 0 1px 0 rgba(255, 255, 255, 0.06),
-                inset 0 0 30px rgba(130, 149, 160, 0.05),
+                inset 0 0 30px rgba(0, 240, 255, 0.05),
                 0 24px 70px rgba(0, 0, 0, 0.75),
-                0 0 46px rgba(197, 138, 69, 0.1);
+                0 0 46px rgba(255, 0, 127, 0.1);
             animation: popIn 0.45s var(--ease-smooth);
             max-width: 90%; width: 420px; z-index: 20;
         }
@@ -84,8 +84,8 @@
         .screen::before {
             content: ''; position: absolute; inset: 0; border-radius: inherit;
             background:
-                radial-gradient(circle at 50% 25%, rgba(217, 160, 91, 0.07) 0%, transparent 70%),
-                linear-gradient(180deg, rgba(197, 138, 69, 0) 55%, rgba(197, 138, 69, 0.12) 100%);
+                radial-gradient(circle at 50% 25%, rgba(255, 77, 166, 0.07) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(255, 0, 127, 0) 55%, rgba(255, 0, 127, 0.12) 100%);
             pointer-events: none;
         }
         .screen.hidden { display: none; }
@@ -98,10 +98,10 @@
             text-transform: uppercase;
         }
         /* Золотой градиент по буквам, фолбэк — сплошной янтарный */
-        .screen h1 .gold-text { color: #C58A45; }
+        .screen h1 .gold-text { color: #FF007F; }
         @supports ((-webkit-background-clip: text) or (background-clip: text)) {
             .screen h1 .gold-text {
-                background: linear-gradient(115deg, #E8C79B 0%, #D9A05B 45%, #B07C42 100%);
+                background: linear-gradient(115deg, #FF9BD4 0%, #FF007F 45%, #B0005C 100%);
                 -webkit-background-clip: text; background-clip: text;
                 -webkit-text-fill-color: transparent; color: transparent;
             }
@@ -110,57 +110,57 @@
         .score-text {
             font-family: 'Unbounded', sans-serif; font-weight: 600;
             font-size: 44px; color: #F7F1E6; margin-bottom: 6px;
-            text-shadow: 0 0 20px rgba(197, 138, 69, 0.5);
+            text-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
         }
-        .score-label { font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #8295A0; margin-bottom: 14px; }
+        .score-label { font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #00F0FF; margin-bottom: 14px; }
 
         .new-record {
             display: none;
             font-family: 'Unbounded', sans-serif; font-size: 14px; font-weight: 600;
-            color: #D9A05B; text-shadow: 0 0 15px rgba(217, 160, 91, 0.6);
+            color: #FF4DA6; text-shadow: 0 0 15px rgba(255, 77, 166, 0.6);
             margin-bottom: 15px; animation: pulse 1s infinite alternate;
             align-items: center; justify-content: center; gap: 8px;
-            background: rgba(197, 138, 69, 0.1); border: 1px solid rgba(197, 138, 69, 0.35);
+            background: rgba(255, 0, 127, 0.1); border: 1px solid rgba(255, 0, 127, 0.35);
             border-radius: 999px; padding: 8px 16px;
         }
         .new-record.show { display: flex; }
         @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
 
-        .best-line { color: #C58A45; font-weight: 700; margin-bottom: 20px; font-size: 14px; }
+        .best-line { color: #FF007F; font-weight: 700; margin-bottom: 20px; font-size: 14px; }
         .best-line strong { font-family: 'Unbounded', sans-serif; font-weight: 600; }
 
         /* ===== ЗОЛОТАЯ КНОПКА (как на сайте) ===== */
         .btn-play {
-            background: var(--gold); color: #17191B;
+            background: var(--gold); color: #140A1E;
             border: none; padding: 16px 40px; font-size: 16px; font-weight: 700;
             font-family: 'Manrope', sans-serif; letter-spacing: 0.4px;
             border-radius: 999px; cursor: pointer; text-transform: uppercase;
             transition: transform 0.35s var(--ease-smooth), box-shadow 0.35s var(--ease-smooth);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 36px rgba(197, 138, 69, 0.28);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 36px rgba(255, 0, 127, 0.28);
             width: 100%; margin-bottom: 14px; display: block; text-decoration: none; line-height: 1.5;
         }
         @media (hover: hover) and (pointer: fine) {
             .btn-play:hover {
                 transform: translateY(-2px) scale(1.02);
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 18px 48px rgba(197, 138, 69, 0.42);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 18px 48px rgba(255, 0, 127, 0.42);
             }
         }
         .btn-play:active { transform: translateY(0) scale(0.97); }
 
-        .back-link { display: inline-block; color: #8295A0; font-size: 14px; text-decoration: none; cursor: pointer; font-weight: 600; transition: color 0.2s; }
-        .back-link:hover { color: #C58A45; }
+        .back-link { display: inline-block; color: #00F0FF; font-size: 14px; text-decoration: none; cursor: pointer; font-weight: 600; transition: color 0.2s; }
+        .back-link:hover { color: #FF007F; }
 
         .leaderboard {
-            background: rgba(23, 25, 27, 0.45);
-            border: 1px solid rgba(130, 149, 160, 0.12);
+            background: rgba(20, 10, 30, 0.45);
+            border: 1px solid rgba(0, 240, 255, 0.12);
             border-radius: 16px; padding: 12px; margin-bottom: 20px;
             max-height: 150px; overflow-y: auto; text-align: left;
         }
-        .leaderboard-title { color: #D9A05B; font-weight: 700; text-align: center; margin-bottom: 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; }
+        .leaderboard-title { color: #FF4DA6; font-weight: 700; text-align: center; margin-bottom: 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; }
         .leaderboard-row { display: flex; justify-content: space-between; color: #E4E7E5; font-size: 14px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .leaderboard-row:last-child { border-bottom: none; }
         .leaderboard-row span:first-child { color: #A7AAA8; }
-        .leaderboard-row span:last-child { font-weight: 700; color: #C58A45; }
+        .leaderboard-row span:last-child { font-weight: 700; color: #FF007F; }
 
         @keyframes popIn { from { transform: scale(0.82); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
@@ -269,11 +269,12 @@
         let clouds = [];          // фоновые клубы дыма
 
         const bgColors = {
-            night: ['#17191B', '#202326'],
-            day: ['#8295A0', '#E4E7E5'],
-            sunset: ['#94613C', '#C58A45'],
-            autumn: ['#5E1F1F', '#D84315'],
-            morning: ['#A7AAA8', '#E4E7E5']
+            // Vice City: розово-фиолетовый закат во всех режимах
+            night: ['#2B0A4E', '#14051F'],
+            day: ['#FF6EC7', '#00F0FF'],
+            sunset: ['#FF007F', '#7B2FF7'],
+            autumn: ['#B31283', '#FF6EC7'],
+            morning: ['#00F0FF', '#FF9DE2']
         };
         let currentPalette = bgColors.night;
 
@@ -401,7 +402,7 @@
                         vx: (Math.random() - 0.5) * 6,
                         vy: Math.random() * 3 + 1,
                         life: 1,
-                        color: Math.random() > 0.5 ? 'rgba(197, 138, 69, 0.25)' : 'rgba(130, 149, 160, 0.25)',
+                        color: Math.random() > 0.5 ? 'rgba(255, 0, 127, 0.25)' : 'rgba(0, 240, 255, 0.25)',
                         size: Math.random() * 4 + 2
                     });
                 }
@@ -459,8 +460,8 @@
                 document.getElementById('leaderboardListStart').innerHTML = html;
                 document.getElementById('leaderboardListGameOver').innerHTML = html;
             } catch (e) {
-                document.getElementById('leaderboardListStart').innerHTML = '<div style="color:#8295A0; font-size:12px; text-align:center;">Не удалось загрузить</div>';
-                document.getElementById('leaderboardListGameOver').innerHTML = '<div style="color:#8295A0; font-size:12px; text-align:center;">Не удалось загрузить</div>';
+                document.getElementById('leaderboardListStart').innerHTML = '<div style="color:#00F0FF; font-size:12px; text-align:center;">Не удалось загрузить</div>';
+                document.getElementById('leaderboardListGameOver').innerHTML = '<div style="color:#00F0FF; font-size:12px; text-align:center;">Не удалось загрузить</div>';
             }
         }
 
@@ -478,7 +479,7 @@
 
         // Салют: 2–3 золотых burst-а в случайных точках верхней части экрана
         function spawnBurst(x, y, count, power) {
-            const colors = ['#E8C79B', '#C58A45', '#D9A05B', '#8295A0', '#E4E7E5'];
+            const colors = ['#E8C79B', '#FF007F', '#FF4DA6', '#00F0FF', '#E4E7E5'];
             for (let i = 0; i < count; i++) {
                 const a = Math.random() * Math.PI * 2;
                 const v = Math.random() * power;
@@ -567,13 +568,14 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             if (timeOfDay === 'night' || timeOfDay === 'autumn') {
-                ctx.shadowBlur = 50; ctx.shadowColor = '#C58A45'; ctx.fillStyle = '#C58A45';
+                ctx.shadowBlur = 50; ctx.shadowColor = '#FF007F'; ctx.fillStyle = '#FF007F';
                 ctx.beginPath(); ctx.arc(canvas.width * 0.8, 100, 40, 0, Math.PI * 2); ctx.fill();
             } else if (timeOfDay === 'day' || timeOfDay === 'morning') {
-                ctx.shadowBlur = 60; ctx.shadowColor = '#E4E7E5'; ctx.fillStyle = '#E4E7E5';
+                ctx.shadowBlur = 60; ctx.shadowColor = '#FFF0F5'; ctx.fillStyle = '#FFF0F5';
                 ctx.beginPath(); ctx.arc(canvas.width * 0.8, 100, 50, 0, Math.PI * 2); ctx.fill();
             } else {
-                ctx.shadowBlur = 50; ctx.shadowColor = '#94613C'; ctx.fillStyle = '#94613C';
+                // Закатное солнце Vice City — горячий розовый диск
+                ctx.shadowBlur = 50; ctx.shadowColor = '#FF4DA6'; ctx.fillStyle = '#FF4DA6';
                 ctx.beginPath(); ctx.arc(canvas.width * 0.8, canvas.height * 0.4, 80, 0, Math.PI * 2); ctx.fill();
             }
             ctx.shadowBlur = 0;
@@ -585,10 +587,11 @@
             for (let b of buildings) {
                 let x = (b.x - bgOffset) % 3000;
                 if (x < -100) x += 3000;
-                ctx.fillStyle = (timeOfDay === 'day' || timeOfDay === 'morning') ? '#292725' : '#111315';
+                ctx.fillStyle = (timeOfDay === 'day' || timeOfDay === 'morning') ? '#241733' : '#0F0817';
                 ctx.fillRect(x, canvas.height - b.h, b.w, b.h);
                 if (timeOfDay !== 'day' && timeOfDay !== 'morning') {
-                    ctx.fillStyle = timeOfDay === 'sunset' ? 'rgba(197, 138, 69, 0.6)' : '#C58A45';
+                    // Окна зданий светятся неоном: розовый на закате, голубой ночью
+                    ctx.fillStyle = timeOfDay === 'sunset' ? 'rgba(255, 0, 127, 0.6)' : '#00F0FF';
                     for (let wy = canvas.height - b.h + 10; wy < canvas.height - 15; wy += 20) {
                         for (let wx = x + 8; wx < x + b.w - 10; wx += 15) {
                             if ((wx + wy) % 4 !== 0) ctx.fillRect(wx, wy, 6, 8);
@@ -598,7 +601,7 @@
             }
 
             if (weather === 'rain' || weather === 'storm') {
-                ctx.strokeStyle = 'rgba(130, 149, 160, 0.5)'; ctx.lineWidth = 1.5;
+                ctx.strokeStyle = 'rgba(0, 240, 255, 0.5)'; ctx.lineWidth = 1.5;
                 for (let p of weatherParticles) {
                     ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - 5, p.y + p.length); ctx.stroke();
                     p.y += p.speed; p.x -= 2;
@@ -625,7 +628,7 @@
             } else if (weather === 'leaves') {
                 for (let p of weatherParticles) {
                     ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
-                    ctx.fillStyle = Math.random() > 0.5 ? '#94613C' : '#C58A45';
+                    ctx.fillStyle = Math.random() > 0.5 ? '#B0005C' : '#FF007F';
                     ctx.beginPath(); ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2); ctx.fill();
                     ctx.restore();
                     p.y += p.speed; p.x += p.drift; p.rot += 0.02;
@@ -656,14 +659,14 @@
                         if (imgTop.naturalWidth > 0) {
                             ctx.drawImage(imgTop, 0, 0, PIPE_WIDTH, imgHTop);
                         } else {
-                            ctx.fillStyle = '#8295A0';
+                            ctx.fillStyle = '#00F0FF';
                             ctx.fillRect(0, 0, PIPE_WIDTH, imgHTop);
                         }
                     } else {
                         if (imgTop.naturalWidth > 0) {
                             ctx.drawImage(imgTop, pipe.x, yTop - imgHTop, PIPE_WIDTH, imgHTop);
                         } else {
-                            ctx.fillStyle = '#8295A0';
+                            ctx.fillStyle = '#00F0FF';
                             ctx.fillRect(pipe.x, yTop - imgHTop, PIPE_WIDTH, imgHTop);
                         }
                     }
@@ -690,14 +693,14 @@
                         if (imgBottom.naturalWidth > 0) {
                             ctx.drawImage(imgBottom, 0, 0, PIPE_WIDTH, imgHBottom);
                         } else {
-                            ctx.fillStyle = '#8295A0';
+                            ctx.fillStyle = '#00F0FF';
                             ctx.fillRect(0, 0, PIPE_WIDTH, imgHBottom);
                         }
                     } else {
                         if (imgBottom.naturalWidth > 0) {
                             ctx.drawImage(imgBottom, pipe.x, yBottom, PIPE_WIDTH, imgHBottom);
                         } else {
-                            ctx.fillStyle = '#8295A0';
+                            ctx.fillStyle = '#00F0FF';
                             ctx.fillRect(pipe.x, yBottom, PIPE_WIDTH, imgHBottom);
                         }
                     }
@@ -710,10 +713,10 @@
         }
 
         function drawBird() {
-            // Мягкое янтарное сияние вокруг «птицы»
+            // Неоново-розовое сияние вокруг «птицы»
             ctx.save();
             ctx.shadowBlur = 24;
-            ctx.shadowColor = 'rgba(197, 138, 69, 0.55)';
+            ctx.shadowColor = 'rgba(255, 0, 127, 0.55)';
             ctx.drawImage(imgJuice, bird.x, bird.y, bird.width, bird.height);
             ctx.restore();
         }
@@ -738,7 +741,7 @@
                 if (p.img.naturalWidth > 0) {
                     ctx.drawImage(p.img, -p.w/2, -p.h/2, p.w, p.h);
                 } else {
-                    ctx.fillStyle = '#8295A0';
+                    ctx.fillStyle = '#00F0FF';
                     ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
                 }
                 ctx.restore();
@@ -839,7 +842,7 @@
                 }
 
                 // Искры: янтарь + холодный голубой
-                const sparkColors = ['#E8C79B', '#D9A05B', '#C58A45', '#8295A0', '#F7F1E6'];
+                const sparkColors = ['#E8C79B', '#FF4DA6', '#FF007F', '#00F0FF', '#F7F1E6'];
                 for (let i = 0; i < 46; i++) {
                     const a = Math.random() * Math.PI * 2;
                     const v = 2 + Math.random() * 9;
@@ -920,7 +923,7 @@
 
             // Тёплая вспышка на рубежах
             if (milestoneFlash > 0.02) {
-                ctx.fillStyle = `rgba(232, 199, 155, ${milestoneFlash * 0.28})`;
+                ctx.fillStyle = `rgba(255, 77, 166, ${milestoneFlash * 0.28})`;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 milestoneFlash *= 0.9;
             } else { milestoneFlash = 0; }
