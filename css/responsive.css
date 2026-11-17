@@ -13,14 +13,12 @@
     .referral-card { flex-direction: column; gap: 12px; text-align: center; }
     .referral-copy-btn { width: 100%; }
 
-    /* Длинный фон (портретный jpg): на телефоне cover относительно
-       всей высоты документа растягивает картинку в 5-6 раз.
-       Вместо этого показываем её вверху в естественной пропорции
-       (ширина 100%, высота ~ один экран), ниже — тёмный фолбэк.
-       Блюр на телефонах мягче: 3px вместо 4px (перф) */
+    /* Длинный фон (GTA 6 Edition): cover гарантирует, что картинка
+       закрывает всю высоту слоя body::before (весь документ) от верха
+       до низа, даже если контента мало. Блюр мягче: 3px вместо 4px (перф) */
     body::before {
-        background-size: auto, 100% auto, auto, auto;
-        background-position: top center, top center, top left, top right;
+        background-size: auto, cover, auto, auto;
+        background-position: top center;
         filter: blur(3px) saturate(1.15);
     }
 
@@ -48,18 +46,39 @@
         font-size: clamp(12px, 3.2vw, 13px);
     }
 
-    /* Hero: фиксируем высоту, чтобы вертикальная картинка
-       (assets/hero-mobile.jpg) показывалась крупно; центр кадра
+    /* Hero: компактный баннер 70vh, контент по центру
+       (детали раскладки — в base.css, здесь страховка от старых
+       фиксированных высот). Центр кадра вертикальной картинки
        — самый выигрышный, поэтому center center */
     .hero__box {
-        min-height: 480px;
+        min-height: 70vh;
         background-size: cover;
         background-position: center center;
     }
+
+    /* ===== ФУТЕР: юр-ссылки =====
+       Красивый перенос вместо некрасивых разрывов: flex-wrap с
+       равными промежутками, кегль 12px, разделители-точки убраны */
+    .footer__legal {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 6px 12px;
+        font-size: 12px;
+        line-height: 1.5;
+        margin-top: 8px;
+    }
+
+    .footer__legal a { font-size: 12px; }
+
+    /* Точки-разделители не нужны: расстыковку делает gap,
+       и в начале/конце переносимой строки не остаётся «висячих» точек */
+    .footer__legal .footer__divider { display: none; }
 }
 
 @media (max-width: 480px) {
-    .hero__box { min-height: 440px; }
+    .hero__box { min-height: 60vh; }
 
     .age-gate-modal__content,
     .login-modal__content,

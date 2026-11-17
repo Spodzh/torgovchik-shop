@@ -767,11 +767,14 @@ h1, h2 {
     .hero { padding: 10px 0 20px; }
 
     .hero__box {
-        min-height: 480px;
-        /* Вертикальный баннер 941x1672: центр кадра — самый выигрышный,
-           показываем именно его (полная высота картинки ~600px) */
-        padding: 40px 16px;
-        display: block;
+        /* Компактный баннер: 70vh вместо гигантских 480px+,
+           контент строго по центру по вертикали и горизонтали */
+        min-height: 70vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 32px 20px;
         background-image: url('../assets/hero-mobile.jpg');
         background-size: cover;
         background-position: center center;
@@ -796,9 +799,23 @@ h1, h2 {
 
     .hero__box::after { display: none; }
 
-    .hero__content { max-width: 100%; text-align: center; }
+    .hero__content {
+        max-width: 100%;
+        width: 100%;
+        text-align: center;
+    }
 
-    .hero__tag { display: none; }
+    /* Плашка Vice City: на мобильных тоже видна, меньшим кеглем */
+    .hero__tag {
+        display: inline-flex;
+        gap: 10px;
+        font-size: 10px;
+        letter-spacing: 2px;
+        margin-bottom: 14px;
+    }
+
+    .hero__tag::before { width: 22px; }
+
     .hero__leaf { display: none; }
 
     .hero__content h1 {
@@ -809,23 +826,41 @@ h1, h2 {
 
     .hero__content p {
         font-size: 13px;
-        margin-bottom: 18px;
+        margin-bottom: 20px;
         line-height: 1.5;
         margin-left: auto;
         margin-right: auto;
     }
 
+    /* Главная кнопка-акцент: неоновая розовая вывеска Vice City —
+       широкая, с обводкой и свечением */
     .hero__btn {
-        padding: 12px 26px;
+        width: 100%;
+        padding: 14px 24px;
         font-size: 13px;
+        background: rgba(255, 0, 127, 0.1);
+        color: #FF9BD4;
+        border: 2px solid var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow:
+            0 0 18px rgba(255, 0, 127, 0.35),
+            inset 0 0 14px rgba(255, 0, 127, 0.1);
+    }
+
+    .hero__btn:active {
+        background: rgba(255, 0, 127, 0.2);
+        box-shadow:
+            0 0 24px rgba(255, 0, 127, 0.5),
+            inset 0 0 18px rgba(255, 0, 127, 0.15);
     }
 }
 
 @media (max-width: 480px) {
-    .hero__box { min-height: 440px; padding: 32px 12px; }
+    .hero__box { min-height: 60vh; padding: 28px 14px; }
     .hero__content h1 { font-size: 20px; }
-    .hero__content p { font-size: 12px; margin-bottom: 14px; }
-    .hero__btn { padding: 11px 20px; font-size: 12px; }
+    .hero__content p { font-size: 12px; margin-bottom: 16px; }
+    .hero__btn { padding: 13px 16px; font-size: 12px; }
 }
 
 @media (max-width: 600px) {
