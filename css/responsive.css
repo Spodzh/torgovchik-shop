@@ -46,12 +46,13 @@
         font-size: clamp(12px, 3.2vw, 13px);
     }
 
-    /* Hero: компактный баннер 70vh, контент по центру
-       (детали раскладки — в base.css, здесь страховка от старых
-       фиксированных высот). Центр кадра вертикальной картинки
-       — самый выигрышный, поэтому center center */
+    /* Hero: компактный баннер ТОЛЬКО на мобильных — примерно вдвое
+       ниже прежних 70vh: 40vh с пиксельным полом 320px (max() страхует
+       низкие экраны, где 40vh меньше, чем сам контент). Раскладка
+       flex-центрирование и cover для hero-mobile.jpg — из base.css,
+       контент остаётся по центру и не вылезает за края */
     .hero__box {
-        min-height: 70vh;
+        min-height: max(320px, 40vh);
         background-size: cover;
         background-position: center center;
     }
@@ -78,7 +79,7 @@
 }
 
 @media (max-width: 480px) {
-    .hero__box { min-height: 60vh; }
+    .hero__box { min-height: max(300px, 35vh); }
 
     .age-gate-modal__content,
     .login-modal__content,
